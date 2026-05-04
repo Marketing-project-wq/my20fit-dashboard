@@ -1,0 +1,251 @@
+Update WeatherCard.jsx with a completely redesigned modern weather card that includes hourly forecast and activity recommendation.
+
+---
+
+INSTALL: No new packages needed.
+
+---
+
+FULL WeatherCard.jsx REWRITE:
+
+The card has these sections top to bottom:
+1. Current weather (temp + AQI box)
+2. Stats row (4 metrics)
+3. Activity recommendation banner
+4. Divider + "NEXT 12 HOURS" hourly scroll
+5. Updated timestamp
+
+---
+
+WEATHER API:
+
+Use WeatherAPI forecast endpoint (NOT current):
+const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${lat},${lon}&days=2&aqi=yes&alerts=no`
+
+This returns both current + hourly data.
+
+From response, extract:
+- current: data.current.temp_c, feelslike_c, condition.text, condition.code, humidity, uv, wind_kph, air_quality.pm2_5, is_day
+- hourly: data.forecast.forecastday[0].hour + data.forecast.forecastday[1].hour
+  Filter hours from current hour forward, take next 12
+
+Geolocation logic (same as before):
+navigator.geolocation.getCurrentPosition(
+  (pos) => fetchWeather(pos.coords.latitude, pos.coords.longitude),
+  () => fetchWeather(-6.2088, 106.8456) // fallback Jakarta
+)
+
+Cache in localStorage 'my20fit_weather_cache' with 30-min TTL.
+
+---
+
+AQI CALCULATION from PM2.5:
+
+function pm25ToAqi(pm25) {
+  const bp = [
+    [0,12,0,50],[12.1,35.4,51,100],
+    [35.5,55.4,101,150],[55.5,150.4,151,200],
+    [150.5,250.4,201,300],[250.5,500.4,301,500]
+  ];
+  for(const [cL,cH,iL,iH] of bp)
+    if(pm25>=cL && pm25<=cH)
+      return Math.round(((iH-iL)/(cH-cL))*(pm25-cL)+iL);
+  return 500;
+}
+
+function aqiLabel(aqi) {
+  if(aqi<=50) return 'Good';
+  if(aqi<=100) return 'Moderate';
+  if(aqi<=150) return 'Unhealthy for Sensitive';
+  if(aqi<=200) return 'Unhealthy';
+  if(aqi<=300) return 'Very Unhealthy';
+  return 'Hazardous';
+}
+
+---
+
+WEATHER ICON MAPPING from condition.code:
+
+function weatherIcon(code, isDay) {
+  if(code===1000) return isDay ? '☀️' : '🌙';
+  if(code===1003) return isDay ? '⛅' : '☁️';
+  if([1006,1009].includes(code)) return '☁️';
+  if([1030,1135,1147].includes(code)) return '🌫️';
+  if([1063,1150,1153,1180,1183,1240].includes(code)) return '🌦️';
+  if([1186,1189,1192,1195,1243,1246].includes(code)) return '🌧️';
+  if([1087,1273,1276,1279,1282].includes(code)) return '⛈️';
+  return isDay ? '⛅' : '☁️';
+}
+
+---
+
+ACTIVITY RECOMMENDATION LOGIC:
+
+function getRecommendation(aqi, conditionCode, feelsLike) {
+  const isRain = [1063,1150,1153,1180,1183,1186,1189,1192,1195,
+                  1240,1243,1246].includes(conditionCode);
+  const isThunder = [1087,1273,1276,1279,1282].includes(conditionCode);
+  const isHot = feelsLike > 38;
+  const isBadAir = aqi > 100;
+
+  if(isThunder) return {
+    type: 'indoor',
+    icon: '🏋️',
+    tag: 'REKOMENDASI HARI INI',
+    title: 'Latihan Indoor Lebih Baik',
+    desc: 'Petir terdeteksi. Sangat berbahaya untuk aktivitas outdoor.',
+    pills: ['THUNDER ALERT', `AQI ${aqi}`]
+  };
+  if(isBadAir && isRain) return {
+    type: 'indoor',
+    icon: '🏋️',
+    tag: 'REKOMENDASI HARI INI',
+    title: 'Latihan Indoor Lebih Baik',
+    desc: 'Kualitas udara buruk ditambah hujan. Hindari olahraga outdoor hari ini.',
+    pills: [`AQI ${aqi} ${aqiLabel(aqi).toUpperCase()}`, 'HUJAN DERAS']
+  };
+  if(isBadAir) return {
+    type: 'indoor',
+    icon: '😷',
+    tag: 'KUALITAS UDARA BURUK',
+    title: 'Disarankan Indoor',
+    desc: `AQI ${aqi} — paparan PM2.5 tinggi berbahaya untuk paru-paru saat olahraga.`,
+    pills: [`AQI ${aqi}`, aqiLabel(aqi).toUpperCase(), 'BATASI OUTDOOR']
+  };
+  if(isRain) return {
+    type: 'indoor',
+    icon: '🌧️',
+    tag: 'CUACA TIDAK MENDUKUNG',
+    title: 'Pertimbangkan Indoor',
+    desc: 'Hujan saat ini. Olahraga outdoor mungkin tidak nyaman.',
+    pills: ['SEDANG HUJAN', `AQI ${aqi} OK`]
+  };
+  if(isHot) return {
+    type: 'indoor',
+    icon: '🌡️',
+    tag: 'SUHU TERLALU TINGGI',
+    title: 'Waspadai Heat Exhaustion',
+    desc: `Feels like ${feelsLike}° — risiko heat stroke tinggi. Pilih indoor atau olahraga pagi/malam.`,
+    pills: [`FEELS ${feelsLike}°`, 'HEAT RISK']
+  };
+  return {
+    type: 'outdoor',
+    icon: '🏃',
+    tag: 'KONDISI MENDUKUNG',
+    title: 'Oke untuk Outdoor!',
+    desc: `AQI ${aqi} dan cuaca cerah. Waktu yang baik untuk lari atau olahraga outdoor.`,
+    pills: [`AQI ${aqi} ${aqiLabel(aqi).toUpperCase()}`, 'CUACA BAIK']
+  };
+}
+
+---
+
+HOURLY DATA EXTRACTION:
+
+function extractHourly(forecastDays, count = 12) {
+  const allHours = forecastDays.flatMap(d => d.hour);
+  const nowMs = Date.now();
+  const hourBucket = Math.floor(nowMs / 3600000) * 3600000;
+  return allHours
+    .filter(h => new Date(h.time.replace(' ','T')).getTime() >= hourBucket)
+    .slice(0, count)
+    .map(h => {
+      const t = new Date(h.time.replace(' ','T'));
+      const hour = t.getHours();
+      const aqi = h.air_quality?.pm2_5 != null ? pm25ToAqi(h.air_quality.pm2_5) : null;
+      return {
+        time: hour===0?'12AM': hour<12?`${hour}AM`: hour===12?'12PM':`${hour-12}PM`,
+        icon: weatherIcon(h.condition.code, h.is_day===1),
+        temp: Math.round(h.temp_c),
+        aqi
+      };
+    });
+}
+
+---
+
+CARD DESIGN (inline styles, no new CSS file):
+
+Overall card: white bg, border-radius 16px, box-shadow subtle, overflow hidden
+
+Section 1 — TOP ROW (padding 20px, flex, space-between):
+LEFT side:
+  - Location row: red dot (6px circle, #C41101) + "CITYNAME · NOW"
+    Font: Bebas Neue 11px, letter-spacing 2.5px, muted color
+  - Temperature: Orbitron 64px weight 900, letter-spacing -2px
+    with superscript ° (Orbitron 28px)
+  - Condition text: Barlow Condensed 14px weight 500, muted
+  - Feels like: Barlow Condensed 12px, tertiary color
+
+RIGHT side — AQI BOX:
+  Background: #0A0908 (always dark)
+  Border-radius: 12px, padding 14px 16px, text-align center
+  - "AQI" label: Bebas Neue 9px, letter-spacing 2px, rgba(255,255,255,.45)
+  - AQI number: Orbitron 32px weight 900
+    Color by value: ≤50 #22C55E, ≤100 #EAB308, ≤150 #F97316, ≤200 #EF4444, else #DC2626
+  - Status: Bebas Neue 10px, letter-spacing 1.5px, same color as number
+
+Section 2 — STATS GRID (4 columns, border-top divider):
+Each stat: text-center, border-right on non-last
+  - Label: Bebas Neue 9px, letter-spacing 2px, tertiary
+  - Value: Orbitron 16px weight 700
+  - Unit: Barlow Condensed 11px, secondary
+Stats: HUMIDITY (%), UV INDEX (value + low/mod/high), WIND (km/h), PM2.5 (μg/m³)
+
+Section 3 — RECOMMENDATION BANNER (margin 0 16px 16px):
+Border-radius 12px, padding 14px 16px, flex, gap 12px
+
+Indoor type:
+  background: #FEF2F2, border: 1px solid #FECACA
+  Icon wrap (36px circle): background #FEE2E2
+  Tag: Bebas Neue 9px, letter-spacing 2px, color #B91C1C
+  Title: Bebas Neue 15px, #0A0908
+  Desc: Barlow Condensed 12px weight 500, #6B7280
+  Pills: background #FEE2E2, color #B91C1C, Bebas Neue 9px, border-radius 99px
+
+Outdoor type:
+  background: #F0FDF4, border: 1px solid #BBF7D0
+  Icon wrap: background #DCFCE7
+  Tag color: #15803D
+  Pills: background #DCFCE7, color #15803D
+
+Section 4 — HOURLY FORECAST:
+  "NEXT 12 HOURS" label: Bebas Neue 10px, letter-spacing 2.5px, padding 12px 20px 8px
+  Horizontal scroll row (no scrollbar, padding 0 20px 16px, gap 6px):
+  
+  Each hour cell (flex-shrink 0, width 64px, border-radius 10px, padding 10px 6px, text-center):
+    Default: background secondary, border 0.5px tertiary
+    Current hour (NOW): background #0A0908, border #0A0908
+    
+    - Time label: Bebas Neue 10px, letter-spacing 1.5px (white .5 opacity if NOW)
+    - Weather icon: 18px emoji
+    - Temp: Orbitron 13px weight 700 (white if NOW)
+    - AQI badge (if available): Bebas Neue 9px, border-radius 4px, padding 1px 5px
+      ≤100: green bg+text, ≤150: amber, >150: red
+
+Section 5 — UPDATED TIMESTAMP:
+  Barlow Condensed 11px, tertiary, text-right, padding 0 20px 14px
+  Text: "Updated X min ago · Geolocation"
+
+---
+
+LOADING STATE:
+Show skeleton placeholders (gray animated pulse) for temp, AQI, stats while fetching.
+Use CSS animation: @keyframes pulse { 0%,100%{opacity:.4} 50%{opacity:.8} }
+
+ERROR STATE:
+Show "—" for all values, small red text "Gagal memuat data cuaca" below location.
+
+---
+
+FONTS:
+These are already imported in index.css. Use them via inline style:
+fontFamily: "'Bebas Neue', sans-serif"
+fontFamily: "'Orbitron', monospace"  
+fontFamily: "'Barlow Condensed', sans-serif"
+
+---
+
+Keep all other components (Greeting, MCU, Checklist, etc.) completely unchanged.
+Only modify WeatherCard.jsx.
+After updating, verify the app builds with no errors: npm run build
