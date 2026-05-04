@@ -1,0 +1,291 @@
+# Replit Agent Prompt — my20fit Web Dashboard (React + Vite)
+
+---
+
+## PROMPT
+
+```
+Build a responsive React + Vite web app called "my20fit" — a fitness member dashboard.
+No phone frame wrapper. The app fills the full browser viewport directly.
+
+---
+
+TECH STACK:
+- React 18 + Vite
+- Tailwind CSS (for layout and spacing)
+- Lucide React (for icons)
+- Google Fonts: Bebas Neue, Barlow Condensed, Orbitron, Inter
+- No backend yet — all dummy data hardcoded
+
+---
+
+DESIGN SYSTEM:
+
+Colors (CSS variables in index.css):
+--red: #C41101
+--green: #22C55E
+--blue: #3B82F6
+--gold: #FFD700
+--orange: #F97316
+--purple: #A855F7
+--cyan: #06B6D4
+--pink: #F43F5E
+
+Dark theme:
+--bg: #0A0A0A
+--card: #131313
+--card2: #1A1A1A
+--border: #1F1F1F
+--text: #F0F0F0
+--muted: #777777
+
+Light theme (DEFAULT):
+--bg: #F4F2EE
+--card: #FFFFFF
+--card2: #F0EDE5
+--border: transparent
+--border-subtle: #E5E1D8
+--text: #0A0908
+--text-soft: #36322D
+--muted: #6E665C
+--shadow: 0 1px 2px rgba(20,17,12,.04), 0 1px 8px rgba(20,17,12,.05)
+
+Fonts:
+- Display headlines: 'Bebas Neue', sans-serif
+- Body: 'Barlow Condensed', system-ui
+- Numbers/mono: 'Orbitron', monospace
+
+---
+
+LAYOUT:
+
+The app has NO phone frame. It's a full-width responsive web app.
+
+Desktop (≥ 1024px):
+- Max content width: 720px, centered
+- Left sidebar (240px) with navigation — fixed position
+- Main content area scrollable
+- 2-column grid for some sections (checkin tiles, MCU stats)
+
+Tablet (768–1023px):
+- No sidebar — top navigation bar
+- Max content width: 100%, padding 24px
+- 2-column grid maintained
+
+Mobile (< 768px):
+- Full width, padding 16px
+- Single column
+- Bottom navigation bar (5 tabs)
+
+---
+
+THEME TOGGLE:
+
+- Default: LIGHT mode
+- Toggle button in header (sun/moon icon)
+- Saves preference to localStorage key 'my20fit_theme'
+- Apply theme class 'dark' on <html> element
+- All colors use CSS variables — toggle just swaps the variable values
+
+---
+
+PAGES / ROUTING:
+
+For now: single page dashboard (no React Router needed yet).
+Later will add: /login, /profile, /events pages.
+
+---
+
+SECTIONS (render all, in this order):
+
+1. HEADER (sticky top)
+   - Logo: "my20fit" — Bebas Neue, with red "20"
+   - Greeting: "Good Morning, ZIDNI 👋" — dynamic time-based greeting
+   - Theme toggle button (sun/moon)
+   - Avatar placeholder (circle with initials "ZD")
+
+2. PINNED REMINDER
+   Card with left red border (3px), pin icon, text:
+   "📌 First-week checklist: upload MCU, scan your face, book first session."
+
+3. WEATHER CARD
+   Location: Jakarta
+   Data (hardcoded for now, will be replaced with API later):
+   - Temp: 31°C, Feels like: 34°C
+   - Condition: Hazy
+   - Humidity: 72%, UV: 8, Wind: 6 km/h
+   - AQI: 78, Status: "Moderate"
+   Layout: big temperature number (Orbitron font) on left,
+   AQI box on right (dark background in light mode for contrast)
+   Note: "Will be replaced with WeatherAPI geolocation data later"
+
+4. MEDICAL CHECKUP (empty state)
+   Large empty state card with:
+   - Bandage icon (from Lucide or custom SVG)
+   - Title: "No MCU on file yet"
+   - Description: "Upload your medical checkup results and 20FIT Sport Clinic
+     will review them to give you a training & nutrition program tailored to your body."
+   - 4 feature tiles (2x2 grid):
+     * 🔬 Reviewed by doctor
+     * 🎯 Personalized
+     * ⚡ 3-5 business days
+     * 🔒 Private & secure
+   - CTA buttons: "UPLOAD MCU RESULTS" (red) + "BOOK MCU FIRST" (secondary)
+
+5. TODAY'S CHECKLIST
+   Daily header card:
+   - Left: "TODAY" label + date (e.g. "Mon 4 May")
+   - Right: "3/5" progress (Orbitron) + "COMPLETE" label
+   - Bottom: progress bar (black fill, animated width)
+
+   5 checklist items (cards):
+   - ✓ 30-min cardio | "based on your cholesterol" | HIGH · 30 MIN · GYM | done
+   - ✓ Hit fiber target | "30g today" | HOME | done
+   - ✓ 10-min stretch | "before bed" | 10 MIN · HOME | done
+   - ○ Skip fried food | "recovery day" | MED | not done
+   - ○ Sleep by 23:00 | "7h+ target" | HIGH | not done
+
+   INTERACTION: clicking a checklist item toggles done/undone with animation:
+   - Circle: empty → green checkmark (spring bounce + SVG draw animation)
+   - Title: strikethrough sweep animation
+   - When all 5 done:
+     * Header card turns dark green
+     * Header text changes to "ALL DONE TODAY!"
+     * Confetti falls from top of viewport (60 particles, colorful)
+     * After 2s: confetti stops, header stays green permanently
+
+6. QUICK CHECK-IN
+   Section title: "QUICK CHECK-IN"
+   4 tiles in 2x2 grid (desktop) / 2x2 (mobile):
+   - 🌙 Menstrual Cycle | "Not set" | pink accent
+   - 😊 Daily Wellness | "Not logged" | green accent
+   - 💤 Sleep Quality | "Not logged" | purple accent
+   - 💧 Water Intake | "0 / 2.5L" | cyan accent
+
+7. MY MOMENTS (empty state)
+   - Large face scan card
+   - Emoji face circle with blue dashed border
+   - Title: "Scan your face once, photos auto-tagged forever"
+   - Description + 3 steps
+   - CTA: "SCAN MY FACE NOW" (blue button)
+   - Privacy note at bottom
+
+8. SPORTS EVENTS
+   Section title: "UPCOMING SPORTS EVENTS"
+   2 featured event cards:
+   - 🇮🇩 SportFest Vol.3 by 20FIT | 29-31 May 2026 · Menteng Prada | ⏰ 31 days | REGISTER →
+   - 🇮🇩 HYROX Jakarta 2026 | 6-7 Jun 2026 · NICE, PIK2 | ⏰ 51 days | REGISTER →
+
+   Horizontal scroll row of mini cards:
+   - 🇦🇪 HYROX World C. | 12 Jun 2026 | ⏰ 45d
+   - 🇸🇬 HYROX Singapore | 15 Aug 2026 | ⏰ 109d
+   - 🌏 Ironman 70.3 Bintan | 23 Aug 2026 | ⏰ 117d
+   - 🇮🇩 Jakarta Marathon | 26 Oct 2026 | ⏰ 181d
+
+9. 20FIT PLUS (bottom upsell)
+   Dark card (dark background even in light mode):
+   - Badge: "⭐ 20FIT PLUS"
+   - Headline: "START SMART. SAVE 10%."
+   - Subtext: "New here? Plus pays for itself after 2 sessions."
+   - 4 discount tiles (2x2): "10% Arena", "10% Clinic", "10% PT", "10% Shop"
+   - Feature list (4 items)
+   - Price: Rp 49.000/mo + "UPGRADE →" button (gold)
+
+---
+
+BOTTOM NAVIGATION (mobile only, fixed bottom):
+5 tabs with icons and labels:
+- 🏠 Home (active)
+- 📊 Progress
+- 📅 Events
+- 📸 Moments
+- 👤 Profile
+
+---
+
+SECTION HEADERS STYLE:
+- Use custom SVG icons (not emoji) for section headers:
+  * Medical Checkup: bandage/bandaid SVG icon
+  * Today's Checklist: calendar-check SVG icon
+  * My Moments: images/photos SVG icon
+  * Others: appropriate Lucide icons
+- Section head: Bebas Neue 11px, letter-spacing 2.5px, uppercase
+- Thin bottom border line (1px)
+- Right side: date or action link
+
+---
+
+CARD STYLE (light mode):
+- Background: #FFFFFF
+- Border: none
+- Box shadow: 0 1px 2px rgba(20,17,12,.04), 0 1px 8px rgba(20,17,12,.05)
+- Border radius: 14px
+- Padding: 18px
+
+CARD STYLE (dark mode):
+- Background: #131313
+- Border: 1px solid #1F1F1F
+- Box shadow: none
+- Border radius: 14px
+
+---
+
+ANIMATIONS:
+- Page load: sections fade+slide up with stagger (0.1s per section)
+- Checklist item check: spring bounce circle + checkmark draw + strikethrough sweep
+- Progress bar: smooth CSS transition width
+- Confetti: 60 particles fall from viewport top, random colors
+- Theme toggle: smooth CSS transition on all color variables (0.3s)
+- Hover on cards: subtle lift (translateY -2px) + shadow increase
+- Hover on buttons: lift + glow
+
+---
+
+RESPONSIVE NOTES:
+- No horizontal scroll (except events mini scroll row)
+- All text minimum 16px on mobile (prevent iOS zoom)
+- Touch targets minimum 44px height
+- Bottom nav only visible on mobile (< 768px)
+- Sidebar only visible on desktop (≥ 1024px)
+
+---
+
+FILE STRUCTURE:
+src/
+  App.jsx                    — theme toggle, layout wrapper
+  main.jsx
+  index.css                  — CSS variables, global styles, fonts
+  components/
+    Header.jsx               — sticky header with logo + greeting + toggle
+    PinnedReminder.jsx
+    WeatherCard.jsx           — hardcoded data, comment: "TODO: WeatherAPI"
+    MedicalCheckup.jsx        — empty state
+    TodaysChecklist.jsx       — with full interaction + confetti
+    QuickCheckin.jsx
+    MyMoments.jsx             — empty state
+    SportsEvents.jsx
+    PlusCard.jsx
+    BottomNav.jsx             — mobile only
+    Sidebar.jsx               — desktop only
+
+---
+
+IMPORTANT NOTES:
+- Weather data is hardcoded. Add comment: "// TODO: Replace with WeatherAPI geolocation"
+- Greeting name is hardcoded as "ZIDNI". Add comment: "// TODO: Replace with auth user name"
+- All data is static. Add comment: "// TODO: Connect to Supabase"
+- Use CSS variables for ALL colors — never hardcode hex values in components
+- The app must work perfectly on: iPhone SE (375px), iPhone 15 Pro (393px),
+  iPad (768px), MacBook (1440px)
+- Run npm run build at the end to verify no errors
+
+---
+
+DELIVERABLES:
+- Working React + Vite app
+- All 9 sections rendered
+- Theme toggle functional (light default)
+- Checklist interaction with confetti
+- Fully responsive (mobile + tablet + desktop)
+- No build errors
+```

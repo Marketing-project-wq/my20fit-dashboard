@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "my20fit Dashboard"
+version = "1.0.0"
+id = "artifacts/my20fit"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20175
+
+[services.development]
+run = "pnpm --filter @workspace/my20fit run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/my20fit", "run", "build" ]
+publicDir = "artifacts/my20fit/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20175"
+BASE_PATH = "/"
