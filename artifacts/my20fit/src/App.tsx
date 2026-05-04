@@ -1,37 +1,45 @@
+import { useEffect, useState } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
+import Dashboard from "@/pages/Dashboard";
 
 const queryClient = new QueryClient();
 
-function Home() {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Replit Agent is building...</h1>
-        <p className="mt-2 text-sm text-gray-600">Your app will appear here once it's ready.</p>
-      </div>
-    </div>
-  );
-}
-
-function Router() {
+function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
 function App() {
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem('my20fit_theme') || 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('my20fit_theme', theme);
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(t => t === 'light' ? 'dark' : 'light');
+  };
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
+          <Router theme={theme} toggleTheme={toggleTheme} />
         </WouterRouter>
         <Toaster />
       </TooltipProvider>
