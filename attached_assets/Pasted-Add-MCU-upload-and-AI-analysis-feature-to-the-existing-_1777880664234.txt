@@ -1,0 +1,105 @@
+Add MCU upload and AI analysis feature to the existing my20fit dashboard.
+
+BACKEND (add to existing Express server or create server.js):
+
+1. Install dependencies:
+   npm install express multer @anthropic-ai/sdk cors dotenv
+
+2. Create/update server.js with these endpoints:
+
+   POST /api/analyze-mcu
+   - Accept multipart form data (file upload)
+   - Accept: JPG, PNG, PDF, max 10MB
+   - Convert file to base64
+   - Send to Claude API (claude-opus-4-5) with this prompt:
+   
+   System prompt:
+   "You are a medical data analyst for 20FIT Sport Clinic Indonesia. 
+   Analyze this medical checkup (MCU) document and return a JSON response only.
+   No markdown, no explanation outside JSON."
+   
+   User prompt:
+   "Analyze this MCU document. Return ONLY valid JSON with this exact structure:
+   {
+     'summary': 'Brief 2-sentence overall health summary in Bahasa Indonesia',
+     'grade': 'A/B/C/D based on overall health',
+     'metrics': [
+       {'label': 'metric name', 'value': 'value with unit', 'status': 'ok/high/low/warning', 'note': 'brief note'}
+     ],
+     'recommendations': ['recommendation 1', 'recommendation 2', ...],
+     'checklist': [
+       {'icon': 'emoji', 'title': 'task title', 'reason': 'why this task', 'priority': 'high/med/low', 'duration': number_or_null, 'location': 'gym/home/clinic/null'},
+       ... (generate 5 personalized daily tasks based on the MCU results)
+     ],
+     'doctor_notes': 'Key medical findings in Bahasa Indonesia',
+     'reviewed_at': 'today date'
+   }"
+   
+   - Return the JSON to frontend
+   - Handle errors gracefully
+
+3. Add CORS for frontend origin
+4. Store ANTHROPIC_API_KEY in Replit Secrets (env var)
+5. Server listens on process.env.PORT || 3000
+
+FRONTEND changes to MedicalCheckup.jsx:
+
+1. Make "UPLOAD MCU RESULTS" button functional:
+   - onClick: trigger hidden <input type="file" accept=".jpg,.jpeg,.png,.pdf">
+   - Show file picker when clicked
+
+2. Upload flow with 3 states:
+   
+   STATE 1 - UPLOADING (show after file selected):
+   - Overlay on the card
+   - Animated progress bar
+   - Text: "Menganalisis dokumen MCU kamu..."
+   - Subtext: "AI sedang membaca hasil pemeriksaan" 
+   - Spinner animation
+   
+   STATE 2 - SUCCESS (show after API returns):
+   - Replace empty state with MCU Results view:
+   
+   MCU RESULTS VIEW:
+   - Grade badge (A/B/C/D) — large, colored:
+     A = green, B = blue, C = orange, D = red
+   - "YOUR HEALTH BASELINE" headline (Bebas Neue)
+   - Summary text (from AI)
+   - Doctor notes section
+   - Metrics grid: each metric shows label, value, status badge (OK/HIGH/LOW)
+   - "Reviewed by AI · [date]" footer note
+   - Small "Upload new MCU" link at bottom
+   
+   STATE 3 - ERROR:
+   - Error message
+   - "Coba lagi" button
+
+3. After successful analysis, dispatch custom event:
+   window.dispatchEvent(new CustomEvent('mcu-analyzed', { detail: result }))
+
+FRONTEND changes to TodaysChecklist.jsx:
+
+1. Listen for 'mcu-analyzed' event:
+   window.addEventListener('mcu-analyzed', (e) => {
+     setChecklistItems(e.detail.checklist)
+   })
+
+2. Also on component mount, check localStorage for 'my20fit_mcu_result':
+   const saved = localStorage.getItem('my20fit_mcu_result')
+   if (saved) setChecklistItems(JSON.parse(saved).checklist)
+
+3. Show "Personalized from your MCU" badge on checklist header when MCU data exists
+
+LOCALSTORAGE:
+- Save full AI result to: localStorage.setItem('my20fit_mcu_result', JSON.stringify(result))
+- Load on app start: if key exists, show MCU results view (not empty state)
+- Clear option: "Upload new MCU" clears the key and shows empty state again
+
+REPLIT SECRETS:
+- Add instruction: "Add ANTHROPIC_API_KEY to Replit Secrets before running"
+
+IMPORTANT:
+- Keep all existing dashboard functionality intact
+- Only modify MedicalCheckup.jsx and TodaysChecklist.jsx on frontend
+- All other components remain unchanged
+- Test the upload flow works end to end
