@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Dumbbell, CloudRain, CloudLightning, Wind, Thermometer, PersonStanding } from "lucide-react";
 
 interface HourlyItem {
   time: string;
@@ -75,7 +76,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
 
   if (isThunder) return {
     type: "indoor",
-    icon: "🏋️",
+    icon: <CloudLightning size={20} color="#B91C1C" />,
     tag: "REKOMENDASI HARI INI",
     title: "Latihan Indoor Lebih Baik",
     desc: "Petir terdeteksi. Sangat berbahaya untuk aktivitas outdoor.",
@@ -83,7 +84,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
   };
   if (isBadAir && isRain) return {
     type: "indoor",
-    icon: "🏋️",
+    icon: <Dumbbell size={20} color="#B91C1C" />,
     tag: "REKOMENDASI HARI INI",
     title: "Latihan Indoor Lebih Baik",
     desc: "Kualitas udara buruk ditambah hujan. Hindari olahraga outdoor hari ini.",
@@ -91,7 +92,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
   };
   if (isBadAir) return {
     type: "indoor",
-    icon: "😷",
+    icon: <Wind size={20} color="#B91C1C" />,
     tag: "KUALITAS UDARA BURUK",
     title: "Disarankan Indoor",
     desc: `AQI ${aqi} — paparan PM2.5 tinggi berbahaya untuk paru-paru saat olahraga.`,
@@ -99,7 +100,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
   };
   if (isRain) return {
     type: "indoor",
-    icon: "🌧️",
+    icon: <CloudRain size={20} color="#B91C1C" />,
     tag: "CUACA TIDAK MENDUKUNG",
     title: "Pertimbangkan Indoor",
     desc: "Hujan saat ini. Olahraga outdoor mungkin tidak nyaman.",
@@ -107,7 +108,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
   };
   if (isHot) return {
     type: "indoor",
-    icon: "🌡️",
+    icon: <Thermometer size={20} color="#B91C1C" />,
     tag: "SUHU TERLALU TINGGI",
     title: "Waspadai Heat Exhaustion",
     desc: `Feels like ${feelsLike}° — risiko heat stroke tinggi. Pilih indoor atau olahraga pagi/malam.`,
@@ -115,7 +116,7 @@ function getRecommendation(aqi: number, conditionCode: number, feelsLike: number
   };
   return {
     type: "outdoor",
-    icon: "🏃",
+    icon: <PersonStanding size={20} color="#15803D" />,
     tag: "KONDISI MENDUKUNG",
     title: "Oke untuk Outdoor!",
     desc: `AQI ${aqi} dan cuaca cerah. Waktu yang baik untuk lari atau olahraga outdoor.`,
