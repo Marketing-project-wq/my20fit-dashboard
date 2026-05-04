@@ -1,0 +1,76 @@
+Redesign the entire app to match this design system exactly:
+
+FONTS: Import from Google Fonts:
+- 'Bebas Neue' for all headings, labels, section titles, nav items
+- 'Barlow Condensed' for body text
+- 'Orbitron' for numbers (AQI, temperature, progress)
+
+COLORS (light mode default):
+--bg: #F4F2EE
+--card: #FFFFFF  
+--text: #0A0908
+--muted: #6E665C
+--red: #C41101
+
+SIDEBAR (desktop ≥1024px):
+- Background: #0A0A0A (always dark, even in light mode)
+- Logo: "my20FIT" in Bebas Neue, white text
+- Nav items: white text, Bebas Neue font, letter-spacing 2px
+- Active item: red background #C41101, no rounded corners on left side
+- User avatar "ZD": circle at bottom
+- Dark mode toggle button at very bottom
+- Width: 220px, fixed position
+
+HEADER (top, only visible on mobile):
+- Logo + theme toggle only
+- No greeting in header
+
+MAIN CONTENT area:
+- Background: #F4F2EE (light) / #0A0A0A (dark)
+- Max width: 720px centered
+- Padding: 32px 24px
+
+SECTION HEADERS style:
+- Font: Bebas Neue, 11px, letter-spacing: 3px, uppercase
+- Thin 1px bottom border
+- Color: #0A0908 (light) / #F0F0F0 (dark)
+
+GREETING section (top of content, before pinned reminder):
+- Tag: "GOOD MORNING, ZIDNI 👋" — Bebas Neue 11px, letter-spacing 2px, muted color
+- Title: "WELCOME TO 20FIT" — Bebas Neue 28px
+- Message body: Barlow Condensed 13px, muted
+
+CARDS style (light mode):
+- Background: #FFFFFF
+- No border
+- Box shadow: 0 1px 2px rgba(20,17,12,.04), 0 1px 8px rgba(20,17,12,.05)
+- Border radius: 14px
+- Padding: 18px 20px
+
+WEATHER CARD:
+- Temperature: Orbitron font, 44px, weight 800
+- AQI box: pure black #0A0908 background, white text, right side
+- AQI number: Orbitron font
+- Labels: Bebas Neue, uppercase, tracked
+
+CHECKLIST items:
+- Each item is a white floating card
+- Circle on left (empty = border only, done = solid green #22C55E with white checkmark)
+- Title: Barlow Condensed 600 weight
+- Tags (HIGH, 30 MIN, GYM): outlined pills, Bebas Neue font
+
+PLUS CARD:
+- Always dark background: linear-gradient(135deg, #1A1A0F, #0A0A05)
+- Gold accent color: #D4A800
+- Headline: Bebas Neue 32px
+- Even in light mode, this card stays dark
+
+BOTTOM NAV (mobile <768px only):
+- Background: #0A0A0A (always dark)
+- Icons + labels in Bebas Neue
+- Active: red #C41101
+- 5 tabs: Home, Progress, Events, Moments, Profile
+
+Remove all rounded pill styles from nav items.
+Apply Bebas Neue to ALL navigation labels, section titles, and buttons.
+Keep all existing functionality (checklist interaction, confetti, theme toggle).

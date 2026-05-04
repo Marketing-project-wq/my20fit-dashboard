@@ -231,7 +231,7 @@
 .section-header {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 11px;
-  letter-spacing: 2.5px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 8px;
@@ -239,5 +239,5 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: var(--text-soft);
+  color: var(--text);
 }
