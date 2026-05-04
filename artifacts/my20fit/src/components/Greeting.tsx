@@ -14,23 +14,23 @@ export default function Greeting() {
           fontSize: '11px',
           letterSpacing: '2px',
           color: 'var(--muted)',
-          marginBottom: '4px',
+          marginBottom: '2px',
         }}
       >
         {getGreeting()}, ZIDNI 👋
       </p>
-      <h2
+      <h1
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: '28px',
+          fontSize: '48px',
           letterSpacing: '2px',
           color: 'var(--text)',
-          lineHeight: 1.1,
+          lineHeight: 1,
           marginBottom: '6px',
         }}
       >
-        WELCOME TO 20FIT
-      </h2>
+        ZIDNI
+      </h1>
       <p
         style={{
           fontFamily: "'Barlow Condensed', system-ui",

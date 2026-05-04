@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import Header from "@/components/Header";
 import Greeting from "@/components/Greeting";
-import PinnedReminder from "@/components/PinnedReminder";
 import WeatherCard from "@/components/WeatherCard";
 import MedicalCheckup from "@/components/MedicalCheckup";
 import TodaysChecklist from "@/components/TodaysChecklist";
@@ -38,7 +37,6 @@ export default function Dashboard({ theme, toggleTheme }: { theme: string; toggl
             className="flex-1 w-full flex flex-col"
           >
             <motion.div variants={item}><Greeting /></motion.div>
-            <motion.div variants={item}><PinnedReminder /></motion.div>
             <motion.div variants={item}><WeatherCard /></motion.div>
             <motion.div variants={item}><MedicalCheckup /></motion.div>
             <motion.div variants={item}><TodaysChecklist /></motion.div>

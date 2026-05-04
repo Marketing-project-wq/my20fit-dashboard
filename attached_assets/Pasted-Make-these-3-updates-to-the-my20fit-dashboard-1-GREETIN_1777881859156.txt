@@ -1,0 +1,85 @@
+Make these 3 updates to the my20fit dashboard:
+
+---
+
+1. GREETING — make the user name much bigger:
+- "GOOD MORNING, ZIDNI 👋" tag line: keep small (Bebas Neue 11px, muted, tracked)
+- Main title "WELCOME TO 20FIT" or user name "ZIDNI": increase to Bebas Neue 48px, bold, full color (--text)
+- The name should be the most visually dominant element in the greeting card
+
+---
+
+2. PINNED REMINDER — remove it completely:
+- Delete the PinnedReminder component
+- Remove its import and usage from App.jsx or wherever it's rendered
+- Remove the file PinnedReminder.jsx
+
+---
+
+3. WEATHER — replace hardcoded data with live WeatherAPI + geolocation:
+
+In WeatherCard.jsx, implement this logic:
+
+On component mount:
+  Step 1: request geolocation
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      fetchWeather(lat, lon);
+    },
+    (error) => {
+      // fallback to Jakarta if user denies location
+      fetchWeather(-6.2088, 106.8456);
+    }
+  );
+
+  Step 2: fetchWeather function:
+  async function fetchWeather(lat, lon) {
+    const apiKey = import.meta.env.VITE_WEATHER_API_KEY;
+    const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}&aqi=yes`;
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    // Map to display:
+    // temp: data.current.temp_c (rounded)
+    // feels: data.current.feelslike_c (rounded)
+    // condition: data.current.condition.text
+    // humidity: data.current.humidity
+    // uv: data.current.uv
+    // wind: data.current.wind_kph (rounded)
+    // aqi: compute from data.current.air_quality.pm2_5 using US EPA formula
+    // aqiStatus: based on aqi value
+    
+    setWeatherData({ temp, feels, condition, humidity, uv, wind, aqi, aqiStatus });
+  }
+
+  AQI from PM2.5 (US EPA breakpoints):
+  function pm25ToAqi(pm25) {
+    const bp = [
+      [0, 12, 0, 50], [12.1, 35.4, 51, 100],
+      [35.5, 55.4, 101, 150], [55.5, 150.4, 151, 200],
+      [150.5, 250.4, 201, 300], [250.5, 500.4, 301, 500]
+    ];
+    for (const [cLow, cHigh, iLow, iHigh] of bp) {
+      if (pm25 >= cLow && pm25 <= cHigh)
+        return Math.round(((iHigh - iLow) / (cHigh - cLow)) * (pm25 - cLow) + iLow);
+    }
+    return 500;
+  }
+
+  AQI status labels:
+  ≤50: 'Good', ≤100: 'Moderate', ≤150: 'Unhealthy for Sensitive',
+  ≤200: 'Unhealthy', ≤300: 'Very Unhealthy', >300: 'Hazardous'
+
+  Loading state: show skeleton/shimmer while fetching
+  Error state: show "—" for all values
+  
+  Cache result in localStorage key 'my20fit_weather_cache':
+  - Store { data, timestamp }
+  - If cache exists and age < 30 minutes, use cache instead of fetching again
+
+Add VITE_WEATHER_API_KEY to Replit Secrets.
+In .env.example add: VITE_WEATHER_API_KEY=your_weatherapi_key_here
+
+The WeatherAPI key to use: ganti dengan key dari weatherapi.com (free tier)
