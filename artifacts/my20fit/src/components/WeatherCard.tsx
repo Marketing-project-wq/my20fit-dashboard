@@ -271,7 +271,9 @@ export default function WeatherCard() {
     <div style={card} data-testid="card-weather">
 
       {/* ── Section 1: Current ── */}
-      <div style={{ padding: "20px 20px 16px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px" }}>
+      <div style={{ position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, background: "radial-gradient(circle at top right, rgba(196,17,1,0.12) 0%, transparent 50%)", pointerEvents: "none" }} />
+      <div style={{ padding: "20px 20px 16px", display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "16px", position: "relative" }}>
         <div style={{ flex: 1 }}>
           {/* Location row */}
           <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
@@ -318,7 +320,8 @@ export default function WeatherCard() {
 
         {/* AQI Box */}
         <div style={{
-          backgroundColor: "#0A0908",
+          background: "linear-gradient(180deg, #111111 0%, #000000 100%)",
+          boxShadow: "inset 0 0 20px rgba(196,17,1,0.2), 0 10px 30px rgba(0,0,0,0.25)",
           borderRadius: "12px",
           padding: "14px 16px",
           textAlign: "center",
@@ -342,6 +345,7 @@ export default function WeatherCard() {
             </>
           )}
         </div>
+      </div>
       </div>
 
       {/* ── Section 2: Stats Grid ── */}
@@ -409,6 +413,7 @@ export default function WeatherCard() {
               return (
                 <div
                   key={h.time}
+                  className={isNow ? "hourly-cell hourly-cell-now" : "hourly-cell"}
                   style={{
                     flexShrink: 0,
                     width: "64px",

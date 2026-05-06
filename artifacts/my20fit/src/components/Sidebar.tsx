@@ -12,7 +12,7 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
   return (
     <aside
       className="fixed top-0 left-0 bottom-0 w-[220px] hidden lg:flex flex-col z-50"
-      style={{ backgroundColor: '#0A0A0A' }}
+      style={{ background: 'linear-gradient(180deg, #0A0A0A 0%, #111111 100%)' }}
       data-testid="sidebar"
     >
       <div className="px-6 pt-8 pb-6">
@@ -28,7 +28,7 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
         {navItems.map(({ icon: Icon, label, key, active }) => (
           <button
             key={key}
-            className="flex items-center gap-3 px-6 py-3.5 w-full text-left transition-colors"
+            className={`flex items-center gap-3 px-6 py-3.5 w-full text-left transition-all duration-200 sidebar-nav-btn${active ? ' sidebar-nav-active' : ''}`}
             style={{
               fontFamily: "'Bebas Neue', sans-serif",
               letterSpacing: '2px',
@@ -62,7 +62,7 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
 
         <button
           onClick={toggleTheme}
-          className="flex items-center justify-center gap-2 w-full py-2.5 transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-2.5 transition-all duration-200"
           style={{
             backgroundColor: '#1A1A1A',
             color: 'rgba(255,255,255,0.7)',

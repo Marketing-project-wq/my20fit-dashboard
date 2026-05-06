@@ -7,13 +7,14 @@ export default function Greeting() {
   };
 
   return (
-    <div className="mb-6" data-testid="section-greeting">
+    <div className="mb-2" data-testid="section-greeting">
       <p
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
           fontSize: '11px',
-          letterSpacing: '2px',
+          letterSpacing: '3.5px',
           color: 'var(--muted)',
+          opacity: 0.7,
           marginBottom: '2px',
         }}
       >
@@ -23,7 +24,7 @@ export default function Greeting() {
         style={{
           fontFamily: "'Bebas Neue', sans-serif",
           fontSize: '48px',
-          letterSpacing: '2px',
+          letterSpacing: '-1px',
           color: 'var(--text)',
           lineHeight: 1,
           marginBottom: '6px',

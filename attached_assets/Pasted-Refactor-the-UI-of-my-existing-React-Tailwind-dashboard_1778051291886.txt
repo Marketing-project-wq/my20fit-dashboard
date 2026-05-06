@@ -1,0 +1,109 @@
+Refactor the UI of my existing React + Tailwind dashboard to make it feel more premium, modern, and less rigid.
+
+Do NOT change layout structure or functionality.
+Focus only on visual styling, spacing, and subtle interactions.
+
+=== DESIGN DIRECTION ===
+- Athlete-tech luxury (clean, modern, slightly futuristic)
+- Light theme with elegant gradients (not flat)
+- Soft depth, floating cards, premium spacing
+- Inspired by Apple Health (light mode) + Whoop
+
+=== BACKGROUND ===
+Replace flat background with layered gradient:
+
+- Base: #F4F2EE
+- Add radial gradient glow:
+  circle at 20% 10%,
+  rgba(196,17,1,0.08) → transparent 40%
+
+Optional:
+- Add subtle noise texture (very low opacity)
+
+=== CARDS ===
+Update all cards:
+- Background: linear-gradient(180deg, #FFFFFF 0%, #FBFBFB 100%)
+- Border: 1px solid rgba(0,0,0,0.04)
+- Shadow: 0 8px 24px rgba(0,0,0,0.06)
+- Border radius: 16–20px
+
+Add hover:
+- translateY(-3px)
+- slightly stronger shadow
+
+=== WEATHER CARD (HERO SECTION) ===
+Make it visually stronger:
+
+- Add radial gradient overlay:
+  circle at top right,
+  rgba(196,17,1,0.12) → transparent 50%
+
+- Keep layout same, enhance depth only
+
+=== AQI BADGE ===
+Upgrade to feel like a device:
+
+- Background: linear-gradient(180deg, #111111, #000000)
+- Add inner glow:
+  inset 0 0 20px rgba(196,17,1,0.2)
+- Add shadow:
+  0 10px 30px rgba(0,0,0,0.25)
+
+=== TYPOGRAPHY ===
+- Reduce rigidity, increase hierarchy
+
+Greeting label:
+- opacity: 0.6
+- letter-spacing: wider
+
+User name:
+- slight negative letter spacing (-1px)
+- keep large and bold
+
+=== SPACING ===
+- Increase spacing between sections to 20–24px
+- Add more breathing room inside cards (padding 20–24px)
+
+=== HOURLY FORECAST ITEMS ===
+Add interaction:
+
+Hover:
+- translateY(-4px)
+- shadow: 0 6px 16px rgba(0,0,0,0.08)
+
+Active item (NOW):
+- subtle red glow shadow:
+  0 8px 20px rgba(196,17,1,0.25)
+
+=== SIDEBAR ===
+Improve depth:
+
+- Background: linear-gradient(180deg, #0A0A0A, #111111)
+
+Nav hover:
+- background: rgba(255,255,255,0.04)
+
+Keep active state red as is
+
+=== GLOBAL EFFECT ===
+Add top fade overlay:
+
+- fixed element at top
+- height ~120px
+- gradient:
+  rgba(244,242,238,1) → transparent
+
+=== INTERACTIONS ===
+Keep subtle and premium:
+- Smooth transitions (200–300ms ease)
+- No flashy animations
+- Focus on polish, not complexity
+
+=== IMPORTANT ===
+- Do NOT redesign layout
+- Do NOT change data structure
+- Do NOT add new features
+- Only enhance visuals, depth, and feel
+
+Goal:
+Make the UI feel like a premium fitness performance dashboard instead of a basic admin panel.

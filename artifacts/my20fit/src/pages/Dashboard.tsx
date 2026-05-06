@@ -23,27 +23,39 @@ const item = {
 
 export default function Dashboard({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   return (
-    <div className="min-h-screen w-full flex" style={{ backgroundColor: 'var(--bg)', color: 'var(--text)' }}>
+    <div
+      className="min-h-screen w-full flex"
+      style={{
+        background: `
+          radial-gradient(circle at 20% 10%, rgba(196,17,1,0.08) 0%, transparent 40%),
+          var(--bg)
+        `,
+        color: 'var(--text)',
+      }}
+    >
+      {/* Top fade overlay */}
+      <div className="top-fade-overlay" />
+
       <Sidebar theme={theme} toggleTheme={toggleTheme} />
 
       <main className="flex-1 w-full lg:pl-[220px]">
-        <div className="max-w-[720px] mx-auto w-full px-4 md:px-6 lg:px-8 pb-6 pt-2 lg:pt-8 min-h-screen flex flex-col">
+        <div className="max-w-[720px] mx-auto w-full px-4 md:px-6 lg:px-8 pb-8 pt-2 lg:pt-8 min-h-screen flex flex-col">
           <Header theme={theme} toggleTheme={toggleTheme} />
 
           <motion.div
             variants={container}
             initial="hidden"
             animate="show"
-            className="flex-1 w-full flex flex-col"
+            className="flex-1 w-full flex flex-col gap-1"
           >
-            <motion.div variants={item}><Greeting /></motion.div>
-            <motion.div variants={item}><WeatherCard /></motion.div>
-            <motion.div variants={item}><MedicalCheckup /></motion.div>
-            <motion.div variants={item}><TodaysChecklist /></motion.div>
-            <motion.div variants={item}><QuickCheckin /></motion.div>
-            <motion.div variants={item}><MyMoments /></motion.div>
-            <motion.div variants={item}><SportsEvents /></motion.div>
-            <motion.div variants={item}><PlusCard /></motion.div>
+            <motion.div variants={item} className="mb-2"><Greeting /></motion.div>
+            <motion.div variants={item} className="mb-5"><WeatherCard /></motion.div>
+            <motion.div variants={item} className="mb-5"><MedicalCheckup /></motion.div>
+            <motion.div variants={item} className="mb-5"><TodaysChecklist /></motion.div>
+            <motion.div variants={item} className="mb-5"><QuickCheckin /></motion.div>
+            <motion.div variants={item} className="mb-5"><MyMoments /></motion.div>
+            <motion.div variants={item} className="mb-5"><SportsEvents /></motion.div>
+            <motion.div variants={item} className="mb-5"><PlusCard /></motion.div>
           </motion.div>
         </div>
       </main>
