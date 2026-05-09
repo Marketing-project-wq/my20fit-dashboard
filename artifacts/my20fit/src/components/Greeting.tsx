@@ -1,10 +1,19 @@
+import { useAuth } from "@/contexts/AuthContext";
+
 export default function Greeting() {
+  const { user, profile, photoProfile } = useAuth();
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "GOOD MORNING";
     if (hour < 18) return "GOOD AFTERNOON";
     return "GOOD EVENING";
   };
+
+  const displayName = profile?.full_name
+    || photoProfile?.name
+    || user?.email?.split("@")[0]?.toUpperCase()
+    || "MEMBER";
 
   return (
     <div className="mb-2" data-testid="section-greeting">
@@ -18,7 +27,7 @@ export default function Greeting() {
           marginBottom: '2px',
         }}
       >
-        {getGreeting()}, ZIDNI 👋
+        {getGreeting()}, {displayName} 👋
       </p>
       <h1
         style={{
@@ -30,7 +39,7 @@ export default function Greeting() {
           marginBottom: '6px',
         }}
       >
-        ZIDNI
+        {displayName}
       </h1>
       <p
         style={{
