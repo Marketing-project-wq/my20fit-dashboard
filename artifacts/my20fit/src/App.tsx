@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
+import Progress from "@/pages/Progress";
+import ComingSoon from "@/pages/ComingSoon";
 
 const queryClient = new QueryClient();
 
@@ -12,6 +14,10 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
   return (
     <Switch>
       <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/progress" component={() => <Progress theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/events" component={() => <ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/profile" component={() => <ComingSoon title="PROFILE" theme={theme} toggleTheme={toggleTheme} />} />
       <Route component={NotFound} />
     </Switch>
   );

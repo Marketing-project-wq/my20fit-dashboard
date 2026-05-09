@@ -1,14 +1,17 @@
 import { Home, Target, Calendar, Camera, User, Sun, Moon } from "lucide-react";
+import { Link, useLocation } from "wouter";
 
 const navItems = [
-  { icon: Home, label: "HOME", key: "home", active: true },
-  { icon: Target, label: "PROGRESS", key: "progress" },
-  { icon: Calendar, label: "EVENTS", key: "events" },
-  { icon: Camera, label: "MOMENTS", key: "moments" },
-  { icon: User, label: "PROFILE", key: "profile" },
+  { icon: Home, label: "HOME", key: "home", href: "/" },
+  { icon: Target, label: "PROGRESS", key: "progress", href: "/progress" },
+  { icon: Calendar, label: "EVENTS", key: "events", href: "/events" },
+  { icon: Camera, label: "MOMENTS", key: "moments", href: "/moments" },
+  { icon: User, label: "PROFILE", key: "profile", href: "/profile" },
 ];
 
 export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
+  const [location] = useLocation();
+
   return (
     <aside
       className="fixed top-0 left-0 bottom-0 w-[220px] hidden lg:flex flex-col z-50"
@@ -16,34 +19,40 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
       data-testid="sidebar"
     >
       <div className="px-6 pt-8 pb-6">
-        <h1
-          className="text-3xl tracking-wide text-white"
-          style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-        >
-          my<span style={{ color: '#C41101' }}>20</span>FIT
-        </h1>
+        <Link href="/">
+          <h1
+            className="text-3xl tracking-wide text-white cursor-pointer"
+            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+          >
+            my<span style={{ color: '#C41101' }}>20</span>FIT
+          </h1>
+        </Link>
       </div>
 
       <nav className="flex-1 flex flex-col mt-2">
-        {navItems.map(({ icon: Icon, label, key, active }) => (
-          <button
-            key={key}
-            className={`flex items-center gap-3 px-6 py-3.5 w-full text-left transition-all duration-200 sidebar-nav-btn${active ? ' sidebar-nav-active' : ''}`}
-            style={{
-              fontFamily: "'Bebas Neue', sans-serif",
-              letterSpacing: '2px',
-              fontSize: '14px',
-              backgroundColor: active ? '#C41101' : 'transparent',
-              color: active ? '#FFFFFF' : 'rgba(255,255,255,0.6)',
-              borderRadius: active ? '0 8px 8px 0' : '0',
-              marginRight: active ? '12px' : '0',
-            }}
-            data-testid={`sidebar-${key}`}
-          >
-            <Icon size={18} strokeWidth={active ? 2.5 : 2} />
-            <span>{label}</span>
-          </button>
-        ))}
+        {navItems.map(({ icon: Icon, label, key, href }) => {
+          const active = location === href || (href === "/" && location === "");
+          return (
+            <Link key={key} href={href}>
+              <button
+                className={`flex items-center gap-3 px-6 py-3.5 w-full text-left transition-all duration-200 sidebar-nav-btn${active ? ' sidebar-nav-active' : ''}`}
+                style={{
+                  fontFamily: "'Bebas Neue', sans-serif",
+                  letterSpacing: '2px',
+                  fontSize: '14px',
+                  backgroundColor: active ? '#C41101' : 'transparent',
+                  color: active ? '#FFFFFF' : 'rgba(255,255,255,0.6)',
+                  borderRadius: active ? '0 8px 8px 0' : '0',
+                  marginRight: active ? '12px' : '0',
+                }}
+                data-testid={`sidebar-${key}`}
+              >
+                <Icon size={18} strokeWidth={active ? 2.5 : 2} />
+                <span>{label}</span>
+              </button>
+            </Link>
+          );
+        })}
       </nav>
 
       <div className="mt-auto px-6 pb-6 flex flex-col gap-3">

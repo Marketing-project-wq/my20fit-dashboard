@@ -1,0 +1,272 @@
+Add React Router and build the Progress page for my20fit dashboard.
+
+---
+
+## STEP 1: SETUP REACT ROUTER
+
+Install: npm install react-router-dom
+
+Wrap App.jsx with BrowserRouter.
+Create routes:
+- / → Dashboard (existing)
+- /progress → Progress page
+- /events → placeholder "Coming Soon" page
+- /moments → placeholder "Coming Soon" page  
+- /profile → placeholder "Coming Soon" page
+
+Update Sidebar.jsx and BottomNav.jsx:
+- Use <NavLink> from react-router-dom instead of plain divs
+- Active state: NavLink automatically gets 'active' class
+  Apply red background on active for sidebar, red color for bottom nav
+- Clicking nav items navigates to respective routes
+
+---
+
+## STEP 2: INSTALL CHART LIBRARY
+
+npm install recharts
+
+---
+
+## STEP 3: CREATE Progress.jsx
+
+File: src/pages/Progress.jsx
+
+---
+
+### PAGE LAYOUT
+
+Same sidebar + main content layout as Dashboard.
+Page title section at top:
+  - "PROGRESS" (Bebas Neue 32px, --text color)
+  - Subtitle: "Pantau perkembangan kesehatanmu" (Barlow Condensed 14px, muted)
+  - Right side: date range selector pills: "1M" | "3M" | "6M" | "1Y" | "ALL"
+    Active pill: red bg, white text. Others: border only.
+
+---
+
+### DATA SOURCES
+
+1. MCU Baseline from localStorage 'my20fit_mcu_result':
+   Extract: grade, bmi, bodyFat, restingHr, metrics array
+
+2. Manual entries from localStorage 'my20fit_progress_entries':
+   Array of objects: { date, weight, bmi, bodyFat, restingHr, waist, bloodPressureSys, bloodPressureDia, note }
+   On first load, if MCU data exists, seed first entry from MCU data with today's date.
+
+3. Workout history from localStorage 'my20fit_workouts':
+   Array: { date, type, duration, note }
+   Seeded with empty array if not exists.
+
+---
+
+### SECTION 1: HEALTH GRADE CARD
+
+Full-width card at top.
+Left: MCU grade badge (large A/B/C/D):
+  A = #16A34A green, B = #2563EB blue, C = #D97706 orange, D = #DC2626 red
+  Circle 80px, white letter inside, Bebas Neue 48px
+  Below grade: "Health Grade" label (Bebas Neue 10px tracked)
+  Below: "Last updated: [date]" (Barlow Condensed 12px muted)
+
+Right: AI summary text from MCU (italic, Barlow Condensed 14px)
+If no MCU: "Upload MCU untuk melihat health grade kamu" with CTA button.
+
+---
+
+### SECTION 2: SUMMARY METRIC CARDS
+
+Horizontal scroll row (or 3-col grid on desktop) of metric cards.
+Each card: white bg, shadow, border-radius 14px, padding 16px
+
+Metrics to show:
+1. BERAT BADAN
+   Value: latest entry weight (kg) | Orbitron 28px
+   Change: "+0.5 kg" or "-1.2 kg" vs previous entry
+   Arrow up (red if gained) or down (green if lost)
+   Unit below value
+
+2. BMI
+   Value: latest bmi | Orbitron 28px
+   Status pill: Underweight/Normal/Overweight/Obese
+   Color: blue/green/orange/red
+
+3. BODY FAT %
+   Value: latest bodyFat | Orbitron 28px
+   Status: Essential/Athletic/Fitness/Average/Obese
+   Color accordingly
+
+4. RESTING HR
+   Value: latest restingHr bpm | Orbitron 28px
+   Status: Athlete/Excellent/Good/Above Average/High
+   Color: green/green/blue/orange/red
+
+5. LINGKAR PINGGANG
+   Value: latest waist cm | Orbitron 28px
+   Risk: Low/Moderate/High based on gender
+
+6. BLOOD PRESSURE
+   Value: "120/80" | Orbitron 24px
+   Status: Normal/Elevated/High
+   Color: green/orange/red
+
+Scroll horizontally on mobile, 3-col grid on desktop.
+
+---
+
+### SECTION 3: CHARTS
+
+For each metric, a line chart card:
+
+CHART CARD DESIGN:
+- White card, shadow, border-radius 14px
+- Header: metric name (Bebas Neue 12px tracked) + current value
+- Recharts LineChart, responsive
+- Line color: --red (#C41101)
+- Dot: filled red circle
+- Grid: light gray horizontal lines only
+- Tooltip: custom styled (dark bg, white text, Barlow Condensed)
+- X-axis: dates formatted as "4 May", "11 May" etc. (Barlow Condensed 10px)
+- Y-axis: values (Barlow Condensed 10px)
+- Area fill below line: rgba(196,17,1,0.06)
+
+Charts to show (in order):
+1. Berat Badan (kg) over time
+2. BMI over time — add reference lines: underweight(18.5), overweight(25), obese(30)
+   Reference lines: dashed, labeled
+3. Body Fat % over time
+4. Resting Heart Rate over time
+5. Blood Pressure (two lines: systolic + diastolic)
+   Systolic: red line, Diastolic: blue line
+   Reference line at 120 (systolic normal) and 80 (diastolic normal)
+6. Lingkar Pinggang (cm)
+
+If only 1 data point: show "Tambah data untuk melihat tren" below chart.
+If no data: show empty state with add button.
+
+---
+
+### SECTION 4: ADD MANUAL DATA
+
+Floating action button (FAB) bottom-right:
+  Circle button, red bg, + icon (Lucide Plus), size 56px
+  Fixed position, z-index 50
+  On click: open "Tambah Data" bottom sheet modal
+
+ADD DATA MODAL:
+Title: "Tambah Data Kesehatan"
+Date picker at top (default: today)
+
+Form fields (all optional, fill what you have):
+  - Berat Badan: number input, suffix "kg", step 0.1
+  - BMI: number input, step 0.1 (auto-calculate if weight + height known)
+  - Body Fat: number input, suffix "%", step 0.1
+  - Resting HR: number input, suffix "bpm"
+  - Lingkar Pinggang: number input, suffix "cm"
+  - Blood Pressure: two inputs side by side "120" / "80" mmHg
+  - Catatan: textarea, placeholder "Kondisi hari ini, perubahan diet, dll"
+
+Height input (one-time setup, saves to localStorage 'my20fit_height'):
+  If not set, show height field with note "Digunakan untuk hitung BMI otomatis"
+  After set, hide field (show "Edit tinggi badan" small link)
+
+BMI auto-calculate:
+  If weight + height both filled:
+  bmi = weight / ((height/100) ** 2)
+  Show preview: "BMI: 23.4 (Normal)" below weight field
+
+"Simpan Data" button (red, full width, Bebas Neue)
+On save:
+  - Push to 'my20fit_progress_entries' array in localStorage
+  - Sort by date
+  - Close modal
+  - Charts re-render with new data
+
+---
+
+### SECTION 5: WORKOUT HISTORY
+
+Section title: "RIWAYAT LATIHAN"
+
+Add workout FAB or link inside same modal:
+Tab inside "Tambah Data" modal:
+  Tab 1: "Kesehatan" (metrics above)
+  Tab 2: "Latihan"
+
+Workout tab fields:
+  - Tanggal: date picker
+  - Jenis Latihan: pill selector:
+    Cardio / Strength / HIIT / Yoga / Cycling / Swimming / Running / Other
+  - Durasi: number input "menit"
+  - Catatan: textarea
+
+Workout history display:
+  List of workout cards, grouped by week:
+  Week header: "Minggu ini · 3 sesi · 210 menit"
+  
+  Each workout card:
+    Left: sport icon (Lucide) in colored circle
+    Middle: type + duration + date
+    Right: duration badge (Bebas Neue)
+    
+  Colors per type:
+    Cardio: red, Strength: blue, HIIT: orange
+    Yoga: purple, Cycling: cyan, Swimming: blue, Running: green
+
+  Empty state: "Belum ada riwayat latihan. Mulai catat aktivitasmu!"
+  with dumbbell icon.
+
+Weekly summary stats row:
+  Total sesi | Total menit | Streak hari
+
+---
+
+### SECTION 6: INSIGHTS (bottom of page)
+
+AI-generated recommendations from MCU data (static from localStorage):
+Show MCU recommendations array as cards:
+  Each recommendation: bullet point card with icon
+  Icon: Lucide CheckCircle (green) or AlertCircle (orange)
+  Text: Barlow Condensed 13px
+
+If no MCU: "Upload MCU untuk mendapatkan rekomendasi personal"
+
+---
+
+### EMPTY STATE (no data at all)
+
+If no MCU and no manual entries:
+Full page empty state:
+  Large icon: Activity from lucide-react
+  Title: "Belum ada data progress" (Bebas Neue 24px)
+  Desc: "Upload MCU atau tambah data manual untuk mulai tracking kesehatanmu"
+  Two CTAs:
+    Primary: "UPLOAD MCU" → navigate to / and scroll to MCU
+    Secondary: "TAMBAH DATA MANUAL" → open add data modal
+
+---
+
+### FONTS & COLORS
+
+Same as dashboard:
+- Bebas Neue: all labels, titles, section headers
+- Orbitron: all metric numbers
+- Barlow Condensed: body text, descriptions
+- CSS variables for all colors (theme-aware)
+
+---
+
+### RESPONSIVE
+
+Desktop: 2-column chart grid (charts side by side)
+Tablet: 2-column charts, 2-column metric cards
+Mobile: single column everything, FAB visible
+
+---
+
+After building:
+1. Update Sidebar.jsx NavLinks to use react-router-dom
+2. Update BottomNav.jsx NavLinks same
+3. Add /progress route in App.jsx
+4. npm run build — fix all errors
+5. Verify navigation works between Dashboard and Progress
