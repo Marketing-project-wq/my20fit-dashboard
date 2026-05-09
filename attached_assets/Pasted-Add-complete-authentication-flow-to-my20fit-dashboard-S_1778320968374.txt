@@ -1,0 +1,411 @@
+Add complete authentication flow to my20fit dashboard.
+
+---
+
+## STEP 1: INSTALL DEPENDENCIES
+
+npm install @supabase/supabase-js
+
+---
+
+## STEP 2: SUPABASE CLIENT
+
+Create src/lib/supabase.js:
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+Add to Replit Secrets:
+VITE_SUPABASE_URL = https://gsiyhcfhomboixzsiwaw.supabase.co
+VITE_SUPABASE_ANON_KEY = (anon/public key from Supabase dashboard → Settings → API)
+
+---
+
+## STEP 3: AUTH CONTEXT
+
+Create src/contexts/AuthContext.jsx:
+
+import { createContext, useContext, useEffect, useState } from 'react'
+import { supabase } from '../lib/supabase'
+
+const AuthContext = createContext({})
+
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+  const [photoProfile, setPhotoProfile] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      if (session?.user) loadProfiles(session.user)
+      else setLoading(false)
+    })
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null)
+        if (session?.user) await loadProfiles(session.user)
+        else {
+          setProfile(null)
+          setPhotoProfile(null)
+          setLoading(false)
+        }
+      }
+    )
+    return () => subscription.unsubscribe()
+  }, [])
+
+  async function loadProfiles(authUser) {
+    try {
+      // Load my20fit profile
+      const { data: myProfile } = await supabase
+        .from('my20fit_profile')
+        .select('*')
+        .eq('auth_user_id', authUser.id)
+        .single()
+      setProfile(myProfile)
+
+      // Load photo_user_mirror profile
+      const { data: photoData } = await supabase
+        .from('photo_user_mirror')
+        .select('*')
+        .eq('auth_user_id', authUser.id)
+        .single()
+      setPhotoProfile(photoData)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function signOut() {
+    await supabase.auth.signOut()
+    setUser(null)
+    setProfile(null)
+    setPhotoProfile(null)
+  }
+
+  const value = { user, profile, photoProfile, loading, signOut, loadProfiles }
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
+
+export const useAuth = () => useContext(AuthContext)
+
+---
+
+## STEP 4: LOGIN PAGE
+
+Create src/pages/Login.jsx
+
+DESIGN: Exactly match the existing my20fit-login.html design:
+- Left panel (desktop 54%): dark #0A0A0A background, sticky
+  - Red stripe top
+  - Dot grid texture
+  - Logo "my20FIT" Bebas Neue, "20" red
+  - Wordmark 3 lines stagger animated:
+    Line 1: "ELEVATE." white + shimmer sweep animation
+    Line 2: "EVERY." muted (rgba white .28)
+    Line 3: "METRIC." red #C41101
+  - Chips: "AI Health Analysis" / "Daily Checklist" / "Sport Events"
+  - Desktop features list (4 items with icons)
+- Right panel: #F4F2EE background, form area
+
+FORM HAS 3 STATES:
+
+### STATE 1: LOGIN (default)
+Tab switcher: [Masuk] [Daftar]
+Active tab: Masuk
+
+Fields:
+- Email (type="email")
+- Password (type="password" with show/hide toggle)
+- "Lupa password?" link → triggers forgot password flow
+
+Button: "MASUK →" (red, Bebas Neue, full width)
+Divider: "atau"
+Button: "Masuk dengan Google" (white, Google icon)
+
+Below form: "Belum punya akun?" → switch to register tab
+
+### STATE 2: REGISTER
+Tab: Daftar
+
+Fields:
+- Nama lengkap
+- Email
+- Nomor HP (+62 prefix)
+- Password (min 8 chars)
+- Confirm password
+
+Button: "DAFTAR GRATIS →"
+Divider: "atau"  
+Button: "Daftar dengan Google"
+
+### STATE 3: FORGOT PASSWORD
+Triggered by "Lupa password?" link
+Back arrow to return to login
+
+Field: Email
+Button: "KIRIM RESET PASSWORD →"
+Success state: "Email reset telah dikirim ke [email]"
+
+---
+
+## STEP 5: AUTH LOGIC IN Login.jsx
+
+### EMAIL LOGIN:
+
+async function handleLogin(email, password) {
+  setLoading(true)
+  setError(null)
+  
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    })
+    
+    if (error) {
+      // Check if user exists in photo_user_mirror but not in auth
+      if (error.message.includes('Invalid login credentials')) {
+        const { data: mirror } = await supabase
+          .from('photo_user_mirror')
+          .select('email, name, auth_type')
+          .eq('email', email)
+          .single()
+        
+        if (mirror) {
+          setError('Email ini terdaftar di 20FIT. Gunakan password yang sama dengan akun 20FIT kamu, atau reset password.')
+        } else {
+          setError('Email atau password salah.')
+        }
+      } else {
+        setError(error.message)
+      }
+      return
+    }
+    
+    // Success → navigate to dashboard
+    navigate('/')
+    
+  } finally {
+    setLoading(false)
+  }
+}
+
+### EMAIL REGISTER:
+
+async function handleRegister(name, email, phone, password) {
+  setLoading(true)
+  setError(null)
+  
+  try {
+    // Check if email exists in photo_user_mirror
+    const { data: existing } = await supabase
+      .from('photo_user_mirror')
+      .select('email, name, auth_user_id')
+      .eq('email', email)
+      .single()
+    
+    if (existing?.auth_user_id) {
+      setError('Email ini sudah terdaftar. Silakan masuk.')
+      setActiveTab('login')
+      return
+    }
+    
+    // Register with Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          phone: phone
+        }
+      }
+    })
+    
+    if (error) { setError(error.message); return }
+    
+    // Trigger function handles linking to photo_user_mirror automatically
+    // Update phone in my20fit_profile
+    if (data.user) {
+      await supabase
+        .from('my20fit_profile')
+        .update({ phone, full_name: name })
+        .eq('auth_user_id', data.user.id)
+    }
+    
+    // Navigate to dashboard
+    navigate('/')
+    
+  } finally {
+    setLoading(false)
+  }
+}
+
+### GOOGLE OAUTH:
+
+async function handleGoogleLogin() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/'
+    }
+  })
+  if (error) setError(error.message)
+}
+
+### FORGOT PASSWORD:
+
+async function handleForgotPassword(email) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/reset-password'
+  })
+  if (error) setError(error.message)
+  else setForgotSuccess(true)
+}
+
+---
+
+## STEP 6: PROTECTED ROUTES
+
+Update App.jsx routing:
+
+import { Navigate } from 'react-router-dom'
+import { useAuth } from './contexts/AuthContext'
+
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth()
+  
+  if (loading) return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: 'var(--bg)'
+    }}>
+      <div style={{
+        width: 40, height: 40, borderRadius: '50%',
+        border: '3px solid #C41101',
+        borderTopColor: 'transparent',
+        animation: 'spin 0.7s linear infinite'
+      }}/>
+    </div>
+  )
+  
+  if (!user) return <Navigate to="/login" replace />
+  return children
+}
+
+Routes:
+- /login → <Login /> (public)
+- /reset-password → <ResetPassword /> (public)
+- / → <ProtectedRoute><Dashboard /></ProtectedRoute>
+- /progress → <ProtectedRoute><Progress /></ProtectedRoute>
+- /events → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+- /moments → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+- /profile → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+
+Wrap App with AuthProvider in main.jsx:
+<AuthProvider>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+</AuthProvider>
+
+---
+
+## STEP 7: UPDATE DASHBOARD WITH USER DATA
+
+In Dashboard.jsx and all components, use useAuth():
+
+const { user, profile, photoProfile } = useAuth()
+
+Update Greeting section:
+- Name: profile?.full_name || photoProfile?.name || user?.email?.split('@')[0] || 'Member'
+- Show name in large Bebas Neue as before
+
+Update Sidebar:
+- Avatar initials: from profile?.full_name or photoProfile?.name
+- Name: same as above
+- Email: user?.email
+- Plus badge: profile?.is_plus_member ? show "⭐ PLUS MEMBER" : hide
+
+Add logout in Sidebar:
+- "KELUAR" button at very bottom (below Dark Mode toggle)
+- onClick: signOut() from useAuth() → navigates to /login
+
+---
+
+## STEP 8: RESET PASSWORD PAGE
+
+Create src/pages/ResetPassword.jsx
+Simple form: new password + confirm password
+Use supabase.auth.updateUser({ password: newPassword })
+After success: navigate to /login with success message
+
+---
+
+## STEP 9: LOADING + ERROR STATES IN LOGIN
+
+Loading state on buttons:
+- Spinner replaces button text
+- Button disabled during loading
+
+Error display:
+- Red card below form fields
+- Icon: AlertCircle from lucide-react
+- Error message text
+- Auto-dismiss after 5s
+
+Success states:
+- Green card for positive messages
+- Checkmark icon
+
+Email not verified state:
+- Show "Cek email kamu untuk verifikasi akun"
+- Resend email button
+
+---
+
+## STEP 10: ANIMATIONS (match existing login HTML)
+
+Page load sequence:
+- Hero left panel: stripe grow + glow expand + logo slideDown + wordmark stagger
+- Form panel: slideUp from bottom 0.55s delay
+
+Wordmark animations (CSS):
+@keyframes shimmer {
+  0% { background-position: -200% center }
+  100% { background-position: 200% center }
+}
+Line 1 "ELEVATE": shimmer sweep red-white looping every 5s
+Line 2 "EVERY": glitch pulse opacity flicker every 6s
+Line 3 "METRIC": static red
+
+Tab switch: form content fade+slide in
+Input focus: border glow + scale(1.01)
+Button hover: translateY(-2px) + red glow
+Button click: ripple effect
+Google button: shimmer sweep on hover
+
+---
+
+## IMPORTANT NOTES
+
+- VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY must be in Replit Secrets
+  (get anon key from Supabase Dashboard → Settings → API → anon public)
+- For Google OAuth: enable in Supabase Dashboard → Authentication → Providers → Google
+  (need Google Cloud Console OAuth credentials)
+- Login page must NOT show sidebar/bottom nav
+- All existing dashboard functionality must remain intact
+- Theme toggle works on login page too (save to localStorage)
+
+After completing:
+npm run build — fix all errors before finishing
