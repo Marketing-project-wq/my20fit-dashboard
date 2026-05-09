@@ -132,7 +132,7 @@ export default function Login() {
     setError(null);
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/" },
+      options: { redirectTo: window.location.origin + import.meta.env.BASE_URL },
     });
     if (err) setError(err.message);
   }
@@ -142,7 +142,7 @@ export default function Login() {
     setLoading(true); setError(null);
     try {
       const { error: err } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-        redirectTo: window.location.origin + "/reset-password",
+        redirectTo: window.location.origin + import.meta.env.BASE_URL + "reset-password",
       });
       if (err) { setError(err.message); return; }
       setForgotSuccess(true);
