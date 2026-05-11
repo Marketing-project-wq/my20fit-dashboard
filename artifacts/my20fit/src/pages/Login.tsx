@@ -71,11 +71,10 @@ export default function Login() {
     setGoogleLoading(true);
     setError(null);
     try {
-      const base = import.meta.env.BASE_URL.replace(/\/$/, "");
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin + base + "/auth/callback",
+          redirectTo: "https://my-20fit.replit.app/auth/callback",
           skipBrowserRedirect: false,
           queryParams: { access_type: "offline", prompt: "select_account" },
         },
