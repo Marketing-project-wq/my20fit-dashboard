@@ -22,7 +22,7 @@ const inputBase: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Bebas Neue', sans-serif",
+  fontFamily: "'Barlow Condensed', sans-serif",
   fontSize: 10,
   letterSpacing: "2px",
   color: "#6E665C",
@@ -153,7 +153,7 @@ export default function Login() {
 
   const redBtn: React.CSSProperties = {
     width: "100%", padding: "13px", borderRadius: 10, cursor: "pointer",
-    fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "2.5px",
+    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, letterSpacing: "2.5px",
     border: "none", background: "#C41101", color: "#fff",
     transition: "transform 0.2s ease, box-shadow 0.2s ease",
     opacity: loading ? 0.7 : 1,
@@ -176,10 +176,10 @@ export default function Login() {
         <div style={{ height: 3, background: "linear-gradient(90deg, #C41101, #FF4444, #C41101)", backgroundSize: "200% 100%", animation: "stripeShimmer 3s linear infinite" }} />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "48px 56px" }}>
           <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} style={{ marginBottom: 40 }}>
-            <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: "#fff", letterSpacing: "4px", margin: 0 }}>
+            <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 34, color: "#fff", letterSpacing: "1.5px", margin: 0 }}>
               my<span style={{ color: "#C41101" }}>20</span>FIT
             </h1>
-            <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "2px 10px", display: "inline-block", marginTop: 6 }}>
+            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: "1.5px", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "2px 10px", display: "inline-block", marginTop: 6 }}>
               MEMBER APP
             </span>
           </motion.div>
@@ -190,14 +190,14 @@ export default function Login() {
               { text: "METRIC.", style: { color: "#C41101" } as React.CSSProperties },
             ].map(({ text, style }, i) => (
               <motion.div key={text} initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 + i * 0.12, type: "spring", stiffness: 200 }}
-                style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 72, lineHeight: 0.9, ...style }}>
+                style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 66, lineHeight: 0.9, ...style }}>
                 {text}
               </motion.div>
             ))}
           </div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 48 }}>
             {["AI Health Analysis", "Daily Checklist", "Sport Events"].map(chip => (
-              <span key={chip} style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: "1.5px", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "4px 12px" }}>{chip}</span>
+              <span key={chip} style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 11, letterSpacing: "1px", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "4px 12px" }}>{chip}</span>
             ))}
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -206,7 +206,7 @@ export default function Login() {
                 <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(196,17,1,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                   <Icon size={15} style={{ color: "#C41101" }} />
                 </div>
-                <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "rgba(255,255,255,0.65)" }}>{text}</span>
+                <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 14, color: "rgba(255,255,255,0.65)" }}>{text}</span>
               </div>
             ))}
           </motion.div>
@@ -220,7 +220,7 @@ export default function Login() {
       >
         <div style={{ width: "100%", maxWidth: 400 }}>
           <div className="lg:hidden" style={{ marginBottom: 28, textAlign: "center" }}>
-            <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, color: "#0A0908", letterSpacing: "3px" }}>
+            <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 30, color: "#0A0908", letterSpacing: "1px" }}>
               my<span style={{ color: "#C41101" }}>20</span>FIT
             </h1>
           </div>
@@ -234,7 +234,7 @@ export default function Login() {
                   style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#6E665C", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, marginBottom: 20 }}>
                   ← Kembali ke Masuk
                 </button>
-                <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: "2px", color: "#0A0908", marginBottom: 6 }}>LUPA PASSWORD</h2>
+                <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 22, letterSpacing: "0.5px", color: "#0A0908", marginBottom: 6 }}>LUPA PASSWORD</h2>
                 <p style={{ fontSize: 13, color: "#6E665C", marginBottom: 24 }}>Kami akan kirimkan link reset ke email kamu.</p>
                 {forgotSuccess ? (
                   <div style={{ background: "#DCFCE7", border: "1px solid #86EFAC", borderRadius: 10, padding: "16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
@@ -259,8 +259,8 @@ export default function Login() {
             {/* LOGIN / REGISTER */}
             {formState === "normal" && (
               <motion.div key="normal" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
-                <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", marginBottom: 4 }}>SELAMAT DATANG</p>
-                <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", marginBottom: 20 }}>
+                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: "1.5px", color: "#6E665C", marginBottom: 4 }}>SELAMAT DATANG</p>
+                <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 26, letterSpacing: "0.5px", color: "#0A0908", marginBottom: 20 }}>
                   Masuk ke my20fit.
                 </h2>
 
@@ -268,7 +268,7 @@ export default function Login() {
                 <div style={{ display: "flex", marginBottom: 24, borderRadius: 10, overflow: "hidden", border: "1px solid #E5E1D8", background: "#fff" }}>
                   {(["login", "register"] as Tab[]).map(t => (
                     <button key={t} onClick={() => { setTab(t); setError(null); setSuccessMsg(null); }}
-                      style={{ flex: 1, padding: "11px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: "2px", cursor: "pointer", transition: "all 0.2s", border: "none",
+                      style={{ flex: 1, padding: "11px", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 13, letterSpacing: "1px", cursor: "pointer", transition: "all 0.2s", border: "none",
                         backgroundColor: tab === t ? "#0A0908" : "transparent", color: tab === t ? "#fff" : "#6E665C" }}>
                       {t === "login" ? "MASUK" : "DAFTAR"}
                     </button>
@@ -401,7 +401,7 @@ function GoogleBtn({ onClick, label, loading }: { onClick: () => void; label: st
       style={{
         width: "100%", height: 48, display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
         background: "#fff", border: "1.5px solid #E5E1D8", borderRadius: 12, cursor: loading ? "default" : "pointer",
-        fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, fontWeight: 600, color: "#0A0908",
+        fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 15, color: "#0A0908",
         marginBottom: 0, boxShadow: "0 1px 3px rgba(0,0,0,.08)", transition: "all .2s",
         opacity: loading ? 0.75 : 1,
       }}

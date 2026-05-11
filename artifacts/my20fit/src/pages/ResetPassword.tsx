@@ -36,7 +36,7 @@ export default function ResetPassword() {
   return (
     <div style={{ minHeight: "100vh", background: "#F4F2EE", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
-        <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: "3px", color: "#0A0908", marginBottom: 4 }}>
+        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 28, letterSpacing: "3px", color: "#0A0908", marginBottom: 4 }}>
           my<span style={{ color: "#C41101" }}>20</span>FIT
         </h1>
         <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#6E665C", marginBottom: 28 }}>
@@ -59,19 +59,19 @@ export default function ResetPassword() {
               </div>
             )}
             <div style={{ position: "relative" }}>
-              <label style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", display: "block", marginBottom: 4 }}>PASSWORD BARU</label>
+              <label style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", display: "block", marginBottom: 4 }}>PASSWORD BARU</label>
               <input type={showPw ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min. 8 karakter" required style={{ ...inputStyle, paddingRight: 44 }} />
               <button type="button" onClick={() => setShowPw(s => !s)} style={{ position: "absolute", right: 12, bottom: 12, background: "none", color: "#6E665C", cursor: "pointer" }}>
                 {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
             <div>
-              <label style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", display: "block", marginBottom: 4 }}>KONFIRMASI PASSWORD</label>
+              <label style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", display: "block", marginBottom: 4 }}>KONFIRMASI PASSWORD</label>
               <input type="password" value={confirm} onChange={e => setConfirm(e.target.value)} placeholder="Ulangi password" required style={inputStyle} />
             </div>
             <button type="submit" disabled={loading} style={{
               background: "#C41101", color: "#fff", border: "none", borderRadius: 10, padding: "14px",
-              fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px", cursor: "pointer",
+              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", cursor: "pointer",
               transition: "transform 0.2s, box-shadow 0.2s", marginTop: 4,
               opacity: loading ? 0.7 : 1,
             }}>

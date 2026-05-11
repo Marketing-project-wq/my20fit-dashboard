@@ -164,7 +164,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "8px 12px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ fontFamily: "'Orbitron', monospace", fontSize: 13, fontWeight: 700, color: p.color || "#fff" }}>
+        <p key={i} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 700, color: p.color || "#fff" }}>
           {p.value}{p.name ? ` ${p.name}` : ""}
         </p>
       ))}
@@ -179,8 +179,8 @@ const SleepTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
-      <p style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{hours}j</p>
-      <span style={{ background: q.color + "25", color: q.color, fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99 }}>{q.label}</span>
+      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{hours}j</p>
+      <span style={{ background: q.color + "25", color: q.color, fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99 }}>{q.label}</span>
     </div>
   );
 };
@@ -192,7 +192,7 @@ const WaterTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
-      <p style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
+      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{pct}% dari target</p>
     </div>
   );
@@ -210,9 +210,9 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
   return (
     <div className="app-card" style={{ marginBottom: 0 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: "2.5px", color: "var(--muted)" }}>{title}</p>
+        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: "2.5px", color: "var(--muted)" }}>{title}</p>
         {latestVal != null && (
-          <span style={{ fontFamily: "'Orbitron', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
             {String(latestVal)}{unit}
           </span>
         )}
@@ -280,9 +280,9 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
       borderRadius: 14, padding: "14px 16px", minWidth: 130,
       border: "1px solid rgba(0,0,0,0.04)", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", flexShrink: 0,
     }}>
-      <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 9, letterSpacing: "2px", color: "var(--muted)", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, letterSpacing: "2px", color: "var(--muted)", marginBottom: 6 }}>{label}</p>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 3, marginBottom: 4 }}>
-        <span style={{ fontFamily: "'Orbitron', monospace", fontSize: 26, fontWeight: 900, lineHeight: 1, color: "var(--text)" }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 900, lineHeight: 1, color: "var(--text)" }}>
           {value ?? "—"}
         </span>
         {unit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>{unit}</span>}
@@ -492,7 +492,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
     fontSize: 14, color: "var(--text)", outline: "none",
   };
   const labelStyle: React.CSSProperties = {
-    fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px",
+    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, letterSpacing: "2px",
     color: "var(--muted)", marginBottom: 4, display: "block",
   };
 
@@ -515,7 +515,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
           {/* Page title + range selector */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
             <div>
-              <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, letterSpacing: "2px", color: "var(--text)", lineHeight: 1 }}>PROGRESS</h1>
+              <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 30, letterSpacing: "1px", color: "var(--text)", lineHeight: 1 }}>PROGRESS</h1>
               <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--muted)", marginTop: 2 }}>Pantau perkembangan kesehatanmu</p>
             </div>
             <div style={{ display: "flex", gap: 6 }}>
@@ -524,7 +524,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   key={r}
                   onClick={() => setDateRange(r)}
                   style={{
-                    fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "1.5px",
+                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, letterSpacing: "1px",
                     padding: "4px 10px", borderRadius: 6, cursor: "pointer", transition: "all 0.2s",
                     backgroundColor: dateRange === r ? "#C41101" : "transparent",
                     color: dateRange === r ? "#fff" : "var(--muted)",
@@ -541,14 +541,14 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--card2)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <Activity size={32} style={{ color: "var(--muted)" }} />
               </div>
-              <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: "2px", color: "var(--text)" }}>BELUM ADA DATA</h2>
+              <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 22, letterSpacing: "0.5px", color: "var(--text)" }}>BELUM ADA DATA</h2>
               <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--muted)", textAlign: "center", maxWidth: 280 }}>
                 Upload MCU atau tambah data manual untuk mulai tracking kesehatanmu
               </p>
               <div style={{ display: "flex", gap: 10 }}>
                 <button
                   onClick={() => setShowModal(true)}
-                  style={{ background: "#C41101", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "2px", padding: "10px 20px", borderRadius: 8, cursor: "pointer" }}
+                  style={{ background: "#C41101", color: "#fff", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "1px", padding: "10px 20px", borderRadius: 8, cursor: "pointer" }}
                 >
                   TAMBAH DATA MANUAL
                 </button>
@@ -568,9 +568,9 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                         display: "flex", alignItems: "center", justifyContent: "center",
                         boxShadow: `0 8px 24px ${gradeColor(mcuResult.grade)}40`,
                       }}>
-                        <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 48, color: "#fff", lineHeight: 1 }}>{mcuResult.grade}</span>
+                        <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 44, color: "#fff", lineHeight: 1 }}>{mcuResult.grade}</span>
                       </div>
-                      <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "var(--muted)", marginTop: 6 }}>HEALTH GRADE</p>
+                      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, letterSpacing: "2px", color: "var(--muted)", marginTop: 6 }}>HEALTH GRADE</p>
                       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
                         {mcuResult.date ? format(parseISO(mcuResult.date), "d MMM yyyy") : "Terbaru"}
                       </p>
@@ -596,7 +596,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               {/* Trend Summary Banner */}
               {hasTrendData && (
                 <div style={{ background: "var(--card)", borderRadius: 14, padding: "16px 20px", boxShadow: "var(--shadow, 0 2px 8px rgba(0,0,0,0.06))" }}>
-                  <div style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)", marginBottom: 12 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", marginBottom: 12 }}>
                     RINGKASAN TREN · 7 HARI TERAKHIR
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
@@ -611,9 +611,9 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                         <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--bg)", borderRadius: 10, padding: "8px 12px", flex: "1 0 140px" }}>
                           <div style={{ color: item.color }}>{item.icon}</div>
                           <div>
-                            <div style={{ fontFamily: "'Bebas Neue'", fontSize: 10, letterSpacing: 1.5, color: "var(--muted)" }}>{item.label}</div>
+                            <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 1.5, color: "var(--muted)" }}>{item.label}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{item.value}</span>
+                              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{item.value}</span>
                               <TrendBadge trend={item.trend} positiveIsGood={item.positiveIsGood} />
                             </div>
                           </div>
@@ -695,9 +695,9 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                 <p className="section-header">KUALITAS TIDUR</p>
                 <div className="app-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>KUALITAS TIDUR</p>
+                    <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>KUALITAS TIDUR</p>
                     {sleepData.length > 0 && (
-                      <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
                         {sleepData[sleepData.length - 1].hours}j
                       </span>
                     )}
@@ -705,7 +705,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   {sleepData.length < 1 ? (
                     <div style={{ textAlign: "center", padding: "32px 20px" }}>
                       <Moon size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
-                      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 16, color: "var(--muted)" }}>BELUM ADA DATA TIDUR</div>
+                      <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, color: "var(--muted)" }}>BELUM ADA DATA TIDUR</div>
                       <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
                         Catat jam tidur kamu di Quick Check-in setiap hari
                       </div>
@@ -741,9 +741,9 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                 <p className="section-header">ASUPAN AIR HARIAN</p>
                 <div className="app-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>ASUPAN AIR HARIAN</p>
+                    <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ASUPAN AIR HARIAN</p>
                     {waterData.length > 0 && (
-                      <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "#06B6D4" }}>
+                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "#06B6D4" }}>
                         {waterData[waterData.length - 1].liters}L
                       </span>
                     )}
@@ -751,7 +751,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   {waterData.length < 1 ? (
                     <div style={{ textAlign: "center", padding: "32px 20px" }}>
                       <Droplets size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
-                      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 16, color: "var(--muted)" }}>BELUM ADA DATA AIR</div>
+                      <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, color: "var(--muted)" }}>BELUM ADA DATA AIR</div>
                       <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
                         Catat asupan air di Quick Check-in setiap hari
                       </div>
@@ -788,7 +788,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <p className="section-header">ENERGI & MOOD</p>
                   <div className="app-card">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                      <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>ENERGI & MOOD</p>
+                      <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ENERGI & MOOD</p>
                       <div style={{ display: "flex", gap: 12 }}>
                         <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "#22C55E" }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />Energi
@@ -826,7 +826,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {workoutGroups.map((group, gi) => (
                       <div key={gi}>
-                        <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: "2px", color: "var(--muted)", marginBottom: 8 }}>
+                        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 11, letterSpacing: "1.5px", color: "var(--muted)", marginBottom: 8 }}>
                           {group.label.toUpperCase()}
                         </p>
                         {group.items.map((w, wi) => {
@@ -837,12 +837,12 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                                 <WIcon size={18} style={{ color: wColor }} />
                               </div>
                               <div style={{ flex: 1 }}>
-                                <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "1.5px", color: "var(--text)" }}>{w.type.toUpperCase()}</p>
+                                <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "1px", color: "var(--text)" }}>{w.type.toUpperCase()}</p>
                                 <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)" }}>
                                   {fmtDate(w.date)}{w.note ? ` · ${w.note}` : ""}
                                 </p>
                               </div>
-                              <span style={{ fontFamily: "'Orbitron', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
                                 {w.duration}<span style={{ fontSize: 10, color: "var(--muted)", fontFamily: "'Barlow Condensed', sans-serif" }}> min</span>
                               </span>
                             </div>
@@ -915,7 +915,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: "2px", color: "var(--text)" }}>TAMBAH DATA KESEHATAN</h2>
+              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, letterSpacing: "2px", color: "var(--text)" }}>TAMBAH DATA KESEHATAN</h2>
               <button onClick={() => setShowModal(false)} style={{ color: "var(--muted)", fontSize: 22, background: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
             </div>
 
@@ -925,7 +925,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   key={tab}
                   onClick={() => setModalTab(tab)}
                   style={{
-                    flex: 1, padding: "10px", fontFamily: "'Bebas Neue', sans-serif",
+                    flex: 1, padding: "10px", fontFamily: "'Barlow Condensed', sans-serif",
                     fontSize: 13, letterSpacing: "2px", cursor: "pointer", transition: "all 0.2s",
                     backgroundColor: modalTab === tab ? "#C41101" : "transparent",
                     color: modalTab === tab ? "#fff" : "var(--muted)",
@@ -985,7 +985,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>TEKANAN DARAH (mmHg)</span>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <input type="number" value={fBpSys} onChange={e => setFBpSys(e.target.value)} placeholder="120" style={{ ...inputStyle, flex: 1 }} />
-                    <span style={{ color: "var(--muted)", fontFamily: "'Bebas Neue', sans-serif", fontSize: 18 }}>/</span>
+                    <span style={{ color: "var(--muted)", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18 }}>/</span>
                     <input type="number" value={fBpDia} onChange={e => setFBpDia(e.target.value)} placeholder="80" style={{ ...inputStyle, flex: 1 }} />
                   </div>
                 </div>
@@ -994,7 +994,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <textarea value={fNote} onChange={e => setFNote(e.target.value)}
                     placeholder="Kondisi hari ini, perubahan diet, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-                <button onClick={saveHealthEntry} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
+                <button onClick={saveHealthEntry} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN DATA
                 </button>
               </div>
@@ -1008,7 +1008,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>JENIS LATIHAN</span>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                     {workoutTypes.map(t => (
-                      <button key={t} onClick={() => setWType(t)} style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "1.5px", padding: "5px 12px", borderRadius: 6, cursor: "pointer", transition: "all 0.15s", backgroundColor: wType === t ? "#C41101" : "transparent", color: wType === t ? "#fff" : "var(--muted)", border: wType === t ? "1px solid #C41101" : "1px solid var(--border-subtle)" }}>
+                      <button key={t} onClick={() => setWType(t)} style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, letterSpacing: "1px", padding: "5px 12px", borderRadius: 6, cursor: "pointer", transition: "all 0.15s", backgroundColor: wType === t ? "#C41101" : "transparent", color: wType === t ? "#fff" : "var(--muted)", border: wType === t ? "1px solid #C41101" : "1px solid var(--border-subtle)" }}>
                         {t.toUpperCase()}
                       </button>
                     ))}
@@ -1022,7 +1022,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>CATATAN</span>
                   <textarea value={wNote} onChange={e => setWNote(e.target.value)} placeholder="Intensitas, lokasi, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-                <button onClick={saveWorkout} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
+                <button onClick={saveWorkout} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN LATIHAN
                 </button>
               </div>

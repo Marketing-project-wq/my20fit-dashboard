@@ -95,7 +95,7 @@ function SliderField({ label, value, onChange, color, getLabel }: {
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)" }}>{label}</label>
+        <label style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 2, color: "var(--muted)" }}>{label}</label>
         <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 600, color }}>{getLabel(value)}</span>
       </div>
       <input type="range" min={1} max={10} value={value} onChange={e => onChange(Number(e.target.value))}
@@ -314,7 +314,7 @@ export default function QuickCheckin() {
           <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#EC4899" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Heart size={18} style={{ color: "#EC4899" }} />
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 13, letterSpacing: 1, color: "var(--text)" }}>SIKLUS</span>
+            <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>SIKLUS</span>
           </div>
           {gender === "male" ? (
             <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", opacity: 0.5 }}>
@@ -324,10 +324,10 @@ export default function QuickCheckin() {
             <>
               <span style={{
                 display: "inline-block", background: cycleInfo.phaseColor + "22",
-                color: cycleInfo.phaseColor, fontFamily: "'Bebas Neue'",
+                color: cycleInfo.phaseColor, fontFamily: "'Barlow Condensed'",
                 fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99,
               }}>{cycleInfo.phase}</span>
-              <div style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "var(--text)", marginTop: 4 }}>
+              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "var(--text)", marginTop: 4 }}>
                 {cycleInfo.cycleDay}<span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginLeft: 3 }}>hari</span>
               </div>
             </>
@@ -357,7 +357,7 @@ export default function QuickCheckin() {
           <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Smile size={18} style={{ color: "#22C55E" }} />
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 13, letterSpacing: 1, color: "var(--text)" }}>WELLNESS</span>
+            <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>WELLNESS</span>
           </div>
           {wellnessData ? (
             <>
@@ -382,16 +382,16 @@ export default function QuickCheckin() {
           <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#A855F7" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Moon size={18} style={{ color: "#A855F7" }} />
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 13, letterSpacing: 1, color: "var(--text)" }}>TIDUR</span>
+            <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>TIDUR</span>
           </div>
           {sleepInfo ? (
             <>
-              <div style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "var(--text)" }}>
+              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "var(--text)" }}>
                 {sleepInfo.hours}j{sleepInfo.minutes > 0 ? ` ${sleepInfo.minutes}m` : ""}
               </div>
               <span style={{
                 display: "inline-block", background: sleepInfo.color + "22",
-                color: sleepInfo.color, fontFamily: "'Bebas Neue'",
+                color: sleepInfo.color, fontFamily: "'Barlow Condensed'",
                 fontSize: 10, letterSpacing: 1, padding: "2px 7px", borderRadius: 99, marginTop: 2,
               }}>{sleepInfo.quality}</span>
             </>
@@ -411,9 +411,9 @@ export default function QuickCheckin() {
           <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#06B6D4" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Droplets size={18} style={{ color: "#06B6D4" }} />
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 13, letterSpacing: 1, color: "var(--text)" }}>AIR</span>
+            <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>AIR</span>
           </div>
-          <div style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "var(--text)" }}>
+          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "var(--text)" }}>
             {totalCups}<span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", margin: "0 2px" }}>/</span>{targetCups}
           </div>
           <div style={{ height: 4, background: "var(--bg, #f5f5f5)", borderRadius: 99, marginTop: 6, overflow: "hidden" }}>
@@ -441,7 +441,7 @@ export default function QuickCheckin() {
               }}
             >
               <div style={{ fontSize: 32, marginBottom: 8 }}>{g === "male" ? "♂️" : "♀️"}</div>
-              <div style={{ fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 1, color: selectedGender === g ? "#C41101" : "var(--text)" }}>
+              <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 16, letterSpacing: 1, color: selectedGender === g ? "#C41101" : "var(--text)" }}>
                 {g === "male" ? "LAKI-LAKI" : "PEREMPUAN"}
               </div>
             </div>
@@ -461,7 +461,7 @@ export default function QuickCheckin() {
             background: selectedGender ? "#C41101" : "#ccc",
             color: "#fff", border: "none",
             borderRadius: 12, cursor: selectedGender ? "pointer" : "not-allowed",
-            fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 2,
+            fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1,
           }}
         >SIMPAN</button>
       </BottomSheet>
@@ -469,7 +469,7 @@ export default function QuickCheckin() {
       {/* ========== MODAL: CYCLE ========== */}
       <BottomSheet isOpen={showCycleModal} onClose={() => setShowCycleModal(false)} title="Siklus Menstruasi">
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 8 }}>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
             HARI PERTAMA HAID TERAKHIR
           </label>
           <input
@@ -487,13 +487,13 @@ export default function QuickCheckin() {
           />
         </div>
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 8 }}>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
             PANJANG SIKLUS RATA-RATA
           </label>
           <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "center" }}>
             <button onClick={() => setCycleLength(l => Math.max(21, l - 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontSize: 20, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
             <div style={{ textAlign: "center" }}>
-              <span style={{ fontFamily: "'Orbitron'", fontSize: 28, fontWeight: 700, color: "var(--text)" }}>{cycleLength}</span>
+              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 28, fontWeight: 700, color: "var(--text)" }}>{cycleLength}</span>
               <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)", marginLeft: 6 }}>hari</span>
             </div>
             <button onClick={() => setCycleLength(l => Math.min(35, l + 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontSize: 20, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
@@ -504,7 +504,7 @@ export default function QuickCheckin() {
           return (
             <div style={{ background: "var(--bg, #f9f9f9)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                <span style={{ background: info.phaseColor + "22", color: info.phaseColor, fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 1, padding: "3px 10px", borderRadius: 99 }}>{info.phase}</span>
+                <span style={{ background: info.phaseColor + "22", color: info.phaseColor, fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 1, padding: "3px 10px", borderRadius: 99 }}>{info.phase}</span>
                 <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--text)" }}>Hari ke-{info.cycleDay} dalam siklus</span>
               </div>
               <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)" }}>Perkiraan ovulasi: <strong style={{ color: "var(--text)" }}>{info.ovulation}</strong></div>
@@ -514,7 +514,7 @@ export default function QuickCheckin() {
         })()}
         <button
           onClick={saveCycle} disabled={!lastPeriod}
-          style={{ width: "100%", padding: 14, background: lastPeriod ? "#C41101" : "#ccc", color: "#fff", border: "none", borderRadius: 12, cursor: lastPeriod ? "pointer" : "not-allowed", fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 2 }}
+          style={{ width: "100%", padding: 14, background: lastPeriod ? "#C41101" : "#ccc", color: "#fff", border: "none", borderRadius: 12, cursor: lastPeriod ? "pointer" : "not-allowed", fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1 }}
         >SIMPAN</button>
       </BottomSheet>
 
@@ -523,7 +523,7 @@ export default function QuickCheckin() {
         <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)", marginBottom: 20 }}>Bagaimana kondisi kamu hari ini?</p>
 
         <div style={{ marginBottom: 24 }}>
-          <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 12 }}>SUASANA HATI</label>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 12 }}>SUASANA HATI</label>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             {MOODS.map(m => (
               <div key={m.value} onClick={() => setMood(m.value)} style={{ textAlign: "center", cursor: "pointer" }}>
@@ -539,7 +539,7 @@ export default function QuickCheckin() {
         <SliderField label="TINGKAT STRES" value={stress} onChange={setStress} color={stressColor} getLabel={stressLabel} />
 
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 10 }}>NYERI OTOT</label>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 10 }}>NYERI OTOT</label>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
             {["Tidak Ada", "Ringan", "Sedang", "Berat", "Sangat Berat"].map(s => (
               <button key={s} onClick={() => setSoreness(s)} style={{ padding: "8px 14px", borderRadius: 99, border: `1.5px solid ${soreness === s ? "#22C55E" : "var(--border-subtle, #E5E1D8)"}`, background: soreness === s ? "#22C55E" : "transparent", color: soreness === s ? "#fff" : "var(--text)", fontFamily: "'Barlow Condensed'", fontSize: 13, fontWeight: 600, cursor: "pointer", transition: "all .2s" }}>{s}</button>
@@ -547,7 +547,7 @@ export default function QuickCheckin() {
           </div>
         </div>
 
-        <button onClick={saveWellness} style={{ width: "100%", padding: 14, background: "#22C55E", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 2 }}>SIMPAN</button>
+        <button onClick={saveWellness} style={{ width: "100%", padding: 14, background: "#22C55E", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1 }}>SIMPAN</button>
       </BottomSheet>
 
       {/* ========== MODAL: SLEEP ========== */}
@@ -558,7 +558,7 @@ export default function QuickCheckin() {
             { label: "JAM BANGUN", value: wakeTime, set: setWakeTime },
           ].map(f => (
             <div key={f.label}>
-              <label style={{ fontFamily: "'Bebas Neue'", fontSize: 10, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 6 }}>{f.label}</label>
+              <label style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 6 }}>{f.label}</label>
               <input
                 type="time" value={f.value} onChange={e => f.set(e.target.value)}
                 style={{ width: "100%", padding: 12, border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 10, fontSize: 16, fontFamily: "'Barlow Condensed'", background: "var(--card)", color: "var(--text)", boxSizing: "border-box" }}
@@ -568,17 +568,17 @@ export default function QuickCheckin() {
         </div>
 
         <div style={{ background: "var(--bg, #f9f9f9)", borderRadius: 12, padding: 16, textAlign: "center", marginBottom: 16 }}>
-          <div style={{ fontFamily: "'Orbitron'", fontSize: 36, fontWeight: 900, color: "var(--text)" }}>
+          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 36, fontWeight: 900, color: "var(--text)" }}>
             {currentSleepInfo.hours}<span style={{ fontSize: 18 }}>j</span>
             {currentSleepInfo.minutes > 0 && <>{currentSleepInfo.minutes}<span style={{ fontSize: 18 }}>m</span></>}
           </div>
-          <span style={{ display: "inline-block", background: currentSleepInfo.color + "20", color: currentSleepInfo.color, fontFamily: "'Bebas Neue'", fontSize: 12, letterSpacing: 1.5, padding: "4px 12px", borderRadius: 99, marginTop: 8 }}>{currentSleepInfo.quality}</span>
+          <span style={{ display: "inline-block", background: currentSleepInfo.color + "20", color: currentSleepInfo.color, fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 12, letterSpacing: 1.5, padding: "4px 12px", borderRadius: 99, marginTop: 8 }}>{currentSleepInfo.quality}</span>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.4 }}>{currentSleepInfo.tip}</div>
         </div>
 
         {/* Weekly chart */}
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 10 }}>7 HARI TERAKHIR</label>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 10 }}>7 HARI TERAKHIR</label>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 60 }}>
             {weekSleep.map((d, i) => (
               <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
@@ -589,19 +589,19 @@ export default function QuickCheckin() {
           </div>
         </div>
 
-        <button onClick={saveSleep} style={{ width: "100%", padding: 14, background: "#A855F7", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 2 }}>SIMPAN</button>
+        <button onClick={saveSleep} style={{ width: "100%", padding: 14, background: "#A855F7", color: "#fff", border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1 }}>SIMPAN</button>
       </BottomSheet>
 
       {/* ========== MODAL: WATER ========== */}
       <BottomSheet isOpen={showWaterModal} onClose={() => setShowWaterModal(false)} title="Kebutuhan Air Harian">
         <div style={{ background: "var(--bg, #f9f9f9)", borderRadius: 12, padding: 16, marginBottom: 20 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-            <span style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)" }}>BERAT BADAN</span>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>BERAT BADAN</span>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="number" value={weight} min={30} max={200}
                 onChange={e => setWeight(Number(e.target.value))}
-                style={{ width: 60, padding: "6px 8px", textAlign: "center", border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 8, fontSize: 16, fontFamily: "'Orbitron'", fontWeight: 700, background: "var(--card)", color: "var(--text)" }}
+                style={{ width: 60, padding: "6px 8px", textAlign: "center", border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 8, fontSize: 16, fontFamily: "'JetBrains Mono'", fontWeight: 700, background: "var(--card)", color: "var(--text)" }}
               />
               <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)" }}>kg</span>
             </div>
@@ -612,14 +612,14 @@ export default function QuickCheckin() {
         </div>
 
         <div style={{ textAlign: "center", marginBottom: 20 }}>
-          <div style={{ fontFamily: "'Orbitron'", fontSize: 40, fontWeight: 900, color: "var(--text)" }}>
+          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 40, fontWeight: 900, color: "var(--text)" }}>
             {totalCups}<span style={{ fontSize: 18, color: "var(--muted)", margin: "0 4px" }}>/</span>{targetCups}
           </div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)" }}>gelas hari ini</div>
           <div style={{ height: 8, background: "var(--bg, #f5f5f5)", borderRadius: 99, margin: "12px 0", overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${waterPct}%`, background: "#06B6D4", borderRadius: 99, transition: "width .4s ease" }} />
           </div>
-          <div style={{ fontFamily: "'Bebas Neue'", fontSize: 13, letterSpacing: 1, color: waterPct >= 100 ? "#22C55E" : "#06B6D4" }}>
+          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 13, letterSpacing: 1, color: waterPct >= 100 ? "#22C55E" : "#06B6D4" }}>
             {waterPct >= 100 ? "✓ TARGET TERCAPAI!" : `${Math.round(waterPct)}% dari target`}
           </div>
         </div>
@@ -635,7 +635,7 @@ export default function QuickCheckin() {
               onClick={() => addIntake(btn.cups, btn.ml)}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = "#06B6D4"; (e.currentTarget as HTMLButtonElement).style.color = "#fff"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = "transparent"; (e.currentTarget as HTMLButtonElement).style.color = "#06B6D4"; }}
-              style={{ flex: 1, padding: "10px 8px", border: "1.5px solid #06B6D4", borderRadius: 10, background: "transparent", color: "#06B6D4", fontFamily: "'Bebas Neue'", fontSize: 14, letterSpacing: 1, cursor: "pointer", transition: "all .2s" }}
+              style={{ flex: 1, padding: "10px 8px", border: "1.5px solid #06B6D4", borderRadius: 10, background: "transparent", color: "#06B6D4", fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, cursor: "pointer", transition: "all .2s" }}
             >
               {btn.label}
               <div style={{ fontSize: 10, fontFamily: "'Barlow Condensed'", opacity: .7, marginTop: 2 }}>{btn.ml}ml</div>
@@ -645,7 +645,7 @@ export default function QuickCheckin() {
 
         {intakeLogs.length > 0 && (
           <div style={{ marginBottom: 8 }}>
-            <label style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2, color: "var(--muted)", display: "block", marginBottom: 8 }}>LOG HARI INI</label>
+            <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>LOG HARI INI</label>
             {intakeLogs.map((log, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "0.5px solid var(--border-subtle, #E5E1D8)", fontFamily: "'Barlow Condensed'", fontSize: 13 }}>
                 <span style={{ color: "var(--muted)" }}>{log.time}</span>

@@ -14,9 +14,10 @@ export default function PlusCard() {
           style={{
             backgroundColor: '#1F1F0A',
             borderRadius: '4px',
-            fontFamily: "'Bebas Neue', sans-serif",
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 900,
             fontSize: '10px',
-            letterSpacing: '2px',
+            letterSpacing: '1.5px',
             color: '#D4A800',
           }}
         >
@@ -25,13 +26,13 @@ export default function PlusCard() {
 
         <h3
           className="mb-1 leading-none"
-          style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '32px', letterSpacing: '2px' }}
+          style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: '30px', letterSpacing: '1px' }}
         >
           START SMART. SAVE 10%.
         </h3>
         <p
           className="mb-5"
-          style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}
+          style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '13px', color: 'rgba(255,255,255,0.55)' }}
         >
           New here? Plus pays for itself after 2 sessions.
         </p>
@@ -44,9 +45,10 @@ export default function PlusCard() {
               style={{
                 backgroundColor: '#1A1A0A',
                 borderRadius: '6px',
-                fontFamily: "'Bebas Neue', sans-serif",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
                 fontSize: '13px',
-                letterSpacing: '1.5px',
+                letterSpacing: '1px',
                 color: '#D4A800',
               }}
             >
@@ -66,7 +68,8 @@ export default function PlusCard() {
               <Check size={13} strokeWidth={3} style={{ color: '#D4A800', flexShrink: 0 }} />
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', system-ui",
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 900,
                   fontSize: '14px',
                   color: 'rgba(255,255,255,0.8)',
                 }}
@@ -81,14 +84,14 @@ export default function PlusCard() {
           <div>
             <p
               className="mb-0.5"
-              style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: '10px', letterSpacing: '2px', color: 'rgba(255,255,255,0.4)' }}
+              style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: '10px', letterSpacing: '1.5px', color: 'rgba(255,255,255,0.4)' }}
             >
               PRICE
             </p>
             <p
-              style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: '18px', fontWeight: 700 }}
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '18px', fontWeight: 700 }}
             >
-              Rp 49.000<span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)' }}>/mo</span>
+              Rp 49.000<span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', fontFamily: "'Barlow Condensed', sans-serif" }}>/mo</span>
             </p>
           </div>
           <button
@@ -97,9 +100,10 @@ export default function PlusCard() {
               backgroundColor: '#D4A800',
               color: '#0A0A05',
               borderRadius: '6px',
-              fontFamily: "'Bebas Neue', sans-serif",
+              fontFamily: "'Anton', sans-serif",
+              fontWeight: 400,
               fontSize: '13px',
-              letterSpacing: '2px',
+              letterSpacing: '1px',
             }}
             data-testid="button-upgrade-plus"
           >

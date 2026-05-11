@@ -19,9 +19,10 @@ export default function Greeting() {
     <div className="mb-2" data-testid="section-greeting">
       <p
         style={{
-          fontFamily: "'Bebas Neue', sans-serif",
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900,
           fontSize: '11px',
-          letterSpacing: '3.5px',
+          letterSpacing: '2px',
           color: 'var(--muted)',
           opacity: 0.7,
           marginBottom: '2px',
@@ -31,9 +32,10 @@ export default function Greeting() {
       </p>
       <h1
         style={{
-          fontFamily: "'Bebas Neue', sans-serif",
-          fontSize: '48px',
-          letterSpacing: '-1px',
+          fontFamily: "'Anton', sans-serif",
+          fontWeight: 400,
+          fontSize: '44px',
+          letterSpacing: '-0.5px',
           color: 'var(--text)',
           lineHeight: 1,
           marginBottom: '6px',
@@ -43,7 +45,8 @@ export default function Greeting() {
       </h1>
       <p
         style={{
-          fontFamily: "'Barlow Condensed', system-ui",
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900,
           fontSize: '13px',
           color: 'var(--muted)',
           lineHeight: 1.5,

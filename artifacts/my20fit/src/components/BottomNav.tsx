@@ -31,9 +31,10 @@ export default function BottomNav() {
                 <Icon size={20} strokeWidth={active ? 2.5 : 1.8} />
                 <span
                   style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontFamily: "'Anton', sans-serif",
+                    fontWeight: 400,
                     fontSize: '9px',
-                    letterSpacing: '1.5px',
+                    letterSpacing: '1px',
                   }}
                 >
                   {label}

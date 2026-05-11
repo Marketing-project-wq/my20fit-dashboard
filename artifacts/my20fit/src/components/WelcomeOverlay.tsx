@@ -93,14 +93,14 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
                 <div style={{
                   width: 72, height: 72, borderRadius: "50%", background: "#C41101",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "'Bebas Neue', sans-serif", fontSize: 30, color: "#fff",
+                  fontFamily: "'Barlow Condensed', sans-serif", fontSize: 30, color: "#fff",
                   marginBottom: 14,
                 }}>
                   {firstName.slice(0, 2).toUpperCase()}
                 </div>
               )}
 
-              <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", margin: 0 }}>
+              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", margin: 0 }}>
                 Halo, {firstName}! 👋
               </h2>
 
@@ -109,7 +109,7 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
                   <span style={{
                     background: "#DCFCE7", color: "#16A34A", border: "1px solid #86EFAC",
                     borderRadius: 20, padding: "4px 14px",
-                    fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "1.5px",
+                    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, letterSpacing: "1.5px",
                   }}>
                     ✓ AKUN 20FIT TERHUBUNG
                   </span>
@@ -153,7 +153,7 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
               style={{
                 width: "100%", padding: "14px", background: "#C41101", color: "#fff",
                 border: "none", borderRadius: 10, cursor: "pointer",
-                fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px",
+                fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px",
                 transition: "transform 0.2s, box-shadow 0.2s",
               }}
               onMouseEnter={e => {

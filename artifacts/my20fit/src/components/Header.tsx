@@ -8,8 +8,8 @@ export default function Header({ theme, toggleTheme }: { theme: string; toggleTh
       data-testid="header"
     >
       <h1
-        className="text-2xl tracking-wide"
-        style={{ fontFamily: "'Bebas Neue', sans-serif", color: 'var(--text)' }}
+        className="text-2xl"
+        style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: '1px', color: 'var(--text)' }}
       >
         my<span style={{ color: '#C41101' }}>20</span>FIT
       </h1>

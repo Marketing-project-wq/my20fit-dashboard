@@ -48,7 +48,7 @@ export default function BottomSheet({ isOpen, onClose, title, children }: Bottom
           alignItems: "center", marginBottom: 20,
         }}>
           <div style={{
-            fontFamily: "'Bebas Neue'",
+            fontFamily: "'Barlow Condensed'",
             fontSize: 22, letterSpacing: 1,
             color: "var(--text)",
           }}>{title}</div>

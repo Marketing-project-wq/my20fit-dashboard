@@ -281,7 +281,7 @@ export default function WeatherCard() {
             {loading ? (
               <Shimmer w={100} h={10} />
             ) : (
-              <span style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "11px", letterSpacing: "2.5px", ...muted }}>
+              <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "11px", letterSpacing: "2.5px", ...muted }}>
                 {error ? "LOCATION · NOW" : `${weather?.city?.toUpperCase()} · NOW`}
               </span>
             )}
@@ -292,10 +292,10 @@ export default function WeatherCard() {
             <Shimmer w={140} h={56} style={{ marginBottom: "6px" }} />
           ) : (
             <div style={{ display: "flex", alignItems: "flex-start", lineHeight: 1, marginBottom: "4px" }}>
-              <span style={{ fontFamily: "'Orbitron', monospace", fontSize: "64px", fontWeight: 900, letterSpacing: "-2px", ...text }}>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "56px", fontWeight: 900, letterSpacing: "-2px", ...text }}>
                 {error ? "—" : weather?.temp}
               </span>
-              <span style={{ fontFamily: "'Orbitron', monospace", fontSize: "28px", fontWeight: 700, marginTop: "8px", ...muted }}>°</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 700, marginTop: "8px", ...muted }}>°</span>
             </div>
           )}
 
@@ -328,7 +328,7 @@ export default function WeatherCard() {
           minWidth: "80px",
           flexShrink: 0,
         }}>
-          <span style={{ display: "block", fontFamily: "'Bebas Neue', sans-serif", fontSize: "9px", letterSpacing: "2px", color: "rgba(255,255,255,.45)", marginBottom: "4px" }}>AQI</span>
+          <span style={{ display: "block", fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", color: "rgba(255,255,255,.45)", marginBottom: "4px" }}>AQI</span>
           {loading ? (
             <>
               <Shimmer w={44} h={32} style={{ margin: "0 auto 6px" }} />
@@ -336,10 +336,10 @@ export default function WeatherCard() {
             </>
           ) : (
             <>
-              <span style={{ display: "block", fontFamily: "'Orbitron', monospace", fontSize: "32px", fontWeight: 900, color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), lineHeight: 1 }}>
+              <span style={{ display: "block", fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 900, color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), lineHeight: 1 }}>
                 {error ? "—" : weather?.aqi}
               </span>
-              <span style={{ display: "block", fontFamily: "'Bebas Neue', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), marginTop: "6px", lineHeight: 1.2 }}>
+              <span style={{ display: "block", fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), marginTop: "6px", lineHeight: 1.2 }}>
                 {error ? "N/A" : weather?.aqiLabel?.toUpperCase()}
               </span>
             </>
@@ -364,11 +364,11 @@ export default function WeatherCard() {
               borderRight: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none",
             }}
           >
-            <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "9px", letterSpacing: "2px", ...muted, marginBottom: "4px" }}>{s.label}</p>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", ...muted, marginBottom: "4px" }}>{s.label}</p>
             {loading ? (
               <Shimmer w={36} h={18} style={{ margin: "0 auto 3px" }} />
             ) : (
-              <p style={{ fontFamily: "'Orbitron', monospace", fontSize: "16px", fontWeight: 700, ...text, lineHeight: 1 }}>{s.val}</p>
+              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "16px", fontWeight: 700, ...text, lineHeight: 1 }}>{s.val}</p>
             )}
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "11px", ...muted, marginTop: "2px" }}>{s.unit}</p>
           </div>
@@ -382,12 +382,12 @@ export default function WeatherCard() {
             {rec.icon}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "9px", letterSpacing: "2px", color: recTagColor, marginBottom: "2px" }}>{rec.tag}</p>
-            <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "15px", color: "#0A0908", marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", color: recTagColor, marginBottom: "2px" }}>{rec.tag}</p>
+            <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: "#0A0908", marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 500, color: "#6B7280", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
               {rec.pills.map(pill => (
-                <span key={pill} style={{ backgroundColor: recPillBg, color: recTagColor, fontFamily: "'Bebas Neue', sans-serif", fontSize: "9px", letterSpacing: "1px", borderRadius: "99px", padding: "3px 8px" }}>{pill}</span>
+                <span key={pill} style={{ backgroundColor: recPillBg, color: recTagColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "1px", borderRadius: "99px", padding: "3px 8px" }}>{pill}</span>
               ))}
             </div>
           </div>
@@ -396,7 +396,7 @@ export default function WeatherCard() {
 
       {/* ── Section 4: Hourly Forecast ── */}
       <div>
-        <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "10px", letterSpacing: "2.5px", ...muted, padding: "14px 20px 8px" }}>NEXT 12 HOURS</p>
+        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "2.5px", ...muted, padding: "14px 20px 8px" }}>NEXT 12 HOURS</p>
         <div style={{ display: "flex", overflowX: "auto", padding: "0 20px 16px", gap: "6px", scrollbarWidth: "none" }}>
           {loading ? (
             Array.from({ length: 8 }).map((_, i) => (
@@ -424,13 +424,13 @@ export default function WeatherCard() {
                     border: `0.5px solid ${isNow ? "#0A0908" : "var(--border-subtle)"}`,
                   }}
                 >
-                  <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: isNow ? "rgba(255,255,255,.5)" : "var(--muted)", marginBottom: "5px" }}>
+                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: isNow ? "rgba(255,255,255,.5)" : "var(--muted)", marginBottom: "5px" }}>
                     {isNow ? "NOW" : h.time}
                   </p>
                   <p style={{ fontSize: "18px", marginBottom: "4px" }}>{h.icon}</p>
-                  <p style={{ fontFamily: "'Orbitron', monospace", fontSize: "13px", fontWeight: 700, color: isNow ? "#fff" : "var(--text)", marginBottom: "4px" }}>{h.temp}°</p>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 700, color: isNow ? "#fff" : "var(--text)", marginBottom: "4px" }}>{h.temp}°</p>
                   {h.aqi != null && cellAqiColor && cellAqiBg && (
-                    <span style={{ backgroundColor: cellAqiBg, color: cellAqiColor, fontFamily: "'Bebas Neue', sans-serif", fontSize: "9px", borderRadius: "4px", padding: "1px 5px", letterSpacing: "0.5px" }}>
+                    <span style={{ backgroundColor: cellAqiBg, color: cellAqiColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", borderRadius: "4px", padding: "1px 5px", letterSpacing: "0.5px" }}>
                       {h.aqi}
                     </span>
                   )}

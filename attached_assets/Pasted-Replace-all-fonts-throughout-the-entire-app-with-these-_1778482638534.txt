@@ -1,0 +1,273 @@
+Replace all fonts throughout the entire app with these new fonts:
+
+---
+
+## STEP 1: UPDATE FONT IMPORTS IN index.css
+
+Remove existing Google Fonts import and replace with:
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,900;1,900&family=JetBrains+Mono:wght@400;500;700&family=Anton&display=swap');
+
+---
+
+## STEP 2: UPDATE CSS VARIABLES IN index.css
+
+Replace font family variables:
+
+:root {
+  --font-display: 'Anton', sans-serif;
+  --font-display-italic: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow Condensed', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+---
+
+## STEP 3: FONT USAGE RULES
+
+Apply fonts consistently across ALL components:
+
+ANTON REGULAR → use for:
+- Page titles (NUTRISI HARIAN, PROGRESS, HOME, etc.)
+- Section headers (TODAY'S CHECKLIST, MEDICAL CHECKUP, etc.)
+- Navigation labels in sidebar and bottom nav
+- Large headlines and hero text
+- Button text (MASUK, DAFTAR, UPLOAD MCU, etc.)
+- Card titles (ALL DONE TODAY!, NO MCU ON FILE YET, etc.)
+- Tab labels
+- Badge text
+Example: fontFamily: "'Anton', sans-serif"
+
+BARLOW CONDENSED BLACK (weight 900) → use for:
+- Metric labels (HUMIDITY, UV INDEX, AQI, etc.)
+- Tag/chip text (HIGH, 30 MIN, GYM, etc.)
+- Status badges (COMPLETE, UNHEALTHY, etc.)
+- Small caps labels and tracked uppercase text
+- Tile titles in Quick Check-in
+- All letter-spaced uppercase labels
+Example: fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900
+
+BARLOW CONDENSED BLACK ITALIC (weight 900 italic) → use for:
+- AI-generated text (MCU summary, nutrition insight, recommendations)
+- Doctor notes and medical summaries
+- Motivational subtext in greeting
+- Insight/tip text in cards
+- Quote-style callouts
+Example: fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: 'italic'
+
+JETBRAINS MONO REGULAR → use for:
+- All numbers (temperature, AQI, BMI, weight, HR, etc.)
+- Progress counters (5/5, 3/5, etc.)
+- Time displays (23:00, 06:00, etc.)
+- Stats and metrics values
+- Calorie numbers
+- Water intake amounts
+- Any numerical data
+Example: fontFamily: "'JetBrains Mono', monospace"
+
+---
+
+## STEP 4: UPDATE ALL COMPONENTS
+
+Go through every component file and update fontFamily:
+
+### src/index.css global rules:
+body {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400; /* Anton only has regular weight */
+}
+
+/* Utility classes */
+.font-display { font-family: 'Anton', sans-serif; }
+.font-body { font-family: 'Barlow Condensed', sans-serif; font-weight: 900; }
+.font-body-italic { 
+  font-family: 'Barlow Condensed', sans-serif; 
+  font-weight: 900; 
+  font-style: italic; 
+}
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+### Header.jsx:
+- Logo "my20FIT": Anton
+- Greeting tag "GOOD MORNING, ZIDNI": Barlow Condensed 900
+- Name "ZIDNI": Anton 48px
+
+### Sidebar.jsx:
+- "MY20FIT" logo: Anton
+- Nav labels (HOME, PROGRESS, etc.): Anton
+- User name: Anton
+- "PLUS MEMBER" badge: Barlow Condensed 900
+- Email: Barlow Condensed 900
+
+### WeatherCard.jsx:
+- "JAKARTA · NOW": Barlow Condensed 900, letter-spacing 2.5px
+- Temperature number: JetBrains Mono
+- "AQI" label: Barlow Condensed 900
+- AQI number: JetBrains Mono
+- "UNHEALTHY/MODERATE" status: Barlow Condensed 900
+- Stat labels (HUMIDITY, UV INDEX, etc.): Barlow Condensed 900
+- Stat values (89, 1.2, 9): JetBrains Mono
+- Condition text: Barlow Condensed 900
+- "NEXT 12 HOURS": Barlow Condensed 900
+- Hour time labels: Barlow Condensed 900
+- Hour temp values: JetBrains Mono
+- Recommendation title: Anton
+- Recommendation desc: Barlow Condensed 900
+- Recommendation pills: Barlow Condensed 900
+
+### MedicalCheckup.jsx:
+- "MEDICAL CHECKUP" section header: Barlow Condensed 900, tracked
+- "NO MCU ON FILE YET": Anton
+- Description: Barlow Condensed 900
+- Feature tiles (Reviewed by doctor, etc.): Barlow Condensed 900
+- Button text: Anton
+- Grade badge letter: Anton
+- "YOUR HEALTH BASELINE": Anton
+- Summary text: Barlow Condensed 900 italic
+- Doctor notes: Barlow Condensed 900 italic
+- Metric labels: Barlow Condensed 900
+- Metric values: JetBrains Mono
+
+### TodaysChecklist.jsx:
+- "TODAY'S CHECKLIST" header: Barlow Condensed 900, tracked
+- "TODAY" label: Barlow Condensed 900
+- Date: Anton
+- Progress number "5/5": JetBrains Mono
+- "COMPLETE" label: Barlow Condensed 900
+- "ALL DONE TODAY!": Anton
+- Item title: Barlow Condensed 900
+- Item subtitle: Barlow Condensed 900
+- Tags (HIGH, 30 MIN, GYM): Barlow Condensed 900
+- Empty state title: Anton
+- CTA button: Anton
+
+### QuickCheckin.jsx:
+- "QUICK CHECK-IN" header: Barlow Condensed 900, tracked
+- Tile titles: Anton
+- Tile values: JetBrains Mono for numbers, Barlow Condensed 900 for text
+- Modal titles: Anton
+- Modal labels: Barlow Condensed 900, tracked
+- Slider values: JetBrains Mono
+- Time inputs: JetBrains Mono
+- Duration display: JetBrains Mono
+- Save buttons: Anton
+- Phase labels: Barlow Condensed 900
+- Quality badges: Barlow Condensed 900
+
+### SportsEvents.jsx:
+- "UPCOMING SPORTS EVENTS" header: Barlow Condensed 900, tracked
+- Event title: Anton
+- Event date/location: Barlow Condensed 900
+- Countdown: JetBrains Mono + Barlow Condensed 900
+- "REGISTER →" button: Anton
+
+### PlusCard.jsx:
+- "20FIT PLUS" badge: Barlow Condensed 900
+- "START SMART. SAVE 10%." headline: Anton
+- Description: Barlow Condensed 900
+- Discount tiles: JetBrains Mono for %, Anton for label
+- Price: JetBrains Mono
+- "UPGRADE →": Anton
+
+### Progress.jsx:
+- "PROGRESS" title: Anton
+- Subtitle: Barlow Condensed 900
+- Date range pills: Barlow Condensed 900
+- "HEALTH GRADE": Barlow Condensed 900, tracked
+- Grade letter: Anton
+- Summary text: Barlow Condensed 900 italic
+- Metric card labels: Barlow Condensed 900
+- Metric values: JetBrains Mono
+- Status badges: Barlow Condensed 900
+- Chart axis labels: JetBrains Mono
+- Chart tooltip: Barlow Condensed 900
+- Section titles: Barlow Condensed 900, tracked
+- Workout type: Anton
+- Duration: JetBrains Mono
+- FAB hint: Barlow Condensed 900
+
+### Nutrition.jsx:
+- "NUTRISI HARIAN": Anton
+- Date: Barlow Condensed 900
+- "REFRESH": Barlow Condensed 900
+- "GOAL NUTRISI HARI INI": Barlow Condensed 900, tracked
+- Goal text: Barlow Condensed 900 italic
+- Calorie numbers: JetBrains Mono
+- Macro labels: Barlow Condensed 900
+- Meal time: Anton
+- Time range: Barlow Condensed 900
+- "SEKARANG" badge: Barlow Condensed 900
+- Food names: Barlow Condensed 900
+- Portions: Barlow Condensed 900
+- Calorie per food: JetBrains Mono
+- Tags: Barlow Condensed 900
+- "HINDARI": Barlow Condensed 900
+- Reason text: Barlow Condensed 900 italic
+- Insight: Barlow Condensed 900 italic
+- Supplement name: Anton
+- Supplement dose: JetBrains Mono
+- Disclaimer: Barlow Condensed 900
+
+### Login.jsx:
+- Wordmark lines: Anton (ELEVATE, EVERY, METRIC)
+- Tab labels: Anton
+- Form heading label: Barlow Condensed 900
+- Form title: Anton
+- Field labels: Barlow Condensed 900, tracked
+- Input text: Barlow Condensed 900
+- Button text: Anton
+- "atau": Barlow Condensed 900
+- Terms text: Barlow Condensed 900
+- Switch link: Barlow Condensed 900
+- Feature titles: Anton
+- Feature descriptions: Barlow Condensed 900
+- Footer links: Barlow Condensed 900
+- Chip tags: Barlow Condensed 900
+
+### BottomNav.jsx:
+- All tab labels: Anton
+
+---
+
+## STEP 5: FONT SIZE ADJUSTMENTS
+
+Anton renders slightly smaller than Bebas Neue visually.
+Adjust sizes:
+- Former Bebas Neue 32px → Anton 30px
+- Former Bebas Neue 22px (modal titles) → Anton 22px
+- Former Bebas Neue 11px labels → Barlow Condensed 900 11px
+- Former Bebas Neue 48px (greeting name) → Anton 44px
+- Former Orbitron 64px (temp) → JetBrains Mono 56px
+- Former Orbitron 32px (AQI) → JetBrains Mono 28px
+- Former Orbitron 28px (metrics) → JetBrains Mono 26px
+
+---
+
+## STEP 6: LETTER SPACING ADJUSTMENTS
+
+Anton has natural spacing — reduce letter-spacing:
+- Labels that had letterSpacing: '2px' or '2.5px' → reduce to '1px' or '1.5px'
+- Section headers → letterSpacing: '1.5px' max
+- Buttons → letterSpacing: '1px'
+
+JetBrains Mono — keep default spacing (0) for numbers.
+Add slight negative letter-spacing for large numbers:
+- 64px+ numbers: letterSpacing: '-1px'
+- 32px+ numbers: letterSpacing: '-0.5px'
+
+---
+
+## STEP 7: VERIFY
+
+After updating all components:
+1. Check that no component still references 'Bebas Neue' or 'Orbitron'
+2. grep -r "Bebas Neue" src/ — should return nothing
+3. grep -r "Orbitron" src/ — should return nothing
+4. npm run build — fix all errors
+5. Visual check: numbers use JetBrains Mono, 
+   headlines use Anton, labels use Barlow Condensed 900

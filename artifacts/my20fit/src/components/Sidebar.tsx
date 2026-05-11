@@ -33,8 +33,8 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
       <div className="px-6 pt-8 pb-6">
         <Link href="/">
           <h1
-            className="text-3xl tracking-wide text-white cursor-pointer"
-            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
+            className="text-3xl cursor-pointer text-white"
+            style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: '1px' }}
           >
             my<span style={{ color: "#C41101" }}>20</span>FIT
           </h1>
@@ -49,8 +49,9 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
               <button
                 className={`flex items-center gap-3 px-6 py-3.5 w-full text-left transition-all duration-200 sidebar-nav-btn${active ? " sidebar-nav-active" : ""}`}
                 style={{
-                  fontFamily: "'Bebas Neue', sans-serif",
-                  letterSpacing: "2px",
+                  fontFamily: "'Anton', sans-serif",
+                  fontWeight: 400,
+                  letterSpacing: "1px",
                   fontSize: "14px",
                   backgroundColor: active ? "#C41101" : "transparent",
                   color: active ? "#FFFFFF" : "rgba(255,255,255,0.6)",
@@ -70,20 +71,20 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
       <div className="mt-auto px-6 pb-6 flex flex-col gap-3">
         <div className="flex items-center gap-3 pt-4 border-t border-white/10">
           <div
-            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-bold"
-            style={{ backgroundColor: "#C41101", fontFamily: "'Bebas Neue', sans-serif" }}
+            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm"
+            style={{ backgroundColor: "#C41101", fontFamily: "'Anton', sans-serif", fontWeight: 400 }}
           >
             {initials}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-white text-sm truncate" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "1px" }}>
+            <span className="text-white text-sm truncate" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: "0.5px" }}>
               {displayName}
             </span>
-            <span className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Barlow Condensed', sans-serif" }}>
+            <span className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>
               {user?.email}
             </span>
             {isPlusMember && (
-              <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "1.5px" }}>
+              <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: "1px" }}>
                 ⭐ PLUS MEMBER
               </span>
             )}
@@ -96,8 +97,9 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
           style={{
             backgroundColor: "#1A1A1A",
             color: "rgba(255,255,255,0.7)",
-            fontFamily: "'Bebas Neue', sans-serif",
-            letterSpacing: "2px",
+            fontFamily: "'Anton', sans-serif",
+            fontWeight: 400,
+            letterSpacing: "1px",
             fontSize: "12px",
             borderRadius: "6px",
           }}

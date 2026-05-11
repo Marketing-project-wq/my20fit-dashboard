@@ -180,7 +180,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
           <div style={{ marginBottom: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
               <div>
-                <div style={{ fontFamily: "'Bebas Neue'", fontSize: 32, letterSpacing: 1, color: "var(--text)" }}>
+                <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 30, letterSpacing: 0.5, color: "var(--text)" }}>
                   NUTRISI HARIAN
                 </div>
                 <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, color: "var(--muted)" }}>
@@ -196,7 +196,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                   padding: "8px 14px", background: "transparent",
                   border: "1.5px solid var(--border-subtle, #E5E1D8)",
                   borderRadius: 10, cursor: loading ? "not-allowed" : "pointer",
-                  fontFamily: "'Bebas Neue'", fontSize: 12, letterSpacing: 1.5,
+                  fontFamily: "'Barlow Condensed'", fontSize: 12, letterSpacing: 1.5,
                   color: "var(--muted)", transition: "all .2s",
                 }}
               >
@@ -213,7 +213,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
               }}>
                 <AlertTriangle size={16} color="#D97706" style={{ flexShrink: 0, marginTop: 2 }} />
                 <div>
-                  <div style={{ fontFamily: "'Bebas Neue'", fontSize: 12, letterSpacing: 1.5, color: "#92400E", marginBottom: 2 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, letterSpacing: 1.5, color: "#92400E", marginBottom: 2 }}>
                     REKOMENDASI UMUM
                   </div>
                   <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "#78350F", lineHeight: 1.4 }}>
@@ -228,15 +228,15 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
           {!hasAnyData && !loading && !recommendation && !error && (
             <div style={{ textAlign: "center", padding: "60px 20px" }}>
               <UtensilsCrossed size={48} style={{ color: "var(--muted)", opacity: 0.3, marginBottom: 16, margin: "0 auto 16px", display: "block" }} />
-              <div style={{ fontFamily: "'Bebas Neue'", fontSize: 24, color: "var(--text)", marginBottom: 8 }}>BELUM ADA DATA</div>
+              <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 22, color: "var(--text)", marginBottom: 8 }}>BELUM ADA DATA</div>
               <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)", maxWidth: 280, margin: "0 auto 24px", lineHeight: 1.5 }}>
                 Lengkapi data kesehatanmu untuk mendapatkan rekomendasi nutrisi yang personal.
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <button onClick={() => setLocation("/")} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontFamily: "'Bebas Neue'", fontSize: 15, letterSpacing: 2, cursor: "pointer" }}>
+                <button onClick={() => setLocation("/")} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, cursor: "pointer" }}>
                   UPLOAD MCU DULU →
                 </button>
-                <button onClick={() => generateRecommendation(true)} style={{ background: "transparent", border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 12, padding: "12px 24px", fontFamily: "'Bebas Neue'", fontSize: 15, letterSpacing: 2, color: "var(--muted)", cursor: "pointer" }}>
+                <button onClick={() => generateRecommendation(true)} style={{ background: "transparent", border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 12, padding: "12px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, color: "var(--muted)", cursor: "pointer" }}>
                   GENERATE DENGAN DATA UMUM
                 </button>
               </div>
@@ -247,7 +247,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
           {loading && (
             <div style={{ textAlign: "center", padding: "40px 20px" }}>
               <div className="spin-anim" style={{ width: 48, height: 48, borderRadius: "50%", border: "3px solid #C41101", borderTopColor: "transparent", margin: "0 auto 16px" }} />
-              <div style={{ fontFamily: "'Bebas Neue'", fontSize: 18, letterSpacing: 2, color: "var(--text)", marginBottom: 8 }}>
+              <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 18, letterSpacing: 0.5, color: "var(--text)", marginBottom: 8 }}>
                 MENYUSUN REKOMENDASI
               </div>
               <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)" }}>
@@ -261,7 +261,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
             <div style={{ textAlign: "center", padding: "40px 20px" }}>
               <AlertTriangle size={40} style={{ color: "#D97706", margin: "0 auto 12px", display: "block" }} />
               <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, color: "var(--muted)", marginBottom: 16 }}>{error}</div>
-              <button onClick={() => generateRecommendation(true)} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontFamily: "'Bebas Neue'", fontSize: 14, letterSpacing: 2, cursor: "pointer" }}>
+              <button onClick={() => generateRecommendation(true)} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, cursor: "pointer" }}>
                 COBA LAGI
               </button>
             </div>
@@ -273,17 +273,17 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
               {/* Last updated */}
               {cachedTimestamp && (
-                <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)", textAlign: "right" }}>
+                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, color: "var(--muted)", textAlign: "right" }}>
                   Diperbarui: {new Date(cachedTimestamp).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} · Cache berlaku 3 jam
                 </div>
               )}
 
               {/* Section 1: Goal + Calories */}
               <div style={{ background: "linear-gradient(135deg, #0A0908 0%, #1A1A0F 100%)", borderRadius: 16, padding: 20 }}>
-                <div style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
+                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
                   GOAL NUTRISI HARI INI
                 </div>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 16, fontWeight: 600, color: "#fff", marginBottom: 20, lineHeight: 1.4 }}>
+                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 15, fontStyle: "italic", color: "#fff", marginBottom: 20, lineHeight: 1.4 }}>
                   {recommendation.overall_goal}
                 </div>
 
@@ -295,10 +295,10 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                     { label: "LEMAK", value: recommendation.calorie_estimate?.breakdown?.fat, unit: "", color: "#22C55E" },
                   ].map(item => (
                     <div key={item.label} style={{ textAlign: "center" }}>
-                      <div style={{ fontFamily: "'Orbitron'", fontSize: 16, fontWeight: 700, color: item.color, lineHeight: 1 }}>
+                      <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 16, fontWeight: 700, color: item.color, lineHeight: 1 }}>
                         {item.value ?? "—"}
                       </div>
-                      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 9, letterSpacing: 1.5, color: "rgba(255,255,255,.4)", marginTop: 3 }}>
+                      <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 9, letterSpacing: 1.5, color: "rgba(255,255,255,.4)", marginTop: 3 }}>
                         {item.label}
                       </div>
                     </div>
@@ -316,11 +316,11 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
               {recommendation.hydration && (
                 <div style={{ background: "var(--card)", borderRadius: 14, padding: "16px 20px", boxShadow: "var(--shadow, 0 2px 8px rgba(0,0,0,0.06))" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>
                       <Droplets size={14} color="#06B6D4" />
                       HIDRASI HARI INI
                     </div>
-                    <span style={{ fontFamily: "'Orbitron'", fontSize: 16, fontWeight: 700, color: "#06B6D4" }}>
+                    <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 16, fontWeight: 700, color: "#06B6D4" }}>
                       {recommendation.hydration.current_l}L / {recommendation.hydration.target_l}L
                     </span>
                   </div>
@@ -365,9 +365,9 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           <span style={{ fontSize: 24 }}>{meal.emoji}</span>
                           <div>
                             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              <span style={{ fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 0.5, color: "var(--text)" }}>{meal.time}</span>
+                              <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 16, letterSpacing: 0.5, color: "var(--text)" }}>{meal.time}</span>
                               {isCurrent && (
-                                <span style={{ background: "#C41101", color: "#fff", fontFamily: "'Bebas Neue'", fontSize: 9, letterSpacing: 1.5, padding: "2px 8px", borderRadius: 99 }}>
+                                <span style={{ background: "#C41101", color: "#fff", fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: 1.5, padding: "2px 8px", borderRadius: 99 }}>
                                   SEKARANG
                                 </span>
                               )}
@@ -384,16 +384,16 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           {meal.suggestions.map((s, i) => (
                             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                               <div>
-                                <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.name}</span>
+                                <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</span>
                                 <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>{s.portion}</span>
                                 {s.tags?.map(tag => (
-                                  <span key={tag} style={{ display: "inline-block", background: "rgba(196,17,1,.08)", color: "#C41101", fontFamily: "'Bebas Neue'", fontSize: 9, letterSpacing: 1, padding: "2px 6px", borderRadius: 4, marginLeft: 6 }}>
+                                  <span key={tag} style={{ display: "inline-block", background: "rgba(196,17,1,.08)", color: "#C41101", fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: 1, padding: "2px 6px", borderRadius: 4, marginLeft: 6 }}>
                                     {tag}
                                   </span>
                                 ))}
                               </div>
                               {s.calories != null && (
-                                <span style={{ fontFamily: "'Orbitron'", fontSize: 12, fontWeight: 700, color: "var(--muted)", flexShrink: 0 }}>
+                                <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 12, fontWeight: 700, color: "var(--muted)", flexShrink: 0 }}>
                                   {s.calories}
                                 </span>
                               )}
@@ -407,7 +407,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                         <div style={{ padding: "0 16px 14px", borderTop: "0.5px solid var(--border-subtle, #E5E1D8)" }}>
                           {meal.avoid && meal.avoid.length > 0 && (
                             <div style={{ marginTop: 12 }}>
-                              <div style={{ fontFamily: "'Bebas Neue'", fontSize: 10, letterSpacing: 2, color: "#EF4444", marginBottom: 6 }}>HINDARI</div>
+                              <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 1.5, color: "#EF4444", marginBottom: 6 }}>HINDARI</div>
                               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                                 {meal.avoid.map((a, i) => (
                                   <span key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,.08)", color: "#EF4444", fontFamily: "'Barlow Condensed'", fontSize: 12, padding: "4px 10px", borderRadius: 99 }}>
@@ -433,7 +433,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
               {/* Section 4: Foods to avoid today */}
               {recommendation.foods_to_avoid_today && recommendation.foods_to_avoid_today.length > 0 && (
                 <div style={{ background: "var(--card)", borderRadius: 14, padding: "16px 20px", boxShadow: "var(--shadow, 0 2px 8px rgba(0,0,0,0.05))" }}>
-                  <div style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "#EF4444", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "#EF4444", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                     <AlertTriangle size={12} />
                     HINDARI HARI INI
                   </div>
@@ -456,7 +456,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
               {/* Section 5: Supplements */}
               {recommendation.supplements && recommendation.supplements.length > 0 && (
                 <div style={{ background: "var(--card)", borderRadius: 14, padding: "16px 20px", boxShadow: "var(--shadow, 0 2px 8px rgba(0,0,0,0.05))" }}>
-                  <div style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", marginBottom: 12, display: "flex", alignItems: "center", gap: 6 }}>
                     <Pill size={12} />
                     SUPLEMEN REKOMENDASI
                   </div>
@@ -464,11 +464,11 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                     {recommendation.supplements.map((s, i) => (
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                         <div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{s.name}</div>
+                          <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</div>
                           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)" }}>{s.reason}</div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
-                          <div style={{ fontFamily: "'Bebas Neue'", fontSize: 12, letterSpacing: 1, color: "#C41101" }}>{s.dose}</div>
+                          <div style={{ fontFamily: "'JetBrains Mono'", fontWeight: 700, fontSize: 12, color: "#C41101" }}>{s.dose}</div>
                           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)" }}>{s.timing}</div>
                         </div>
                       </div>

@@ -166,16 +166,17 @@ export default function TodaysChecklist() {
               style={{
                 backgroundColor: "rgba(34,197,94,0.12)",
                 color: "#22C55E",
-                fontFamily: "'Bebas Neue', sans-serif",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
                 fontSize: "9px",
-                letterSpacing: "1.5px",
+                letterSpacing: "1px",
               }}
             >
               FROM YOUR MCU
             </span>
           )}
         </div>
-        <span style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "12px", color: "var(--muted)" }}>{dateStr}</span>
+        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "11px", color: "var(--muted)" }}>{dateStr}</span>
       </div>
 
       {/* Header card */}
@@ -188,9 +189,10 @@ export default function TodaysChecklist() {
           <div>
             <p
               style={{
-                fontFamily: "'Bebas Neue', sans-serif",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
                 fontSize: "10px",
-                letterSpacing: "3px",
+                letterSpacing: "1.5px",
                 color: allDone ? "rgba(255,255,255,0.7)" : "var(--muted)",
               }}
             >
@@ -198,9 +200,9 @@ export default function TodaysChecklist() {
             </p>
             <p
               style={{
-                fontFamily: "'Barlow Condensed', system-ui",
-                fontWeight: 600,
-                fontSize: "16px",
+                fontFamily: "'Anton', sans-serif",
+                fontWeight: 400,
+                fontSize: "15px",
                 color: allDone ? "#fff" : "var(--text)",
               }}
             >
@@ -211,7 +213,7 @@ export default function TodaysChecklist() {
             <p
               className="leading-none"
               style={{
-                fontFamily: "'Orbitron', monospace",
+                fontFamily: "'JetBrains Mono', monospace",
                 fontSize: "22px",
                 fontWeight: 700,
                 color: allDone ? "#fff" : "var(--text)",
@@ -222,9 +224,10 @@ export default function TodaysChecklist() {
             <p
               className="mt-1"
               style={{
-                fontFamily: "'Bebas Neue', sans-serif",
+                fontFamily: allDone ? "'Anton', sans-serif" : "'Barlow Condensed', sans-serif",
+                fontWeight: allDone ? 400 : 900,
                 fontSize: "10px",
-                letterSpacing: "2px",
+                letterSpacing: allDone ? "1px" : "1.5px",
                 color: allDone ? "rgba(255,255,255,0.85)" : "var(--muted)",
               }}
             >
@@ -275,8 +278,8 @@ export default function TodaysChecklist() {
               {task.icon && <span className="mr-1">{task.icon}</span>}
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', system-ui",
-                  fontWeight: 600,
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 900,
                   fontSize: "15px",
                   color: task.done ? "var(--muted)" : "var(--text)",
                   textDecoration: task.done ? "line-through" : "none",
@@ -299,9 +302,10 @@ export default function TodaysChecklist() {
                 <span
                   key={tag}
                   style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontWeight: 900,
                     fontSize: "10px",
-                    letterSpacing: "1.5px",
+                    letterSpacing: "1px",
                     color: "var(--muted)",
                     border: "1px solid var(--border-subtle)",
                     borderRadius: "3px",

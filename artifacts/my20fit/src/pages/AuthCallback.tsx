@@ -46,7 +46,7 @@ export default function AuthCallback() {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100vh", background: "#F4F2EE", gap: 16 }}>
       <div style={{ width: 40, height: 40, borderRadius: "50%", border: "3px solid #C41101", borderTopColor: "transparent", animation: "spin 0.7s linear infinite" }} />
-      <div style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 16, letterSpacing: "2px", color: "#0A0908" }}>
+      <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 16, letterSpacing: "2px", color: "#0A0908" }}>
         MENGHUBUNGKAN AKUN…
       </div>
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
