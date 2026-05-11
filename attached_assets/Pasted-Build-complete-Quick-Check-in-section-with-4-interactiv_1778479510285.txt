@@ -1,0 +1,711 @@
+Build complete Quick Check-in section with 4 interactive tiles.
+All tiles must be clickable and open bottom sheet modals.
+
+---
+
+## GENERAL MODAL SYSTEM
+
+Create a reusable BottomSheet component in src/components/BottomSheet.jsx:
+
+export default function BottomSheet({ isOpen, onClose, title, children }) {
+  useEffect(() => {
+    if (isOpen) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = ''
+    return () => { document.body.style.overflow = '' }
+  }, [isOpen])
+
+  if (!isOpen) return null
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        onClick={onClose}
+        style={{
+          position: 'fixed', inset: 0,
+          background: 'rgba(0,0,0,0.5)',
+          zIndex: 200,
+          animation: 'fadeIn .2s ease'
+        }}
+      />
+      {/* Sheet */}
+      <div style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0,
+        background: 'var(--card)',
+        borderRadius: '20px 20px 0 0',
+        padding: '0 20px 40px',
+        zIndex: 201,
+        maxHeight: '85vh',
+        overflowY: 'auto',
+        animation: 'slideUp .3s cubic-bezier(.22,1,.36,1)',
+      }}>
+        {/* Drag handle */}
+        <div style={{
+          width: 40, height: 4,
+          background: 'var(--border-subtle, #E5E1D8)',
+          borderRadius: 99, margin: '12px auto 20px',
+        }}/>
+        {/* Header */}
+        <div style={{
+          display: 'flex', justifyContent: 'space-between',
+          alignItems: 'center', marginBottom: 20
+        }}>
+          <div style={{
+            fontFamily: "'Bebas Neue'",
+            fontSize: 22, letterSpacing: 1,
+            color: 'var(--text)'
+          }}>{title}</div>
+          <button onClick={onClose} style={{
+            background: 'none', border: 'none',
+            cursor: 'pointer', color: 'var(--muted)',
+            padding: 4
+          }}>
+            <X size={20}/>
+          </button>
+        </div>
+        {children}
+      </div>
+
+      <style>{`
+        @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+        @keyframes slideUp { 
+          from { transform: translateY(100%) } 
+          to { transform: translateY(0) } 
+        }
+      `}</style>
+    </>
+  )
+}
+
+---
+
+## TILE CARD STYLE
+
+Each tile: white card, shadow, border-radius 14px, padding 16px,
+cursor pointer, hover: translateY(-2px) + shadow increase.
+
+Show summary data on tile after user saves:
+- Top: icon + title
+- Bottom: current value or "Belum diisi" (muted)
+- Accent color dot top-right corner
+
+---
+
+## TILE 1: MENSTRUAL CYCLE (pink accent #EC4899)
+
+State from localStorage 'my20fit_gender' and 'my20fit_cycle'.
+
+ON TILE CLICK:
+Check localStorage 'my20fit_gender':
+  - Not set → open Gender Selection modal first
+  - 'male' → show tooltip "Fitur ini untuk pengguna perempuan", tile grayed out
+  - 'female' → open Cycle modal
+
+GENDER SELECTION MODAL:
+Title: "Pilih Jenis Kelamin"
+Subtitle: Barlow Condensed 13px muted "Untuk menampilkan fitur yang relevan"
+
+Two cards side by side:
+<div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, margin:'8px 0 20px' }}>
+  {['male','female'].map(g => (
+    <div
+      key={g}
+      onClick={() => setSelectedGender(g)}
+      style={{
+        border: `2px solid ${selectedGender===g ? '#C41101' : 'var(--border-subtle,#E5E1D8)'}`,
+        background: selectedGender===g ? 'rgba(196,17,1,.05)' : 'var(--card)',
+        borderRadius: 12, padding: '20px 16px',
+        textAlign: 'center', cursor: 'pointer',
+        transition: 'all .2s'
+      }}
+    >
+      <div style={{ fontSize: 32, marginBottom: 8 }}>
+        {g === 'male' ? '♂️' : '♀️'}
+      </div>
+      <div style={{
+        fontFamily: "'Bebas Neue'",
+        fontSize: 16, letterSpacing: 1,
+        color: selectedGender===g ? '#C41101' : 'var(--text)'
+      }}>
+        {g === 'male' ? 'LAKI-LAKI' : 'PEREMPUAN'}
+      </div>
+    </div>
+  ))}
+</div>
+
+Save button:
+<button
+  onClick={() => {
+    if (!selectedGender) return
+    localStorage.setItem('my20fit_gender', selectedGender)
+    setGender(selectedGender)
+    setShowGenderModal(false)
+    if (selectedGender === 'female') setShowCycleModal(true)
+  }}
+  disabled={!selectedGender}
+  style={{
+    width: '100%', padding: '14px',
+    background: selectedGender ? '#C41101' : '#ccc',
+    color: '#fff', border: 'none',
+    borderRadius: 12, cursor: selectedGender ? 'pointer' : 'not-allowed',
+    fontFamily: "'Bebas Neue'", fontSize: 16, letterSpacing: 2
+  }}
+>SIMPAN</button>
+
+CYCLE MODAL:
+Title: "Siklus Menstruasi"
+
+Last period date:
+<div style={{ marginBottom: 20 }}>
+  <label style={{
+    fontFamily:"'Bebas Neue'", fontSize:11,
+    letterSpacing:2, color:'var(--muted)',
+    display:'block', marginBottom:8
+  }}>HARI PERTAMA HAID TERAKHIR</label>
+  <input
+    type="date"
+    value={lastPeriod}
+    onChange={e => setLastPeriod(e.target.value)}
+    max={new Date().toISOString().split('T')[0]}
+    style={{
+      width:'100%', padding:'12px 14px',
+      border:'1.5px solid var(--border-subtle,#E5E1D8)',
+      borderRadius:10, fontSize:16,
+      fontFamily:"'Barlow Condensed'",
+      background:'var(--card)', color:'var(--text)',
+      boxSizing:'border-box'
+    }}
+  />
+</div>
+
+Cycle length stepper:
+<div style={{ marginBottom: 20 }}>
+  <label style={{
+    fontFamily:"'Bebas Neue'", fontSize:11,
+    letterSpacing:2, color:'var(--muted)',
+    display:'block', marginBottom:8
+  }}>PANJANG SIKLUS RATA-RATA</label>
+  <div style={{
+    display:'flex', alignItems:'center',
+    gap:16, justifyContent:'center'
+  }}>
+    <button onClick={() => setCycleLength(l => Math.max(21,l-1))} style={{
+      width:40, height:40, borderRadius:'50%',
+      border:'1.5px solid var(--border-subtle,#E5E1D8)',
+      background:'var(--card)', fontSize:20,
+      cursor:'pointer', color:'var(--text)',
+      display:'flex', alignItems:'center', justifyContent:'center'
+    }}>−</button>
+    <div style={{ textAlign:'center' }}>
+      <span style={{
+        fontFamily:"'Orbitron'", fontSize:28,
+        fontWeight:700, color:'var(--text)'
+      }}>{cycleLength}</span>
+      <span style={{
+        fontFamily:"'Barlow Condensed'",
+        fontSize:13, color:'var(--muted)', marginLeft:6
+      }}>hari</span>
+    </div>
+    <button onClick={() => setCycleLength(l => Math.min(35,l+1))} style={{
+      width:40, height:40, borderRadius:'50%',
+      border:'1.5px solid var(--border-subtle,#E5E1D8)',
+      background:'var(--card)', fontSize:20,
+      cursor:'pointer', color:'var(--text)',
+      display:'flex', alignItems:'center', justifyContent:'center'
+    }}>+</button>
+  </div>
+</div>
+
+Computed info (show when lastPeriod is filled):
+function computeCycleInfo(lastPeriod, cycleLength) {
+  const last = new Date(lastPeriod)
+  const today = new Date()
+  const daysSince = Math.floor((today - last) / (1000*60*60*24))
+  const cycleDay = (daysSince % cycleLength) + 1
+  
+  let phase, phaseColor
+  if (cycleDay <= 5) { phase = 'Menstruasi'; phaseColor = '#EF4444' }
+  else if (cycleDay <= 13) { phase = 'Folikular'; phaseColor = '#3B82F6' }
+  else if (cycleDay <= 16) { phase = 'Ovulasi'; phaseColor = '#22C55E' }
+  else { phase = 'Luteal'; phaseColor = '#A855F7' }
+
+  const nextPeriod = new Date(last)
+  nextPeriod.setDate(nextPeriod.getDate() + cycleLength)
+  while (nextPeriod < today) {
+    nextPeriod.setDate(nextPeriod.getDate() + cycleLength)
+  }
+
+  const ovulation = new Date(last)
+  ovulation.setDate(ovulation.getDate() + cycleLength - 14)
+
+  return { cycleDay, phase, phaseColor, nextPeriod, ovulation }
+}
+
+Show info card:
+- Phase pill (colored bg)
+- "Hari ke-X dalam siklus"
+- "Perkiraan ovulasi: DD MMM"
+- "Haid berikutnya: DD MMM"
+
+Save button → localStorage 'my20fit_cycle'
+Tile shows: phase pill + day number
+
+---
+
+## TILE 2: DAILY WELLNESS (green accent #22C55E)
+
+WELLNESS MODAL:
+Title: "Daily Wellness Check-in"
+Subtitle: "Bagaimana kondisi kamu hari ini?"
+
+MOOD (emoji picker):
+<div style={{ marginBottom: 24 }}>
+  <label style={{
+    fontFamily:"'Bebas Neue'", fontSize:11,
+    letterSpacing:2, color:'var(--muted)',
+    display:'block', marginBottom:12
+  }}>SUASANA HATI</label>
+  <div style={{ display:'flex', justifyContent:'space-between' }}>
+    {[
+      { emoji:'😞', label:'Buruk', value:1 },
+      { emoji:'😕', label:'Kurang', value:2 },
+      { emoji:'😐', label:'Biasa', value:3 },
+      { emoji:'🙂', label:'Baik', value:4 },
+      { emoji:'😄', label:'Luar Biasa', value:5 },
+    ].map(m => (
+      <div
+        key={m.value}
+        onClick={() => setMood(m.value)}
+        style={{ textAlign:'center', cursor:'pointer' }}
+      >
+        <div style={{
+          fontSize: mood===m.value ? 36 : 28,
+          transition:'all .2s',
+          filter: mood===m.value ? 'none' : 'grayscale(0.5) opacity(0.6)'
+        }}>{m.emoji}</div>
+        <div style={{
+          fontFamily:"'Barlow Condensed'",
+          fontSize:10, color: mood===m.value ? '#22C55E' : 'var(--muted)',
+          marginTop:4
+        }}>{m.label}</div>
+        {mood===m.value && (
+          <div style={{
+            width:6, height:6, borderRadius:'50%',
+            background:'#22C55E', margin:'4px auto 0'
+          }}/>
+        )}
+      </div>
+    ))}
+  </div>
+</div>
+
+ENERGY SLIDER:
+function SliderField({ label, value, onChange, color, getLabelText }) {
+  return (
+    <div style={{ marginBottom: 20 }}>
+      <div style={{
+        display:'flex', justifyContent:'space-between',
+        alignItems:'center', marginBottom:8
+      }}>
+        <label style={{
+          fontFamily:"'Bebas Neue'", fontSize:11,
+          letterSpacing:2, color:'var(--muted)'
+        }}>{label}</label>
+        <span style={{
+          fontFamily:"'Barlow Condensed'",
+          fontSize:13, fontWeight:600, color
+        }}>{getLabelText(value)}</span>
+      </div>
+      <input
+        type="range" min={1} max={10} value={value}
+        onChange={e => onChange(Number(e.target.value))}
+        style={{ width:'100%', accentColor: color }}
+      />
+      <div style={{
+        display:'flex', justifyContent:'space-between',
+        fontFamily:"'Barlow Condensed'", fontSize:10,
+        color:'var(--muted)', marginTop:4
+      }}>
+        <span>1</span><span>10</span>
+      </div>
+    </div>
+  )
+}
+
+Energy labels: 1-3 "Sangat Rendah", 4-5 "Rendah", 6-7 "Normal", 8-9 "Tinggi", 10 "Maksimal"
+Stress labels: 1-3 "Santai", 4-5 "Sedikit Stres", 6-7 "Cukup Stres", 8-10 "Sangat Stres"
+Energy color: #22C55E, Stress color: dynamic (green ≤3, amber ≤6, red >6)
+
+MUSCLE SORENESS (pill buttons):
+{['Tidak Ada','Ringan','Sedang','Berat','Sangat Berat'].map(s => (
+  <button
+    key={s}
+    onClick={() => setSoreness(s)}
+    style={{
+      padding:'8px 14px', borderRadius:99,
+      border: `1.5px solid ${soreness===s ? '#22C55E' : 'var(--border-subtle,#E5E1D8)'}`,
+      background: soreness===s ? '#22C55E' : 'transparent',
+      color: soreness===s ? '#fff' : 'var(--text)',
+      fontFamily:"'Barlow Condensed'", fontSize:13,
+      fontWeight:600, cursor:'pointer',
+      transition:'all .2s'
+    }}
+  >{s}</button>
+))}
+
+Save → localStorage 'my20fit_wellness_YYYY-MM-DD'
+Tile shows: mood emoji + energy level
+
+---
+
+## TILE 3: SLEEP QUALITY (purple accent #A855F7)
+
+SLEEP MODAL:
+Title: "Kualitas Tidur"
+
+Two time inputs side by side:
+<div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:20 }}>
+  {[
+    { label:'JAM TIDUR', value:bedTime, set:setBedTime, default:'23:00' },
+    { label:'JAM BANGUN', value:wakeTime, set:setWakeTime, default:'06:00' },
+  ].map(f => (
+    <div key={f.label}>
+      <label style={{
+        fontFamily:"'Bebas Neue'", fontSize:10,
+        letterSpacing:2, color:'var(--muted)',
+        display:'block', marginBottom:6
+      }}>{f.label}</label>
+      <input
+        type="time" value={f.value}
+        onChange={e => f.set(e.target.value)}
+        style={{
+          width:'100%', padding:'12px',
+          border:'1.5px solid var(--border-subtle,#E5E1D8)',
+          borderRadius:10, fontSize:16,
+          fontFamily:"'Barlow Condensed'",
+          background:'var(--card)', color:'var(--text)',
+          boxSizing:'border-box'
+        }}
+      />
+    </div>
+  ))}
+</div>
+
+Duration compute:
+function computeSleep(bed, wake) {
+  const [bH, bM] = bed.split(':').map(Number)
+  const [wH, wM] = wake.split(':').map(Number)
+  let mins = (wH*60+wM) - (bH*60+bM)
+  if (mins < 0) mins += 24*60
+  const hours = Math.floor(mins/60)
+  const minutes = mins%60
+  
+  let quality, color, tip
+  if (mins < 300) {
+    quality='Kurang Sekali'; color='#EF4444'
+    tip='Tidur sangat kurang. Otot tidak bisa recover dengan baik.'
+  } else if (mins < 360) {
+    quality='Kurang'; color='#F97316'
+    tip='Tidur kurang menghambat pemulihan. Coba tidur lebih awal.'
+  } else if (mins < 420) {
+    quality='Cukup'; color='#EAB308'
+    tip='Hampir cukup. Tambah 30-60 menit untuk hasil optimal.'
+  } else if (mins <= 540) {
+    quality='Ideal'; color='#22C55E'
+    tip='Bagus! Tidur kamu optimal untuk pemulihan otot.'
+  } else {
+    quality='Terlalu Banyak'; color='#3B82F6'
+    tip='Tidur terlalu lama bisa membuat badan terasa lemas.'
+  }
+  return { hours, minutes, quality, color, tip }
+}
+
+Show duration card (when both times filled):
+<div style={{
+  background:'var(--bg)', borderRadius:12,
+  padding:'16px', textAlign:'center', marginBottom:16
+}}>
+  <div style={{
+    fontFamily:"'Orbitron'", fontSize:36,
+    fontWeight:900, color:'var(--text)'
+  }}>
+    {sleep.hours}<span style={{fontSize:18}}>j</span>
+    {sleep.minutes}<span style={{fontSize:18}}>m</span>
+  </div>
+  <span style={{
+    display:'inline-block',
+    background: sleep.color+'20',
+    color: sleep.color,
+    fontFamily:"'Bebas Neue'",
+    fontSize:12, letterSpacing:1.5,
+    padding:'4px 12px', borderRadius:99,
+    marginTop:8
+  }}>{sleep.quality}</span>
+  <div style={{
+    fontFamily:"'Barlow Condensed'",
+    fontSize:12, color:'var(--muted)',
+    marginTop:8, lineHeight:1.4
+  }}>{sleep.tip}</div>
+</div>
+
+Weekly chart (last 7 days bar chart using divs):
+const days = ['Sen','Sel','Rab','Kam','Jum','Sab','Min']
+Show bars proportional to sleep hours, today highlighted red.
+Data from localStorage entries.
+
+Save → localStorage 'my20fit_sleep_YYYY-MM-DD'
+Tile shows: hours + quality badge
+
+---
+
+## TILE 4: WATER INTAKE (cyan accent #06B6D4)
+
+WATER MODAL:
+Title: "Kebutuhan Air Harian"
+
+Weight input for target calculation:
+<div style={{ 
+  background:'var(--bg)', borderRadius:12,
+  padding:16, marginBottom:20
+}}>
+  <div style={{
+    display:'flex', alignItems:'center',
+    justifyContent:'space-between', marginBottom:8
+  }}>
+    <span style={{
+      fontFamily:"'Bebas Neue'", fontSize:11,
+      letterSpacing:2, color:'var(--muted)'
+    }}>BERAT BADAN</span>
+    <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+      <input
+        type="number" value={weight} min={30} max={200}
+        onChange={e => setWeight(Number(e.target.value))}
+        style={{
+          width:60, padding:'6px 8px', textAlign:'center',
+          border:'1.5px solid var(--border-subtle,#E5E1D8)',
+          borderRadius:8, fontSize:16,
+          fontFamily:"'Orbitron'", fontWeight:700,
+          background:'var(--card)', color:'var(--text)'
+        }}
+      />
+      <span style={{
+        fontFamily:"'Barlow Condensed'",
+        fontSize:13, color:'var(--muted)'
+      }}>kg</span>
+    </div>
+  </div>
+  <div style={{
+    fontFamily:"'Barlow Condensed'",
+    fontSize:13, color:'var(--text)'
+  }}>
+    Kebutuhan harian: <strong style={{color:'#06B6D4'}}>
+      {(weight * 0.033).toFixed(1)}L
+    </strong> ({Math.round(weight * 0.033 / 0.25)} gelas @250ml)
+  </div>
+</div>
+
+Current intake display:
+const totalCups = intakeLogs.reduce((sum, l) => sum + l.cups, 0)
+const targetCups = Math.round(weight * 0.033 / 0.25)
+const pct = Math.min(100, (totalCups/targetCups)*100)
+
+<div style={{ textAlign:'center', marginBottom:20 }}>
+  <div style={{
+    fontFamily:"'Orbitron'", fontSize:40,
+    fontWeight:900, color:'var(--text)'
+  }}>
+    {totalCups}
+    <span style={{
+      fontSize:18, color:'var(--muted)', margin:'0 4px'
+    }}>/</span>
+    {targetCups}
+  </div>
+  <div style={{
+    fontFamily:"'Barlow Condensed'",
+    fontSize:13, color:'var(--muted)'
+  }}>gelas hari ini</div>
+  
+  {/* Progress bar */}
+  <div style={{
+    height:8, background:'var(--bg)',
+    borderRadius:99, margin:'12px 0',
+    overflow:'hidden'
+  }}>
+    <div style={{
+      height:'100%', width:`${pct}%`,
+      background:'#06B6D4',
+      borderRadius:99,
+      transition:'width .4s ease'
+    }}/>
+  </div>
+  <div style={{
+    fontFamily:"'Bebas Neue'",
+    fontSize:13, letterSpacing:1,
+    color: pct>=100 ? '#22C55E' : '#06B6D4'
+  }}>
+    {pct>=100 ? '✓ TARGET TERCAPAI!' : `${Math.round(pct)}% dari target`}
+  </div>
+</div>
+
+Quick add buttons:
+{[
+  { label:'+1 Gelas', cups:1, ml:250 },
+  { label:'+2 Gelas', cups:2, ml:500 },
+  { label:'+Botol', cups:2.4, ml:600 },
+].map(btn => (
+  <button
+    key={btn.label}
+    onClick={() => addIntake(btn.cups, btn.ml)}
+    style={{
+      flex:1, padding:'10px 8px',
+      border:'1.5px solid #06B6D4',
+      borderRadius:10, background:'transparent',
+      color:'#06B6D4',
+      fontFamily:"'Bebas Neue'",
+      fontSize:14, letterSpacing:1,
+      cursor:'pointer', transition:'all .2s'
+    }}
+    onMouseEnter={e => {
+      e.currentTarget.style.background = '#06B6D4'
+      e.currentTarget.style.color = '#fff'
+    }}
+    onMouseLeave={e => {
+      e.currentTarget.style.background = 'transparent'
+      e.currentTarget.style.color = '#06B6D4'
+    }}
+  >
+    {btn.label}
+    <div style={{
+      fontSize:10, fontFamily:"'Barlow Condensed'",
+      opacity:.7, marginTop:2
+    }}>{btn.ml}ml</div>
+  </button>
+))}
+
+Intake log (today):
+{intakeLogs.map((log, i) => (
+  <div key={i} style={{
+    display:'flex', justifyContent:'space-between',
+    alignItems:'center', padding:'8px 0',
+    borderBottom:'0.5px solid var(--border-subtle,#E5E1D8)',
+    fontFamily:"'Barlow Condensed'", fontSize:13
+  }}>
+    <span style={{ color:'var(--muted)' }}>{log.time}</span>
+    <span style={{ color:'var(--text)' }}>
+      {log.cups} gelas ({log.ml}ml)
+    </span>
+  </div>
+))}
+
+Reset button:
+<button
+  onClick={() => {
+    setIntakeLogs([])
+    saveLogs([])
+  }}
+  style={{
+    background:'none', border:'none',
+    color:'#C41101', cursor:'pointer',
+    fontFamily:"'Barlow Condensed'",
+    fontSize:13, marginTop:8
+  }}
+>Reset hari ini</button>
+
+function addIntake(cups, ml) {
+  const now = new Date()
+  const time = now.toLocaleTimeString('id-ID', { 
+    hour:'2-digit', minute:'2-digit' 
+  })
+  const newLog = { time, cups, ml }
+  const updated = [...intakeLogs, newLog]
+  setIntakeLogs(updated)
+  saveLogs(updated)
+}
+
+function saveLogs(logs) {
+  const today = new Date().toISOString().split('T')[0]
+  localStorage.setItem(
+    `my20fit_water_${today}`,
+    JSON.stringify({ logs, weight })
+  )
+}
+
+Load today's logs on mount:
+useEffect(() => {
+  const today = new Date().toISOString().split('T')[0]
+  const saved = localStorage.getItem(`my20fit_water_${today}`)
+  if (saved) {
+    const data = JSON.parse(saved)
+    setIntakeLogs(data.logs || [])
+    if (data.weight) setWeight(data.weight)
+  }
+}, [])
+
+Tile shows: X/Y gelas + progress mini bar
+
+---
+
+## TILE LAYOUT (2x2 grid)
+
+<div style={{
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  gap: 12
+}}>
+  <TileCycle />
+  <TileWellness />
+  <TileSleep />
+  <TileWater />
+</div>
+
+Each tile base style:
+{
+  background: 'var(--card)',
+  borderRadius: 14,
+  padding: '16px',
+  cursor: 'pointer',
+  boxShadow: 'var(--shadow)',
+  transition: 'all .2s',
+  position: 'relative',
+  overflow: 'hidden',
+}
+
+Accent dot (top-right corner):
+<div style={{
+  position:'absolute', top:12, right:12,
+  width:8, height:8, borderRadius:'50%',
+  background: accentColor
+}}/>
+
+Tile header:
+- Icon (Lucide): size 20, accent color
+- Title: Bebas Neue 13px, letter-spacing 1px, var(--text)
+
+Tile value (after data saved):
+- Orbitron 18px for numbers
+- Barlow Condensed 12px for labels
+
+Empty state:
+- "Belum diisi" Barlow Condensed 12px muted
+
+---
+
+## ESC KEY CLOSE
+
+useEffect(() => {
+  const handleEsc = (e) => {
+    if (e.key === 'Escape') {
+      setShowGenderModal(false)
+      setShowCycleModal(false)
+      setShowWellnessModal(false)
+      setShowSleepModal(false)
+      setShowWaterModal(false)
+    }
+  }
+  window.addEventListener('keydown', handleEsc)
+  return () => window.removeEventListener('keydown', handleEsc)
+}, [])
+
+---
+
+After all changes: npm run build — fix all errors.
