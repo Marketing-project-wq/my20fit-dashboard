@@ -1,0 +1,159 @@
+Fix font loading and application throughout the entire app.
+
+---
+
+## STEP 1: FIX GOOGLE FONTS IMPORT IN index.css
+
+Replace existing @import with this exact string:
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,900;1,900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+---
+
+## STEP 2: ADD FONT VERIFICATION
+
+Add this temporary debug block at the top of App.jsx,
+inside useEffect on mount:
+
+useEffect(() => {
+  document.fonts.ready.then(() => {
+    const fonts = ['Anton', 'Barlow Condensed', 'JetBrains Mono']
+    fonts.forEach(font => {
+      const loaded = document.fonts.check(`16px "${font}"`)
+      console.log(`Font "${font}" loaded:`, loaded)
+    })
+  })
+}, [])
+
+Check browser console — if any font shows false, 
+the import URL is wrong.
+
+---
+
+## STEP 3: FIX CSS VARIABLES
+
+In index.css :root block, ensure these exact values:
+
+:root {
+  --font-display: 'Anton', sans-serif;
+  --font-body: 'Barlow Condensed', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+---
+
+## STEP 4: AUDIT AND FIX ALL COMPONENTS
+
+Search every component for incorrect font usage
+and fix according to these strict rules:
+
+RULE 1 — Anton (display) ONLY for:
+Headlines, page titles, section headers, 
+button text, card titles, nav labels, modal titles.
+Style: fontFamily: "'Anton', sans-serif"
+Note: Anton has only regular weight — never set fontWeight on Anton.
+
+RULE 2 — Barlow Condensed 900 for:
+Labels, tags, badges, descriptions, 
+body text, sublabels, small caps text.
+Style: fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900
+
+RULE 3 — Barlow Condensed 900 Italic for:
+AI-generated text, summaries, insights, quotes, tips.
+Style: fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: 'italic'
+
+RULE 4 — JetBrains Mono for:
+ALL numbers — temperature, AQI, BMI, weight, 
+heart rate, progress counters (5/5), 
+time displays, calories, water amounts, 
+percentages, any numerical data.
+Style: fontFamily: "'JetBrains Mono', monospace"
+
+---
+
+## STEP 5: FIX SPECIFIC VIOLATIONS
+
+Find and fix these common violations:
+
+1. Any element showing a NUMBER but using Barlow Condensed:
+   → Change to JetBrains Mono
+
+2. Any HEADLINE or TITLE using Barlow Condensed:
+   → Change to Anton
+
+3. Any element with fontFamily containing 'Bebas Neue':
+   → Replace with Anton
+
+4. Any element with fontFamily containing 'Orbitron':
+   → Replace with JetBrains Mono
+
+Run these checks in terminal:
+grep -r "Bebas Neue" src/
+grep -r "Orbitron" src/
+grep -r "font-family.*Barlow" src/ | grep -i "title\|header\|headline"
+
+All should return empty or be fixed.
+
+---
+
+## STEP 6: QUICK VISUAL REFERENCE
+
+After fixing, the app should look like:
+
+ANTON — wide, bold, condensed display font:
+Used for: MY20FIT, HOME, PROGRESS, TODAY'S CHECKLIST,
+NO MCU ON FILE YET, ALL DONE TODAY!, UPLOAD MCU,
+MASUK, DAFTAR, NUTRISI HARIAN, PROFIL
+
+BARLOW CONDENSED 900 — very bold condensed:
+Used for: "based on your cholesterol", "Humidity",
+"UV INDEX", tag labels like HIGH · 30 MIN · GYM,
+description text, sublabels, Belum diisi
+
+JETBRAINS MONO — monospace technical font:
+Used for: 27°, 167, 5/5, 23:00, 2.1L, 
+89%, 23.4, 120/80, Rp 49.000
+
+---
+
+## STEP 7: INDEX.CSS GLOBAL RULES
+
+Ensure these global rules exist in index.css:
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Override browser defaults for inputs */
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+/* Numbers always JetBrains Mono */
+.num {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Display text always Anton */
+.display {
+  font-family: 'Anton', sans-serif;
+}
+
+---
+
+After all fixes:
+1. npm run build — fix all errors
+2. Open app and verify in browser:
+   - Page titles should look wide and bold (Anton)
+   - Numbers should look monospaced and technical (JetBrains Mono)
+   - Body text and labels should look very bold condensed (Barlow Condensed 900)
+3. Remove the debug console.log from App.jsx after confirming fonts load

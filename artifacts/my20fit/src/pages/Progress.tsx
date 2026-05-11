@@ -295,8 +295,8 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
           {change > 0
             ? <TrendingUp size={12} style={{ color: "#C41101" }} />
             : <TrendingDown size={12} style={{ color: "#16A34A" }} />}
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: change > 0 ? "#C41101" : "#16A34A" }}>
-            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit}
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: change > 0 ? "#C41101" : "#16A34A" }}>
+            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>{changeUnit}</span>}
           </span>
         </div>
       )}
