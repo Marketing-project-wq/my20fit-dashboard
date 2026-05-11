@@ -1,0 +1,522 @@
+Develop two high-priority features for the Progress page:
+1. Connect sleep + water data from Quick Check-in to Progress charts
+2. Add trend indicators to all metric cards
+
+---
+
+## FEATURE 1: CONNECT SLEEP + WATER TO PROGRESS CHARTS
+
+### Data Reading Utility
+
+Create src/utils/checkinData.js:
+
+// Read all sleep data from localStorage (last N days)
+export function getSleepHistory(days = 30) {
+  const result = []
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const key = `my20fit_sleep_${date.toISOString().split('T')[0]}`
+    const saved = localStorage.getItem(key)
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        // data has bedTime and wakeTime
+        const [bH, bM] = data.bedTime.split(':').map(Number)
+        const [wH, wM] = data.wakeTime.split(':').map(Number)
+        let mins = (wH*60+wM) - (bH*60+bM)
+        if (mins < 0) mins += 24*60
+        const hours = parseFloat((mins/60).toFixed(1))
+        result.push({
+          date: date.toISOString().split('T')[0],
+          hours,
+          bedTime: data.bedTime,
+          wakeTime: data.wakeTime,
+          quality: data.quality || null
+        })
+      } catch {}
+    }
+  }
+  return result.reverse() // oldest first
+}
+
+// Read all water data from localStorage (last N days)
+export function getWaterHistory(days = 30) {
+  const result = []
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+    const key = `my20fit_water_${dateStr}`
+    const saved = localStorage.getItem(key)
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        const totalMl = (data.logs || []).reduce((sum, l) => sum + l.ml, 0)
+        const totalL = parseFloat((totalMl / 1000).toFixed(2))
+        result.push({
+          date: dateStr,
+          liters: totalL,
+          cups: (data.logs || []).reduce((sum, l) => sum + l.cups, 0),
+          target: data.weight ? parseFloat((data.weight * 0.033).toFixed(1)) : 2.5,
+          pct: data.weight
+            ? Math.round((totalL / (data.weight * 0.033)) * 100)
+            : Math.round((totalL / 2.5) * 100)
+        })
+      } catch {}
+    }
+  }
+  return result.reverse()
+}
+
+// Read all wellness data from localStorage (last N days)
+export function getWellnessHistory(days = 30) {
+  const result = []
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+    const key = `my20fit_wellness_${dateStr}`
+    const saved = localStorage.getItem(key)
+    if (saved) {
+      try {
+        const data = JSON.parse(saved)
+        result.push({
+          date: dateStr,
+          mood: data.mood || null,
+          energy: data.energy || null,
+          stress: data.stress || null,
+          soreness: data.soreness || null
+        })
+      } catch {}
+    }
+  }
+  return result.reverse()
+}
+
+// Read checklist completion history
+export function getChecklistHistory(days = 30) {
+  const result = []
+  for (let i = 0; i < days; i++) {
+    const date = new Date()
+    date.setDate(date.getDate() - i)
+    const dateStr = date.toISOString().split('T')[0]
+    // Check if checklist_date matches and get states
+    const savedDate = localStorage.getItem('my20fit_checklist_date')
+    const savedStates = localStorage.getItem('my20fit_checklist_states')
+    if (savedDate === dateStr && savedStates) {
+      const states = JSON.parse(savedStates)
+      const completed = states.filter(Boolean).length
+      const total = states.length
+      result.push({ date: dateStr, completed, total, pct: Math.round((completed/total)*100) })
+    }
+  }
+  return result.reverse()
+}
+
+---
+
+### Add Sleep Chart to Progress.jsx
+
+In Progress.jsx, import the utility:
+import { getSleepHistory, getWaterHistory, getWellnessHistory } from '../utils/checkinData'
+
+Load data on mount:
+const [sleepData, setSleepData] = useState([])
+const [waterData, setWaterData] = useState([])
+const [wellnessData, setWellnessData] = useState([])
+
+useEffect(() => {
+  setSleepData(getSleepHistory(30))
+  setWaterData(getWaterHistory(30))
+  setWellnessData(getWellnessHistory(30))
+}, [])
+
+Add SLEEP CHART after existing charts:
+
+Chart card title: "KUALITAS TIDUR"
+Current value: latest entry hours + "jam"
+
+Recharts config:
+- ComposedChart with Bar + ReferenceLine
+- Bar: fill color based on quality:
+  < 6h: #EF4444 (red)
+  6-7h: #EAB308 (yellow)  
+  7-9h: #22C55E (green)
+  > 9h: #3B82F6 (blue)
+- ReferenceLine at y=7 dashed green label="Ideal"
+- ReferenceLine at y=9 dashed blue label="Max"
+- X axis: date formatted as "4 Mei"
+- Y axis: 0-12, label "jam"
+- Custom tooltip showing hours + quality badge
+
+<ComposedChart data={sleepData} ...>
+  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,.06)"/>
+  <XAxis dataKey="date" tickFormatter={d => {
+    const date = new Date(d)
+    return date.toLocaleDateString('id-ID', { day:'numeric', month:'short' })
+  }} style={{ fontFamily:"'Barlow Condensed'", fontSize:10 }}/>
+  <YAxis domain={[0,12]} style={{ fontFamily:"'Barlow Condensed'", fontSize:10 }}/>
+  <Tooltip content={<SleepTooltip />}/>
+  <ReferenceLine y={7} stroke="#22C55E" strokeDasharray="4 4" 
+    label={{ value:'Ideal', fill:'#22C55E', fontSize:10 }}/>
+  <ReferenceLine y={9} stroke="#3B82F6" strokeDasharray="4 4"
+    label={{ value:'Max', fill:'#3B82F6', fontSize:10 }}/>
+  <Bar dataKey="hours" radius={[4,4,0,0]}>
+    {sleepData.map((entry, i) => (
+      <Cell key={i} fill={
+        entry.hours < 6 ? '#EF4444' :
+        entry.hours < 7 ? '#EAB308' :
+        entry.hours <= 9 ? '#22C55E' : '#3B82F6'
+      }/>
+    ))}
+  </Bar>
+</ComposedChart>
+
+Add WATER INTAKE CHART:
+
+Chart card title: "ASUPAN AIR HARIAN"
+Current value: today's liters + "L"
+
+Recharts config:
+- AreaChart
+- Area fill: #06B6D4 with opacity gradient
+- ReferenceLine at target (2.5L default) dashed
+- Show pct on tooltip "83% dari target"
+- X axis: date, Y axis: liters
+
+Add ENERGY & MOOD CHART:
+
+Chart card title: "ENERGI & MOOD"
+Two lines on same chart:
+- Energy: #22C55E line
+- Mood (scaled to 1-10 from 1-5, multiply by 2): #F97316 line
+Legend at top
+
+---
+
+## FEATURE 2: TREND INDICATORS
+
+### Trend Calculation Utility
+
+Add to src/utils/checkinData.js:
+
+export function calculateTrend(dataArray, valueKey) {
+  if (!dataArray || dataArray.length < 2) return null
+  
+  const sorted = [...dataArray].sort((a,b) => 
+    new Date(a.date) - new Date(b.date)
+  )
+  
+  const latest = sorted[sorted.length - 1][valueKey]
+  const previous = sorted[sorted.length - 2][valueKey]
+  
+  if (!latest || !previous) return null
+  
+  const diff = latest - previous
+  const pct = Math.abs(Math.round((diff / previous) * 100))
+  
+  return {
+    direction: diff > 0 ? 'up' : diff < 0 ? 'down' : 'same',
+    diff: Math.abs(diff).toFixed(1),
+    pct,
+    latest,
+    previous
+  }
+}
+
+export function getMultiPointTrend(dataArray, valueKey, points = 7) {
+  if (!dataArray || dataArray.length < 2) return null
+  
+  const sorted = [...dataArray]
+    .sort((a,b) => new Date(a.date) - new Date(b.date))
+    .slice(-points)
+  
+  if (sorted.length < 2) return null
+  
+  const first = sorted[0][valueKey]
+  const last = sorted[sorted.length-1][valueKey]
+  const diff = last - first
+  const pct = Math.abs(Math.round((diff/first)*100))
+  
+  // Linear regression for trend direction
+  const n = sorted.length
+  const xMean = (n-1)/2
+  const yMean = sorted.reduce((s,d) => s + d[valueKey], 0) / n
+  const slope = sorted.reduce((s,d,i) => 
+    s + (i - xMean) * (d[valueKey] - yMean), 0
+  ) / sorted.reduce((s,_,i) => s + Math.pow(i-xMean,2), 0)
+  
+  return {
+    direction: slope > 0.05 ? 'up' : slope < -0.05 ? 'down' : 'stable',
+    diff: Math.abs(diff).toFixed(1),
+    pct,
+    slope: slope.toFixed(3)
+  }
+}
+
+---
+
+### Trend Indicator Component
+
+Create src/components/TrendBadge.jsx:
+
+export default function TrendBadge({ trend, metric, positiveIsGood = true }) {
+  if (!trend || trend.direction === 'same') return (
+    <span style={{
+      display:'inline-flex', alignItems:'center', gap:3,
+      fontFamily:"'Barlow Condensed'",
+      fontSize:12, color:'var(--muted)'
+    }}>
+      <Minus size={12}/> Stabil
+    </span>
+  )
+
+  // Determine if this trend is good or bad
+  // e.g. weight up = bad, sleep up = good, stress up = bad
+  const isGood = positiveIsGood
+    ? trend.direction === 'up'
+    : trend.direction === 'down'
+
+  const color = isGood ? '#22C55E' : '#EF4444'
+  const Icon = trend.direction === 'up' ? TrendingUp : TrendingDown
+
+  return (
+    <span style={{
+      display:'inline-flex', alignItems:'center', gap:4,
+      background: color + '15',
+      color: color,
+      padding:'3px 8px', borderRadius:99,
+      fontFamily:"'Barlow Condensed'",
+      fontSize:12, fontWeight:600
+    }}>
+      <Icon size={12}/>
+      {trend.direction === 'up' ? '+' : '-'}{trend.diff}
+      <span style={{ opacity:.7 }}>({trend.pct}%)</span>
+    </span>
+  )
+}
+
+---
+
+### Add Trend to Metric Cards in Progress.jsx
+
+For each metric card, compute trend from progress entries:
+
+const entries = progressEntries // from localStorage my20fit_progress_entries
+
+// Metric-specific trend config:
+const metricConfigs = {
+  weight: { 
+    label: 'BERAT BADAN', key: 'weight', unit: 'kg',
+    positiveIsGood: false, // losing weight = good
+    icon: <Weight size={16}/>, color: '#C41101'
+  },
+  bmi: { 
+    label: 'BMI', key: 'bmi', unit: '',
+    positiveIsGood: false,
+    icon: <Activity size={16}/>, color: '#3B82F6'
+  },
+  bodyFat: { 
+    label: 'BODY FAT', key: 'bodyFat', unit: '%',
+    positiveIsGood: false,
+    icon: <Percent size={16}/>, color: '#F97316'
+  },
+  restingHr: { 
+    label: 'RESTING HR', key: 'restingHr', unit: 'bpm',
+    positiveIsGood: false, // lower HR = better
+    icon: <Heart size={16}/>, color: '#EF4444'
+  },
+  waist: { 
+    label: 'LINGKAR PINGGANG', key: 'waist', unit: 'cm',
+    positiveIsGood: false,
+    icon: <Ruler size={16}/>, color: '#A855F7'
+  },
+}
+
+// Sleep trend from check-in data
+const sleepTrend = getMultiPointTrend(sleepData, 'hours', 7)
+// Water trend from check-in data
+const waterTrend = getMultiPointTrend(waterData, 'pct', 7)
+// Energy trend from wellness data
+const energyTrend = getMultiPointTrend(wellnessData, 'energy', 7)
+
+Metric card layout with trend:
+
+<div style={{
+  background:'var(--card)',
+  borderRadius:14,
+  padding:'16px',
+  boxShadow:'var(--shadow)',
+  display:'flex',
+  flexDirection:'column',
+  gap:8
+}}>
+  {/* Header */}
+  <div style={{
+    display:'flex', alignItems:'center',
+    justifyContent:'space-between'
+  }}>
+    <div style={{
+      display:'flex', alignItems:'center', gap:6,
+      fontFamily:"'Bebas Neue'", fontSize:10,
+      letterSpacing:2, color:'var(--muted)'
+    }}>
+      {config.icon}
+      {config.label}
+    </div>
+    <TrendBadge 
+      trend={calculateTrend(entries, config.key)}
+      positiveIsGood={config.positiveIsGood}
+    />
+  </div>
+
+  {/* Value */}
+  <div style={{
+    fontFamily:"'Orbitron'",
+    fontSize:32, fontWeight:900,
+    color:'var(--text)', lineHeight:1
+  }}>
+    {latestValue}
+    <span style={{
+      fontFamily:"'Barlow Condensed'",
+      fontSize:14, color:'var(--muted)',
+      marginLeft:4
+    }}>{config.unit}</span>
+  </div>
+
+  {/* Status badge */}
+  <span style={{
+    display:'inline-block',
+    background: statusColor + '20',
+    color: statusColor,
+    fontFamily:"'Bebas Neue'",
+    fontSize:10, letterSpacing:1.5,
+    padding:'3px 10px', borderRadius:99,
+    alignSelf:'flex-start'
+  }}>{statusLabel}</span>
+
+  {/* Trend context */}
+  {trend && (
+    <div style={{
+      fontFamily:"'Barlow Condensed'",
+      fontSize:11, color:'var(--muted)',
+      borderTop:'0.5px solid var(--border-subtle,#E5E1D8)',
+      paddingTop:8, marginTop:4
+    }}>
+      vs entri sebelumnya · {trend.pct}% {
+        trend.direction === 'up' ? 'naik' : 
+        trend.direction === 'down' ? 'turun' : 'stabil'
+      }
+    </div>
+  )}
+</div>
+
+---
+
+### Add Sleep + Water Metric Cards
+
+Add two new metric cards to the summary row:
+
+SLEEP CARD:
+- Label: "RATA-RATA TIDUR"  
+- Icon: Moon from lucide-react, color #A855F7
+- Value: average hours from last 7 days sleepData
+- Status: same quality logic as Sleep modal
+- Trend: sleepTrend (positiveIsGood: true)
+- Context: "7 hari terakhir"
+
+WATER CARD:
+- Label: "HIDRASI HARIAN"
+- Icon: Droplets from lucide-react, color #06B6D4
+- Value: average pct from last 7 days waterData (e.g. "74%")
+- Status: <50% Kurang, 50-80% Cukup, >80% Baik, 100% Optimal
+- Trend: waterTrend (positiveIsGood: true)
+- Context: "rata-rata 7 hari"
+
+ENERGY CARD:
+- Label: "LEVEL ENERGI"
+- Icon: Zap from lucide-react, color #22C55E
+- Value: average energy from last 7 days wellnessData
+- Status: 1-3 Rendah, 4-6 Normal, 7-8 Baik, 9-10 Tinggi
+- Trend: energyTrend (positiveIsGood: true)
+
+---
+
+### Trend Summary Banner
+
+Add a trend summary banner below health grade card,
+above metric cards. Only show if there are enough data points (≥3).
+
+<div style={{
+  background:'var(--card)',
+  borderRadius:14, padding:'16px 20px',
+  boxShadow:'var(--shadow)',
+  marginBottom:16
+}}>
+  <div style={{
+    fontFamily:"'Bebas Neue'", fontSize:11,
+    letterSpacing:2.5, color:'var(--muted)',
+    marginBottom:12
+  }}>RINGKASAN TREN · 7 HARI TERAKHIR</div>
+  
+  <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+    {trendSummaryItems.map(item => (
+      <div key={item.label} style={{
+        display:'flex', alignItems:'center', gap:6,
+        background:'var(--bg)', borderRadius:10,
+        padding:'8px 12px', flex:'1 0 140px'
+      }}>
+        <div style={{ color: item.color }}>{item.icon}</div>
+        <div>
+          <div style={{
+            fontFamily:"'Bebas Neue'", fontSize:10,
+            letterSpacing:1.5, color:'var(--muted)'
+          }}>{item.label}</div>
+          <div style={{
+            display:'flex', alignItems:'center', gap:4
+          }}>
+            <span style={{
+              fontFamily:"'Orbitron'", fontSize:14,
+              fontWeight:700, color:'var(--text)'
+            }}>{item.value}</span>
+            <TrendBadge trend={item.trend} positiveIsGood={item.positiveIsGood}/>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+trendSummaryItems array:
+[
+  { label:'TIDUR', value:`${avgSleep}j`, icon:<Moon size={14}/>, 
+    color:'#A855F7', trend:sleepTrend, positiveIsGood:true },
+  { label:'HIDRASI', value:`${avgWaterPct}%`, icon:<Droplets size={14}/>, 
+    color:'#06B6D4', trend:waterTrend, positiveIsGood:true },
+  { label:'ENERGI', value:`${avgEnergy}/10`, icon:<Zap size={14}/>, 
+    color:'#22C55E', trend:energyTrend, positiveIsGood:true },
+  { label:'BERAT', value:`${latestWeight}kg`, icon:<Activity size={14}/>, 
+    color:'#C41101', trend:weightTrend, positiveIsGood:false },
+]
+
+---
+
+## EMPTY STATES FOR NEW CHARTS
+
+If no sleep data:
+<div style={{ textAlign:'center', padding:'32px 20px' }}>
+  <Moon size={32} style={{ color:'var(--muted)', opacity:.4, marginBottom:8 }}/>
+  <div style={{ fontFamily:"'Bebas Neue'", fontSize:16, color:'var(--muted)' }}>
+    BELUM ADA DATA TIDUR
+  </div>
+  <div style={{ fontFamily:"'Barlow Condensed'", fontSize:12, color:'var(--muted)', marginTop:4 }}>
+    Catat jam tidur kamu di Quick Check-in setiap hari
+  </div>
+</div>
+
+Same pattern for water and wellness empty states.
+
+---
+
+After all changes: npm run build — fix all errors.

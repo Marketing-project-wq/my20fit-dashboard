@@ -2,17 +2,24 @@ import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import {
   ResponsiveContainer, AreaChart, Area, LineChart, Line,
+  ComposedChart, Bar, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ReferenceLine,
 } from "recharts";
 import { format, subMonths, subYears, parseISO, isAfter } from "date-fns";
 import {
   Plus, Activity, CheckCircle, AlertCircle,
   Dumbbell, Bike, Waves, PersonStanding, Zap, Wind,
-  HeartPulse, TrendingUp, TrendingDown,
+  HeartPulse, TrendingUp, TrendingDown, Moon, Droplets, Ruler,
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
+import TrendBadge from "@/components/TrendBadge";
+import {
+  getSleepHistory, getWaterHistory, getWellnessHistory,
+  calculateTrend, getMultiPointTrend,
+} from "@/utils/checkinData";
+import type { SleepEntry, WaterEntry, WellnessEntry } from "@/utils/checkinData";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -96,6 +103,27 @@ function waistStatus(v?: number): { label: string; color: string } {
   return { label: "High Risk", color: "#DC2626" };
 }
 
+function sleepQuality(h: number): { label: string; color: string } {
+  if (h < 6) return { label: "Kurang Sekali", color: "#EF4444" };
+  if (h < 7) return { label: "Kurang", color: "#F97316" };
+  if (h <= 9) return { label: "Ideal", color: "#22C55E" };
+  return { label: "Terlalu Banyak", color: "#3B82F6" };
+}
+
+function waterStatus(pct: number): { label: string; color: string } {
+  if (pct < 50) return { label: "Kurang", color: "#EF4444" };
+  if (pct < 80) return { label: "Cukup", color: "#EAB308" };
+  if (pct < 100) return { label: "Baik", color: "#22C55E" };
+  return { label: "Optimal", color: "#06B6D4" };
+}
+
+function energyStatus(v: number): { label: string; color: string } {
+  if (v <= 3) return { label: "Rendah", color: "#EF4444" };
+  if (v <= 6) return { label: "Normal", color: "#EAB308" };
+  if (v <= 8) return { label: "Baik", color: "#22C55E" };
+  return { label: "Tinggi", color: "#06B6D4" };
+}
+
 function workoutIcon(type: string) {
   const t = type.toLowerCase();
   if (t === "cardio") return { icon: HeartPulse, color: "#C41101" };
@@ -123,7 +151,12 @@ function fmtDate(d: string) {
   try { return format(parseISO(d), "d MMM"); } catch { return d; }
 }
 
-// ─── Custom tooltip ───────────────────────────────────────────────────────────
+function avg(arr: number[]): number {
+  if (!arr.length) return 0;
+  return parseFloat((arr.reduce((s, v) => s + v, 0) / arr.length).toFixed(1));
+}
+
+// ─── Custom Tooltips ──────────────────────────────────────────────────────────
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number; name?: string; color?: string }[]; label?: string }) => {
   if (!active || !payload?.length) return null;
@@ -135,6 +168,32 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
           {p.value}{p.name ? ` ${p.name}` : ""}
         </p>
       ))}
+    </div>
+  );
+};
+
+const SleepTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
+  if (!active || !payload?.length) return null;
+  const hours = payload[0]?.value ?? 0;
+  const q = sleepQuality(hours);
+  return (
+    <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
+      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{hours}j</p>
+      <span style={{ background: q.color + "25", color: q.color, fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99 }}>{q.label}</span>
+    </div>
+  );
+};
+
+const WaterTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number; dataKey?: string }[]; label?: string }) => {
+  if (!active || !payload?.length) return null;
+  const liters = payload.find(p => p.dataKey === "liters")?.value ?? 0;
+  const pct = payload.find(p => p.dataKey === "pct")?.value ?? 0;
+  return (
+    <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
+      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontFamily: "'Orbitron'", fontSize: 18, fontWeight: 700, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
+      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{pct}% dari target</p>
     </div>
   );
 };
@@ -181,19 +240,8 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
               )}
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickFormatter={fmtDate}
-              tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }}
-              tickLine={false}
-              axisLine={false}
-              domain={['auto', 'auto']}
-            />
+            <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
             <Tooltip content={<CustomTooltip />} />
             {refLines?.map(r => (
               <ReferenceLine key={r.y} y={r.y} stroke="rgba(100,100,100,0.4)" strokeDasharray="4 4"
@@ -202,14 +250,12 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
             ))}
             <Area type="monotone" dataKey={dataKey as string} stroke={color} strokeWidth={2}
               fill={`url(#grad-${trendKey ?? dataKey as string})`} dot={{ r: 3, fill: color, strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: color }}
-              name={unit}
+              activeDot={{ r: 5, fill: color }} name={unit}
             />
             {secondKey && secondColor && (
               <Area type="monotone" dataKey={secondKey as string} stroke={secondColor} strokeWidth={2}
                 fill={`url(#grad2-${dataKey as string})`} dot={{ r: 3, fill: secondColor, strokeWidth: 0 }}
-                activeDot={{ r: 5, fill: secondColor }}
-                name={secondName}
+                activeDot={{ r: 5, fill: secondColor }} name={secondName}
               />
             )}
           </AreaChart>
@@ -221,18 +267,18 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
 
 // ─── Metric Card ──────────────────────────────────────────────────────────────
 
-function MetricCard({ label, value, unit, status, change, changeUnit }:
-  { label: string; value?: number | string; unit?: string; status?: { label: string; color: string }; change?: number; changeUnit?: string }
+function MetricCard({ label, value, unit, status, change, changeUnit, trend, positiveIsGood = true }:
+  {
+    label: string; value?: number | string; unit?: string;
+    status?: { label: string; color: string }; change?: number; changeUnit?: string;
+    trend?: import("@/utils/checkinData").TrendResult | null; positiveIsGood?: boolean;
+  }
 ) {
   return (
     <div style={{
       background: "linear-gradient(180deg, #FFFFFF 0%, #FBFBFB 100%)",
-      borderRadius: 14,
-      padding: "14px 16px",
-      minWidth: 130,
-      border: "1px solid rgba(0,0,0,0.04)",
-      boxShadow: "0 4px 16px rgba(0,0,0,0.05)",
-      flexShrink: 0,
+      borderRadius: 14, padding: "14px 16px", minWidth: 130,
+      border: "1px solid rgba(0,0,0,0.04)", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", flexShrink: 0,
     }}>
       <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 9, letterSpacing: "2px", color: "var(--muted)", marginBottom: 6 }}>{label}</p>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 3, marginBottom: 4 }}>
@@ -257,6 +303,11 @@ function MetricCard({ label, value, unit, status, change, changeUnit }:
           {status.label}
         </span>
       )}
+      {trend && (
+        <div style={{ marginTop: 6 }}>
+          <TrendBadge trend={trend} positiveIsGood={positiveIsGood} />
+        </div>
+      )}
     </div>
   );
 }
@@ -272,6 +323,11 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
   const [modalTab, setModalTab] = useState<"kesehatan" | "latihan">("kesehatan");
   const [height, setHeight] = useState<number | undefined>(undefined);
   const [showHeightEdit, setShowHeightEdit] = useState(false);
+
+  // Checkin data
+  const [sleepData, setSleepData] = useState<SleepEntry[]>([]);
+  const [waterData, setWaterData] = useState<WaterEntry[]>([]);
+  const [wellnessData, setWellnessData] = useState<WellnessEntry[]>([]);
 
   // Form state — health
   const [fDate, setFDate] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -319,6 +375,11 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
     if (rawWorkouts) {
       setWorkouts(JSON.parse(rawWorkouts).sort((a: Workout, b: Workout) => b.date.localeCompare(a.date)));
     }
+
+    // Load checkin data
+    setSleepData(getSleepHistory(30));
+    setWaterData(getWaterHistory(30));
+    setWellnessData(getWellnessHistory(30));
   }, []);
 
   // Auto-calc BMI
@@ -334,6 +395,36 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
   const filteredEntries = useMemo(() => filterByRange(entries, dateRange), [entries, dateRange]);
   const latest = entries[entries.length - 1];
   const prev = entries[entries.length - 2];
+
+  // Trend calculations
+  const weightTrend = useMemo(() => calculateTrend(entries, "weight"), [entries]);
+  const bmiTrend = useMemo(() => calculateTrend(entries, "bmi"), [entries]);
+  const bfTrend = useMemo(() => calculateTrend(entries, "bodyFat"), [entries]);
+  const hrTrend = useMemo(() => calculateTrend(entries, "restingHr"), [entries]);
+  const waistTrend = useMemo(() => calculateTrend(entries, "waist"), [entries]);
+  const sleepTrend = useMemo(() => getMultiPointTrend(sleepData, "hours", 7), [sleepData]);
+  const waterTrend = useMemo(() => getMultiPointTrend(waterData, "pct", 7), [waterData]);
+  const energyTrend = useMemo(() => getMultiPointTrend(wellnessData.filter(d => d.energy != null) as WellnessEntry[], "energy", 7), [wellnessData]);
+
+  // Averages for summary
+  const last7Sleep = sleepData.slice(-7);
+  const last7Water = waterData.slice(-7);
+  const last7Wellness = wellnessData.slice(-7);
+  const avgSleep = avg(last7Sleep.map(d => d.hours));
+  const avgWaterPct = avg(last7Water.map(d => d.pct));
+  const avgEnergy = avg(last7Wellness.filter(d => d.energy != null).map(d => d.energy as number));
+
+  // Wellness chart data (energy + mood scaled to 0-10)
+  const wellnessChartData = useMemo(() =>
+    wellnessData
+      .filter(d => d.energy != null || d.mood != null)
+      .map(d => ({
+        date: d.date,
+        energy: d.energy,
+        mood: d.mood != null ? parseFloat((d.mood * 2).toFixed(1)) : null,
+      })),
+    [wellnessData]
+  );
 
   function saveHealthEntry() {
     if (!fDate) return;
@@ -392,7 +483,8 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
     return groups;
   }, [workouts]);
 
-  const hasAnyData = entries.length > 0 || mcuResult != null;
+  const hasAnyData = entries.length > 0 || mcuResult != null
+    || sleepData.length > 0 || waterData.length > 0 || wellnessData.length > 0;
 
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "var(--card2)", border: "1px solid var(--border-subtle)",
@@ -405,6 +497,8 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
   };
 
   const workoutTypes = ["Cardio", "Strength", "HIIT", "Yoga", "Cycling", "Swimming", "Running", "Other"];
+
+  const hasTrendData = last7Sleep.length >= 3 || last7Water.length >= 3 || last7Wellness.length >= 3;
 
   return (
     <div
@@ -436,9 +530,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     color: dateRange === r ? "#fff" : "var(--muted)",
                     border: dateRange === r ? "1px solid #C41101" : "1px solid var(--border-subtle)",
                   }}
-                >
-                  {r}
-                </button>
+                >{r}</button>
               ))}
             </div>
           </div>
@@ -501,51 +593,226 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                 )}
               </div>
 
+              {/* Trend Summary Banner */}
+              {hasTrendData && (
+                <div style={{ background: "var(--card)", borderRadius: 14, padding: "16px 20px", boxShadow: "var(--shadow, 0 2px 8px rgba(0,0,0,0.06))" }}>
+                  <div style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)", marginBottom: 12 }}>
+                    RINGKASAN TREN · 7 HARI TERAKHIR
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {[
+                      avgSleep > 0 && { label: "TIDUR", value: `${avgSleep}j`, icon: <Moon size={14} />, color: "#A855F7", trend: sleepTrend, positiveIsGood: true },
+                      avgWaterPct > 0 && { label: "HIDRASI", value: `${avgWaterPct}%`, icon: <Droplets size={14} />, color: "#06B6D4", trend: waterTrend, positiveIsGood: true },
+                      avgEnergy > 0 && { label: "ENERGI", value: `${avgEnergy}/10`, icon: <Zap size={14} />, color: "#22C55E", trend: energyTrend, positiveIsGood: true },
+                      latest?.weight != null && { label: "BERAT", value: `${latest.weight}kg`, icon: <Activity size={14} />, color: "#C41101", trend: weightTrend, positiveIsGood: false },
+                    ].filter(Boolean).map((item) => {
+                      if (!item) return null;
+                      return (
+                        <div key={item.label} style={{ display: "flex", alignItems: "center", gap: 6, background: "var(--bg)", borderRadius: 10, padding: "8px 12px", flex: "1 0 140px" }}>
+                          <div style={{ color: item.color }}>{item.icon}</div>
+                          <div>
+                            <div style={{ fontFamily: "'Bebas Neue'", fontSize: 10, letterSpacing: 1.5, color: "var(--muted)" }}>{item.label}</div>
+                            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                              <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{item.value}</span>
+                              <TrendBadge trend={item.trend} positiveIsGood={item.positiveIsGood} />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Section 2: Summary metric cards */}
-              {latest && (
+              {(latest || sleepData.length > 0 || waterData.length > 0 || wellnessData.length > 0) && (
                 <div>
                   <p className="section-header">METRIK TERKINI</p>
                   <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
-                    {latest.weight != null && (
+                    {latest?.weight != null && (
                       <MetricCard label="BERAT BADAN" value={latest.weight} unit="kg"
-                        change={prev?.weight != null ? latest.weight - prev.weight : undefined} changeUnit=" kg" />
+                        change={prev?.weight != null ? latest.weight - prev.weight : undefined} changeUnit=" kg"
+                        trend={weightTrend} positiveIsGood={false} />
                     )}
-                    <MetricCard label="BMI" value={latest.bmi?.toFixed(1)} status={bmiStatus(latest.bmi)}
-                      change={prev?.bmi != null && latest.bmi != null ? latest.bmi - prev.bmi : undefined} changeUnit="" />
-                    {latest.bodyFat != null && (
-                      <MetricCard label="BODY FAT" value={latest.bodyFat} unit="%" status={bfStatus(latest.bodyFat)} />
+                    {latest?.bmi != null && (
+                      <MetricCard label="BMI" value={latest.bmi?.toFixed(1)} status={bmiStatus(latest.bmi)}
+                        change={prev?.bmi != null && latest.bmi != null ? latest.bmi - prev.bmi : undefined} changeUnit=""
+                        trend={bmiTrend} positiveIsGood={false} />
                     )}
-                    {latest.restingHr != null && (
-                      <MetricCard label="RESTING HR" value={latest.restingHr} unit="bpm" status={hrStatus(latest.restingHr)} />
+                    {latest?.bodyFat != null && (
+                      <MetricCard label="BODY FAT" value={latest.bodyFat} unit="%" status={bfStatus(latest.bodyFat)}
+                        trend={bfTrend} positiveIsGood={false} />
                     )}
-                    {latest.waist != null && (
-                      <MetricCard label="PINGGANG" value={latest.waist} unit="cm" status={waistStatus(latest.waist)} />
+                    {latest?.restingHr != null && (
+                      <MetricCard label="RESTING HR" value={latest.restingHr} unit="bpm" status={hrStatus(latest.restingHr)}
+                        trend={hrTrend} positiveIsGood={false} />
                     )}
-                    {latest.bloodPressureSys != null && (
+                    {latest?.waist != null && (
+                      <MetricCard label="PINGGANG" value={latest.waist} unit="cm" status={waistStatus(latest.waist)}
+                        trend={waistTrend} positiveIsGood={false} />
+                    )}
+                    {latest?.bloodPressureSys != null && (
                       <MetricCard label="BLOOD PRESSURE" value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`}
                         status={bpStatus(latest.bloodPressureSys, latest.bloodPressureDia)} />
+                    )}
+                    {/* Checkin-based metric cards */}
+                    {avgSleep > 0 && (
+                      <MetricCard label="RATA-RATA TIDUR" value={avgSleep} unit="j"
+                        status={sleepQuality(avgSleep)} trend={sleepTrend} positiveIsGood={true} />
+                    )}
+                    {avgWaterPct > 0 && (
+                      <MetricCard label="HIDRASI HARIAN" value={`${avgWaterPct}%`}
+                        status={waterStatus(avgWaterPct)} trend={waterTrend} positiveIsGood={true} />
+                    )}
+                    {avgEnergy > 0 && (
+                      <MetricCard label="LEVEL ENERGI" value={avgEnergy} unit="/10"
+                        status={energyStatus(avgEnergy)} trend={energyTrend} positiveIsGood={true} />
                     )}
                   </div>
                 </div>
               )}
 
-              {/* Section 3: Charts */}
+              {/* Section 3: Health Charts */}
+              {(entries.length > 0) && (
+                <div>
+                  <p className="section-header">TREN KESEHATAN</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <ChartCard title="BERAT BADAN" data={filteredEntries} dataKey="weight" unit=" kg" trendKey="weight" />
+                    <ChartCard title="BMI" data={filteredEntries} dataKey="bmi"
+                      refLines={[{ y: 18.5, label: "18.5" }, { y: 25, label: "25" }, { y: 30, label: "30" }]} trendKey="bmi" />
+                    <ChartCard title="BODY FAT %" data={filteredEntries} dataKey="bodyFat" unit="%" trendKey="bodyFat" />
+                    <ChartCard title="RESTING HEART RATE" data={filteredEntries} dataKey="restingHr" unit=" bpm" trendKey="restingHr" />
+                    <ChartCard title="BLOOD PRESSURE" data={filteredEntries} dataKey="bloodPressureSys" unit=" mmHg"
+                      secondKey="bloodPressureDia" secondColor="#3B82F6" secondName="dia mmHg"
+                      refLines={[{ y: 120, label: "120" }, { y: 80, label: "80" }]} trendKey="bp" />
+                    <ChartCard title="LINGKAR PINGGANG" data={filteredEntries} dataKey="waist" unit=" cm" trendKey="waist" />
+                  </div>
+                </div>
+              )}
+
+              {/* Section 4: Sleep Chart */}
               <div>
-                <p className="section-header">TREN KESEHATAN</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <ChartCard title="BERAT BADAN" data={filteredEntries} dataKey="weight" unit=" kg" trendKey="weight" />
-                  <ChartCard title="BMI" data={filteredEntries} dataKey="bmi"
-                    refLines={[{ y: 18.5, label: "18.5" }, { y: 25, label: "25" }, { y: 30, label: "30" }]} trendKey="bmi" />
-                  <ChartCard title="BODY FAT %" data={filteredEntries} dataKey="bodyFat" unit="%" trendKey="bodyFat" />
-                  <ChartCard title="RESTING HEART RATE" data={filteredEntries} dataKey="restingHr" unit=" bpm" trendKey="restingHr" />
-                  <ChartCard title="BLOOD PRESSURE" data={filteredEntries} dataKey="bloodPressureSys" unit=" mmHg"
-                    secondKey="bloodPressureDia" secondColor="#3B82F6" secondName="dia mmHg"
-                    refLines={[{ y: 120, label: "120" }, { y: 80, label: "80" }]} trendKey="bp" />
-                  <ChartCard title="LINGKAR PINGGANG" data={filteredEntries} dataKey="waist" unit=" cm" trendKey="waist" />
+                <p className="section-header">KUALITAS TIDUR</p>
+                <div className="app-card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>KUALITAS TIDUR</p>
+                    {sleepData.length > 0 && (
+                      <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                        {sleepData[sleepData.length - 1].hours}j
+                      </span>
+                    )}
+                  </div>
+                  {sleepData.length < 1 ? (
+                    <div style={{ textAlign: "center", padding: "32px 20px" }}>
+                      <Moon size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
+                      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 16, color: "var(--muted)" }}>BELUM ADA DATA TIDUR</div>
+                      <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                        Catat jam tidur kamu di Quick Check-in setiap hari
+                      </div>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={160}>
+                      <ComposedChart data={sleepData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis domain={[0, 12]} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <Tooltip content={<SleepTooltip />} />
+                        <ReferenceLine y={7} stroke="#22C55E" strokeDasharray="4 4"
+                          label={{ value: "Ideal", fill: "#22C55E", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                        <ReferenceLine y={9} stroke="#3B82F6" strokeDasharray="4 4"
+                          label={{ value: "Max", fill: "#3B82F6", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                        <Bar dataKey="hours" radius={[4, 4, 0, 0]}>
+                          {sleepData.map((entry, i) => (
+                            <Cell key={i} fill={
+                              entry.hours < 6 ? "#EF4444" :
+                              entry.hours < 7 ? "#EAB308" :
+                              entry.hours <= 9 ? "#22C55E" : "#3B82F6"
+                            } />
+                          ))}
+                        </Bar>
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  )}
                 </div>
               </div>
 
-              {/* Section 5: Workout history */}
+              {/* Section 5: Water Chart */}
+              <div>
+                <p className="section-header">ASUPAN AIR HARIAN</p>
+                <div className="app-card">
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                    <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>ASUPAN AIR HARIAN</p>
+                    {waterData.length > 0 && (
+                      <span style={{ fontFamily: "'Orbitron'", fontSize: 14, fontWeight: 700, color: "#06B6D4" }}>
+                        {waterData[waterData.length - 1].liters}L
+                      </span>
+                    )}
+                  </div>
+                  {waterData.length < 1 ? (
+                    <div style={{ textAlign: "center", padding: "32px 20px" }}>
+                      <Droplets size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
+                      <div style={{ fontFamily: "'Bebas Neue'", fontSize: 16, color: "var(--muted)" }}>BELUM ADA DATA AIR</div>
+                      <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                        Catat asupan air di Quick Check-in setiap hari
+                      </div>
+                    </div>
+                  ) : (
+                    <ResponsiveContainer width="100%" height={140}>
+                      <AreaChart data={waterData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="grad-water" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#06B6D4" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={[0, "auto"]} />
+                        <Tooltip content={<WaterTooltip />} />
+                        {waterData.length > 0 && (
+                          <ReferenceLine y={waterData[waterData.length - 1].target} stroke="#06B6D4" strokeDasharray="4 4"
+                            label={{ value: "Target", fill: "#06B6D4", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                        )}
+                        <Area type="monotone" dataKey="liters" stroke="#06B6D4" strokeWidth={2}
+                          fill="url(#grad-water)" dot={{ r: 3, fill: "#06B6D4", strokeWidth: 0 }}
+                          activeDot={{ r: 5, fill: "#06B6D4" }} />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  )}
+                </div>
+              </div>
+
+              {/* Section 6: Energy & Mood Chart */}
+              {wellnessChartData.length > 0 && (
+                <div>
+                  <p className="section-header">ENERGI & MOOD</p>
+                  <div className="app-card">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                      <p style={{ fontFamily: "'Bebas Neue'", fontSize: 11, letterSpacing: 2.5, color: "var(--muted)" }}>ENERGI & MOOD</p>
+                      <div style={{ display: "flex", gap: 12 }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "#22C55E" }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />Energi
+                        </span>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "#F97316" }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F97316", display: "inline-block" }} />Mood ×2
+                        </span>
+                      </div>
+                    </div>
+                    <ResponsiveContainer width="100%" height={130}>
+                      <LineChart data={wellnessChartData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis domain={[0, 10]} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Line type="monotone" dataKey="energy" stroke="#22C55E" strokeWidth={2} dot={{ r: 3, fill: "#22C55E", strokeWidth: 0 }} activeDot={{ r: 5 }} connectNulls name="/10" />
+                        <Line type="monotone" dataKey="mood" stroke="#F97316" strokeWidth={2} dot={{ r: 3, fill: "#F97316", strokeWidth: 0 }} activeDot={{ r: 5 }} connectNulls name="/10" />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              )}
+
+              {/* Section 7: Workout history */}
               <div>
                 <p className="section-header">RIWAYAT LATIHAN</p>
                 {workoutGroups.length === 0 ? (
@@ -587,7 +854,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                 )}
               </div>
 
-              {/* Section 6: Insights */}
+              {/* Section 8: MCU Recommendations */}
               {mcuResult?.recommendations && mcuResult.recommendations.length > 0 && (
                 <div>
                   <p className="section-header">REKOMENDASI MCU</p>
@@ -647,13 +914,11 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               padding: 24, maxHeight: "85vh", overflowY: "auto",
             }}
           >
-            {/* Modal header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 20, letterSpacing: "2px", color: "var(--text)" }}>TAMBAH DATA KESEHATAN</h2>
               <button onClick={() => setShowModal(false)} style={{ color: "var(--muted)", fontSize: 22, background: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
             </div>
 
-            {/* Tabs */}
             <div style={{ display: "flex", gap: 0, marginBottom: 20, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border-subtle)" }}>
               {(["kesehatan", "latihan"] as const).map(tab => (
                 <button
@@ -674,21 +939,15 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
             {modalTab === "kesehatan" ? (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {/* Date */}
                 <div>
                   <span style={labelStyle}>TANGGAL</span>
                   <input type="date" value={fDate} onChange={e => setFDate(e.target.value)} style={inputStyle} />
                 </div>
-
-                {/* Height (one-time) */}
                 {(!height || showHeightEdit) && (
                   <div>
                     <span style={labelStyle}>TINGGI BADAN (cm) {!height && <span style={{ color: "#C41101" }}>*</span>}</span>
-                    <input type="number" value={fHeightInput} onChange={e => setFHeightInput(e.target.value)}
-                      placeholder="170" style={inputStyle} />
-                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 3 }}>
-                      Digunakan untuk hitung BMI otomatis
-                    </p>
+                    <input type="number" value={fHeightInput} onChange={e => setFHeightInput(e.target.value)} placeholder="170" style={inputStyle} />
+                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Digunakan untuk hitung BMI otomatis</p>
                   </div>
                 )}
                 {height && !showHeightEdit && (
@@ -697,8 +956,6 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     Edit tinggi badan ({height} cm)
                   </button>
                 )}
-
-                {/* Weight */}
                 <div>
                   <span style={labelStyle}>BERAT BADAN (kg)</span>
                   <input type="number" value={fWeight} onChange={e => setFWeight(e.target.value)} placeholder="70.0" step="0.1" style={inputStyle} />
@@ -708,32 +965,22 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     </p>
                   )}
                 </div>
-
-                {/* BMI */}
                 <div>
                   <span style={labelStyle}>BMI</span>
                   <input type="number" value={fBmi} onChange={e => setFBmi(e.target.value)} placeholder="22.5" step="0.1" style={inputStyle} />
                 </div>
-
-                {/* Body Fat */}
                 <div>
                   <span style={labelStyle}>BODY FAT (%)</span>
                   <input type="number" value={fBodyFat} onChange={e => setFBodyFat(e.target.value)} placeholder="18.0" step="0.1" style={inputStyle} />
                 </div>
-
-                {/* Resting HR */}
                 <div>
                   <span style={labelStyle}>RESTING HR (bpm)</span>
                   <input type="number" value={fRestingHr} onChange={e => setFRestingHr(e.target.value)} placeholder="62" style={inputStyle} />
                 </div>
-
-                {/* Waist */}
                 <div>
                   <span style={labelStyle}>LINGKAR PINGGANG (cm)</span>
                   <input type="number" value={fWaist} onChange={e => setFWaist(e.target.value)} placeholder="80" style={inputStyle} />
                 </div>
-
-                {/* Blood pressure */}
                 <div>
                   <span style={labelStyle}>TEKANAN DARAH (mmHg)</span>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -742,83 +989,40 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <input type="number" value={fBpDia} onChange={e => setFBpDia(e.target.value)} placeholder="80" style={{ ...inputStyle, flex: 1 }} />
                   </div>
                 </div>
-
-                {/* Note */}
                 <div>
                   <span style={labelStyle}>CATATAN</span>
                   <textarea value={fNote} onChange={e => setFNote(e.target.value)}
-                    placeholder="Kondisi hari ini, perubahan diet, dll"
-                    rows={3}
-                    style={{ ...inputStyle, resize: "vertical" }}
-                  />
+                    placeholder="Kondisi hari ini, perubahan diet, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-
-                <button
-                  onClick={saveHealthEntry}
-                  style={{
-                    width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer",
-                    backgroundColor: "#C41101", color: "#fff",
-                    fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px",
-                    marginTop: 4,
-                  }}
-                >
+                <button onClick={saveHealthEntry} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN DATA
                 </button>
               </div>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {/* Date */}
                 <div>
                   <span style={labelStyle}>TANGGAL</span>
                   <input type="date" value={wDate} onChange={e => setWDate(e.target.value)} style={inputStyle} />
                 </div>
-
-                {/* Workout type */}
                 <div>
                   <span style={labelStyle}>JENIS LATIHAN</span>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                     {workoutTypes.map(t => (
-                      <button
-                        key={t}
-                        onClick={() => setWType(t)}
-                        style={{
-                          fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "1.5px",
-                          padding: "5px 12px", borderRadius: 6, cursor: "pointer", transition: "all 0.15s",
-                          backgroundColor: wType === t ? "#C41101" : "transparent",
-                          color: wType === t ? "#fff" : "var(--muted)",
-                          border: wType === t ? "1px solid #C41101" : "1px solid var(--border-subtle)",
-                        }}
-                      >
+                      <button key={t} onClick={() => setWType(t)} style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 12, letterSpacing: "1.5px", padding: "5px 12px", borderRadius: 6, cursor: "pointer", transition: "all 0.15s", backgroundColor: wType === t ? "#C41101" : "transparent", color: wType === t ? "#fff" : "var(--muted)", border: wType === t ? "1px solid #C41101" : "1px solid var(--border-subtle)" }}>
                         {t.toUpperCase()}
                       </button>
                     ))}
                   </div>
                 </div>
-
-                {/* Duration */}
                 <div>
                   <span style={labelStyle}>DURASI (menit)</span>
                   <input type="number" value={wDuration} onChange={e => setWDuration(e.target.value)} placeholder="45" style={inputStyle} />
                 </div>
-
-                {/* Note */}
                 <div>
                   <span style={labelStyle}>CATATAN</span>
-                  <textarea value={wNote} onChange={e => setWNote(e.target.value)}
-                    placeholder="Intensitas, lokasi, dll" rows={3}
-                    style={{ ...inputStyle, resize: "vertical" }}
-                  />
+                  <textarea value={wNote} onChange={e => setWNote(e.target.value)} placeholder="Intensitas, lokasi, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-
-                <button
-                  onClick={saveWorkout}
-                  style={{
-                    width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer",
-                    backgroundColor: "#C41101", color: "#fff",
-                    fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px",
-                    marginTop: 4,
-                  }}
-                >
+                <button onClick={saveWorkout} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Bebas Neue', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN LATIHAN
                 </button>
               </div>
