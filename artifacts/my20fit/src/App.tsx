@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Dashboard from "@/pages/Dashboard";
 import Progress from "@/pages/Progress";
+import Nutrition from "@/pages/Nutrition";
 import ComingSoon from "@/pages/ComingSoon";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -21,6 +22,7 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
     <Switch>
       <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/progress" component={() => <Progress theme={theme} toggleTheme={toggleTheme} />} />
+      <Route path="/nutrition" component={() => <Nutrition theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/events" component={() => <ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/profile" component={() => <ComingSoon title="PROFILE" theme={theme} toggleTheme={toggleTheme} />} />
