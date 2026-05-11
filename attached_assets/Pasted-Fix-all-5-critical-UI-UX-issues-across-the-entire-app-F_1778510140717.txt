@@ -1,0 +1,667 @@
+Fix all 5 critical UI/UX issues across the entire app.
+
+---
+
+## FIX 1: CONSISTENT EMPTY STATES
+
+Create src/components/EmptyState.jsx — reusable component:
+
+import { useNavigate } from 'react-router-dom'
+
+export default function EmptyState({ 
+  icon, 
+  title, 
+  description, 
+  primaryAction,
+  secondaryAction,
+  compact = false
+}) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: compact ? '24px 16px' : '48px 24px',
+      textAlign: 'center',
+      gap: 12
+    }}>
+      {/* Icon wrapper */}
+      <div style={{
+        width: compact ? 48 : 64,
+        height: compact ? 48 : 64,
+        borderRadius: '50%',
+        background: 'var(--bg)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 4
+      }}>
+        <div style={{ opacity: 0.35, color: 'var(--muted)' }}>
+          {icon}
+        </div>
+      </div>
+
+      {/* Title */}
+      <div style={{
+        fontFamily: "'Anton', sans-serif",
+        fontSize: compact ? 16 : 20,
+        color: 'var(--text)',
+        letterSpacing: 0.5,
+        lineHeight: 1.2
+      }}>{title}</div>
+
+      {/* Description */}
+      {description && (
+        <div style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900,
+          fontSize: 13,
+          color: 'var(--muted)',
+          maxWidth: 280,
+          lineHeight: 1.5
+        }}>{description}</div>
+      )}
+
+      {/* Actions */}
+      {(primaryAction || secondaryAction) && (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+          marginTop: 8,
+          width: '100%',
+          maxWidth: 280
+        }}>
+          {primaryAction && (
+            <button
+              onClick={primaryAction.onClick}
+              style={{
+                background: '#C41101',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 12,
+                padding: '12px 24px',
+                fontFamily: "'Anton', sans-serif",
+                fontSize: 14,
+                letterSpacing: 1.5,
+                cursor: 'pointer',
+                width: '100%',
+                transition: 'all .2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '.85'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >{primaryAction.label}</button>
+          )}
+          {secondaryAction && (
+            <button
+              onClick={secondaryAction.onClick}
+              style={{
+                background: 'transparent',
+                color: 'var(--muted)',
+                border: '1.5px solid var(--border-subtle, #E5E1D8)',
+                borderRadius: 12,
+                padding: '12px 24px',
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 900,
+                fontSize: 14,
+                cursor: 'pointer',
+                width: '100%',
+                transition: 'all .2s'
+              }}
+            >{secondaryAction.label}</button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+Apply EmptyState component consistently across ALL sections:
+
+TodaysChecklist.jsx (no MCU):
+<EmptyState
+  icon={<ClipboardList size={28}/>}
+  title="CHECKLIST BELUM TERSEDIA"
+  description="Upload hasil MCU kamu agar kami bisa membuat checklist harian yang dipersonalisasi."
+  primaryAction={{
+    label: 'UPLOAD MCU →',
+    onClick: () => document.getElementById('section-mcu')
+      ?.scrollIntoView({ behavior: 'smooth' })
+  }}
+/>
+
+MyMoments.jsx (empty):
+<EmptyState
+  icon={<Camera size={28}/>}
+  title="BELUM ADA MOMEN"
+  description="Scan wajahmu sekali dan foto event kamu akan ter-tag otomatis selamanya."
+  primaryAction={{ label: 'SCAN WAJAH SEKARANG →', onClick: () => {} }}
+  secondaryAction={{ label: 'Pelajari lebih lanjut', onClick: () => {} }}
+/>
+
+Progress.jsx (no data):
+<EmptyState
+  icon={<TrendingUp size={28}/>}
+  title="BELUM ADA DATA PROGRESS"
+  description="Upload MCU atau tambah data manual untuk mulai tracking kesehatanmu."
+  primaryAction={{ label: 'TAMBAH DATA →', onClick: () => setShowAddModal(true) }}
+  secondaryAction={{ label: 'Upload MCU', onClick: () => navigate('/') }}
+/>
+
+Sleep chart (no data):
+<EmptyState
+  compact
+  icon={<Moon size={20}/>}
+  title="BELUM ADA DATA TIDUR"
+  description="Catat jam tidur di Quick Check-in setiap hari."
+/>
+
+Water chart (no data):
+<EmptyState
+  compact
+  icon={<Droplets size={20}/>}
+  title="BELUM ADA DATA HIDRASI"
+  description="Catat asupan air di Quick Check-in setiap hari."
+/>
+
+Nutrition.jsx (no data):
+<EmptyState
+  icon={<UtensilsCrossed size={28}/>}
+  title="BELUM ADA DATA"
+  description="Lengkapi data kesehatanmu untuk mendapatkan rekomendasi nutrisi yang personal."
+  primaryAction={{ label: 'UPLOAD MCU DULU →', onClick: () => navigate('/') }}
+  secondaryAction={{ 
+    label: 'Generate dengan data umum', 
+    onClick: () => generateRecommendation(true) 
+  }}
+/>
+
+---
+
+## FIX 2: CONSISTENT LOADING STATES
+
+Create src/components/Skeleton.jsx:
+
+// Animated skeleton block
+export function SkeletonBlock({ width = '100%', height = 16, borderRadius = 8, style = {} }) {
+  return (
+    <div style={{
+      width,
+      height,
+      borderRadius,
+      background: 'linear-gradient(90deg, var(--bg) 25%, var(--border-subtle, #E5E1D8) 50%, var(--bg) 75%)',
+      backgroundSize: '200% 100%',
+      animation: 'shimmer 1.5s infinite',
+      ...style
+    }}/>
+  )
+}
+
+// Card skeleton
+export function SkeletonCard({ rows = 3 }) {
+  return (
+    <div style={{
+      background: 'var(--card)',
+      borderRadius: 14,
+      padding: '18px 20px',
+      boxShadow: 'var(--shadow)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 10
+    }}>
+      <SkeletonBlock height={12} width="40%" />
+      {Array.from({ length: rows }).map((_, i) => (
+        <SkeletonBlock
+          key={i}
+          height={14}
+          width={i === rows - 1 ? '60%' : '100%'}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Metric card skeleton
+export function SkeletonMetric() {
+  return (
+    <div style={{
+      background: 'var(--card)',
+      borderRadius: 14,
+      padding: '16px',
+      boxShadow: 'var(--shadow)',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 8
+    }}>
+      <SkeletonBlock height={10} width="50%" />
+      <SkeletonBlock height={32} width="70%" />
+      <SkeletonBlock height={10} width="40%" />
+    </div>
+  )
+}
+
+Add to index.css:
+@keyframes shimmer {
+  0% { background-position: 200% 0 }
+  100% { background-position: -200% 0 }
+}
+
+Apply skeleton loading consistently:
+
+WeatherCard.jsx:
+if (loading) return (
+  <div style={{ background:'var(--card)', borderRadius:16, padding:20, boxShadow:'var(--shadow)' }}>
+    <div style={{ display:'flex', justifyContent:'space-between', marginBottom:16 }}>
+      <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+        <SkeletonBlock height={10} width={120} />
+        <SkeletonBlock height={64} width={140} />
+        <SkeletonBlock height={12} width={180} />
+      </div>
+      <SkeletonBlock height={100} width={80} borderRadius={12} />
+    </div>
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8 }}>
+      {[1,2,3,4].map(i => <SkeletonBlock key={i} height={48} />)}
+    </div>
+    <div style={{ display:'flex', gap:6, marginTop:16, overflow:'hidden' }}>
+      {[1,2,3,4,5].map(i => <SkeletonBlock key={i} height={90} width={64} style={{flexShrink:0}} />)}
+    </div>
+  </div>
+)
+
+MedicalCheckup.jsx (while analyzing):
+if (analyzing) return (
+  <div style={{ background:'var(--card)', borderRadius:16, padding:24, boxShadow:'var(--shadow)' }}>
+    <div style={{ display:'flex', flexDirection:'column', gap:12, alignItems:'center' }}>
+      <div style={{
+        width:48, height:48, borderRadius:'50%',
+        border:'3px solid #C41101',
+        borderTopColor:'transparent',
+        animation:'spin 0.7s linear infinite'
+      }}/>
+      <div style={{
+        fontFamily:"'Anton', sans-serif",
+        fontSize:16, letterSpacing:1, color:'var(--text)'
+      }}>MENGANALISIS MCU</div>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:13, color:'var(--muted)',
+        textAlign:'center', maxWidth:260, lineHeight:1.5
+      }}>AI sedang membaca dokumen kesehatanmu...</div>
+      <SkeletonCard rows={4} />
+    </div>
+  </div>
+)
+
+Nutrition.jsx:
+if (loading) return (
+  <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+    <SkeletonCard rows={2} />
+    {[1,2,3,4].map(i => <SkeletonCard key={i} rows={3} />)}
+  </div>
+)
+
+Progress.jsx:
+if (loading) return (
+  <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+    <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
+      {[1,2,3,4,5,6].map(i => <SkeletonMetric key={i} />)}
+    </div>
+    <SkeletonCard rows={5} />
+    <SkeletonCard rows={5} />
+  </div>
+)
+
+---
+
+## FIX 3: ERROR HANDLING WITH RETRY
+
+Create src/components/ErrorState.jsx:
+
+export default function ErrorState({ 
+  message = 'Terjadi kesalahan', 
+  onRetry,
+  compact = false
+}) {
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 10,
+      padding: compact ? '16px' : '32px 20px',
+      background: 'var(--card)',
+      borderRadius: 14,
+      border: '1px solid rgba(239,68,68,.2)',
+      textAlign: 'center'
+    }}>
+      <div style={{
+        width: 40, height: 40,
+        borderRadius: '50%',
+        background: 'rgba(239,68,68,.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        <WifiOff size={18} color="#EF4444" />
+      </div>
+
+      <div>
+        <div style={{
+          fontFamily: "'Anton', sans-serif",
+          fontSize: 14, color: 'var(--text)', marginBottom: 4
+        }}>GAGAL MEMUAT</div>
+        <div style={{
+          fontFamily: "'Barlow Condensed', sans-serif",
+          fontWeight: 900, fontSize: 12,
+          color: 'var(--muted)', lineHeight: 1.4
+        }}>{message}</div>
+      </div>
+
+      {onRetry && (
+        <button
+          onClick={onRetry}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: 'transparent',
+            border: '1.5px solid var(--border-subtle, #E5E1D8)',
+            borderRadius: 10, padding: '8px 16px',
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 900, fontSize: 13,
+            color: 'var(--text)', cursor: 'pointer',
+            transition: 'all .2s'
+          }}
+        >
+          <RefreshCw size={12} />
+          COBA LAGI
+        </button>
+      )}
+    </div>
+  )
+}
+
+Apply ErrorState in all API-dependent components:
+
+WeatherCard.jsx:
+const [weatherError, setWeatherError] = useState(null)
+
+// In fetchWeather catch block:
+catch(err) {
+  setWeatherError('Gagal memuat data cuaca. Periksa koneksi internetmu.')
+  setLoading(false)
+}
+
+// In render:
+if (weatherError) return (
+  <ErrorState 
+    message={weatherError}
+    onRetry={() => {
+      setWeatherError(null)
+      setLoading(true)
+      fetchWeather(lat, lon)
+    }}
+  />
+)
+
+MedicalCheckup.jsx — already has error state, 
+make it use ErrorState component consistently.
+
+Nutrition.jsx:
+if (error) return (
+  <ErrorState
+    message={error}
+    onRetry={() => generateRecommendation(true)}
+  />
+)
+
+---
+
+## FIX 4: SAVE AND RESTORE SCROLL POSITION
+
+In src/App.jsx or create src/hooks/useScrollRestore.js:
+
+import { useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
+
+export function useScrollRestore() {
+  const location = useLocation()
+  const scrollPositions = useRef({})
+  const mainRef = useRef(null)
+
+  // Save scroll position before leaving
+  useEffect(() => {
+    const mainEl = mainRef.current
+    if (!mainEl) return
+    
+    const handleScroll = () => {
+      scrollPositions.current[location.pathname] = mainEl.scrollTop
+    }
+    
+    mainEl.addEventListener('scroll', handleScroll, { passive: true })
+    return () => mainEl.removeEventListener('scroll', handleScroll)
+  }, [location.pathname])
+
+  // Restore scroll position on navigate
+  useEffect(() => {
+    const mainEl = mainRef.current
+    if (!mainEl) return
+
+    const savedPosition = scrollPositions.current[location.pathname] || 0
+    
+    // Small delay to let content render first
+    const timer = setTimeout(() => {
+      mainEl.scrollTo({ top: savedPosition, behavior: 'instant' })
+    }, 50)
+
+    return () => clearTimeout(timer)
+  }, [location.pathname])
+
+  return mainRef
+}
+
+In main layout component (App.jsx or Layout.jsx),
+apply the hook to the scrollable main content area:
+
+import { useScrollRestore } from './hooks/useScrollRestore'
+
+function Layout({ children }) {
+  const mainRef = useScrollRestore()
+  
+  return (
+    <div style={{ display:'flex', height:'100dvh', overflow:'hidden' }}>
+      <Sidebar />
+      <main
+        ref={mainRef}
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          height: '100dvh',
+          WebkitOverflowScrolling: 'touch'
+        }}
+      >
+        {children}
+      </main>
+    </div>
+  )
+}
+
+---
+
+## FIX 5: ACTION FEEDBACK (SUCCESS TOASTS)
+
+Create src/components/Toast.jsx:
+
+import { useEffect, useState } from 'react'
+import { Check, AlertCircle, Info, X } from 'lucide-react'
+
+const TOAST_CONFIGS = {
+  success: {
+    icon: <Check size={12} color="#fff"/>,
+    iconBg: '#16A34A',
+    borderColor: 'rgba(22,163,74,.2)'
+  },
+  error: {
+    icon: <AlertCircle size={12} color="#fff"/>,
+    iconBg: '#EF4444',
+    borderColor: 'rgba(239,68,68,.2)'
+  },
+  info: {
+    icon: <Info size={12} color="#fff"/>,
+    iconBg: '#3B82F6',
+    borderColor: 'rgba(59,130,246,.2)'
+  }
+}
+
+export function Toast({ message, type = 'success', onDismiss }) {
+  const config = TOAST_CONFIGS[type]
+  
+  useEffect(() => {
+    const timer = setTimeout(onDismiss, 2500)
+    return () => clearTimeout(timer)
+  }, [onDismiss])
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: 80, left: '50%',
+      transform: 'translateX(-50%)',
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: 10,
+      background: 'rgba(10,10,10,.92)',
+      border: `1px solid ${config.borderColor}`,
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+      borderRadius: 99,
+      padding: '10px 16px 10px 10px',
+      zIndex: 500,
+      whiteSpace: 'nowrap',
+      boxShadow: '0 8px 32px rgba(0,0,0,.3)',
+      animation: 'toastSlideUp .4s cubic-bezier(.34,1.56,.64,1) both'
+    }}>
+      <div style={{
+        width: 22, height: 22, borderRadius: '50%',
+        background: config.iconBg,
+        display: 'flex', alignItems: 'center',
+        justifyContent: 'center', flexShrink: 0
+      }}>{config.icon}</div>
+      <span style={{
+        fontFamily: "'Barlow Condensed', sans-serif",
+        fontWeight: 900, fontSize: 13, color: '#fff'
+      }}>{message}</span>
+      <button
+        onClick={onDismiss}
+        style={{
+          background: 'none', border: 'none',
+          color: 'rgba(255,255,255,.4)',
+          cursor: 'pointer', padding: '0 0 0 4px',
+          display: 'flex', alignItems: 'center'
+        }}
+      ><X size={12}/></button>
+    </div>
+  )
+}
+
+Create src/contexts/ToastContext.jsx:
+
+import { createContext, useContext, useState, useCallback } from 'react'
+import { Toast } from '../components/Toast'
+
+const ToastContext = createContext({})
+
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([])
+
+  const showToast = useCallback((message, type = 'success') => {
+    const id = Date.now()
+    setToasts(prev => [...prev, { id, message, type }])
+  }, [])
+
+  const dismissToast = useCallback((id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }, [])
+
+  return (
+    <ToastContext.Provider value={{ showToast }}>
+      {children}
+      {toasts.map(toast => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => dismissToast(toast.id)}
+        />
+      ))}
+    </ToastContext.Provider>
+  )
+}
+
+export const useToast = () => useContext(ToastContext)
+
+Wrap app in main.jsx:
+import { ToastProvider } from './contexts/ToastContext'
+
+<ToastProvider>
+  <App />
+</ToastProvider>
+
+Use showToast throughout the app:
+
+QuickCheckin — after save wellness:
+const { showToast } = useToast()
+// After save:
+showToast('Wellness check-in tersimpan ✓')
+
+QuickCheckin — after save sleep:
+showToast('Data tidur tersimpan ✓')
+
+QuickCheckin — after add water:
+showToast(`+${ml}ml tercatat`, 'info')
+
+QuickCheckin — after save cycle:
+showToast('Siklus menstruasi diperbarui ✓')
+
+TodaysChecklist — after all done:
+showToast('Semua checklist hari ini selesai! 🎉')
+
+Profile — after save edit:
+showToast('Profil berhasil diperbarui ✓')
+
+Progress — after add data:
+showToast('Data kesehatan berhasil ditambahkan ✓')
+
+MedicalCheckup — after save MCU:
+showToast('Hasil MCU berhasil dianalisis ✓')
+
+MCU error:
+showToast('Gagal menganalisis dokumen. Coba lagi.', 'error')
+
+Nutrition — after generate:
+showToast('Rekomendasi nutrisi diperbarui ✓')
+
+---
+
+## ALSO FIX: Add @keyframes to index.css
+
+@keyframes toastSlideUp {
+  from { 
+    opacity: 0; 
+    transform: translateX(-50%) translateY(16px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg) }
+}
+
+---
+
+After all fixes: npm run build — fix all errors.
+Make sure EmptyState, ErrorState, Toast, 
+and useScrollRestore are used consistently 
+across ALL pages and components.

@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "wouter";
+import { useToast } from "@/contexts/ToastContext";
 import {
   User, Mail, Phone, Calendar, Ruler, Weight,
   Activity, Bell, Moon, Sun, Globe, Shield,
   HelpCircle, Star, ChevronRight, LogOut,
-  Pencil, Trash2, Check, X,
+  Pencil, Trash2, X,
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
@@ -86,9 +87,9 @@ function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) =>
 export default function Profile({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   const [, setLocation] = useLocation();
   const [data, setData] = useState<ProfileData>(getProfileData);
+  const { showToast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   const [editName, setEditName] = useState(mockUser.name);
   const [editPhone, setEditPhone] = useState(mockUser.phone);
@@ -203,8 +204,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
     if (editHeight) localStorage.setItem("my20fit_height", editHeight);
     setData(getProfileData());
     setShowEditModal(false);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 2500);
+    showToast("Profil berhasil diperbarui ✓");
   }
 
   function exportMyData() {
@@ -727,31 +727,6 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
         </div>
       )}
 
-      {/* ── SUCCESS TOAST ── */}
-      {showToast && (
-        <div style={{
-          position: "fixed", bottom: 80, left: "50%", transform: "translateX(-50%)",
-          background: "rgba(10,10,10,.88)", border: "1px solid rgba(255,255,255,.12)",
-          backdropFilter: "blur(16px)", borderRadius: 99, padding: "10px 20px 10px 14px",
-          display: "flex", alignItems: "center", gap: 8,
-          zIndex: 300, whiteSpace: "nowrap",
-          animation: "toastSlideUp .4s cubic-bezier(.34,1.56,.64,1) both",
-        }}>
-          <div style={{ width: 22, height: 22, borderRadius: "50%", background: "#16A34A", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Check size={12} color="#fff" />
-          </div>
-          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 13, color: "#fff" }}>
-            Profil berhasil diperbarui
-          </span>
-        </div>
-      )}
-
-      <style>{`
-        @keyframes toastSlideUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(12px) scale(.95); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-        }
-      `}</style>
     </div>
   );
 }

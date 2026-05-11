@@ -8,6 +8,10 @@ import {
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
+import EmptyState from "@/components/EmptyState";
+import { SkeletonCard } from "@/components/Skeleton";
+import ErrorState from "@/components/ErrorState";
+import { useToast } from "@/contexts/ToastContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -107,6 +111,8 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
   const userData = collectUserData();
   const hasAnyData = !!(userData.mcuData || userData.wellnessData || userData.sleepData || userData.waterData);
 
+  const { showToast } = useToast();
+
   const generateRecommendation = useCallback(async (forceRefresh = false) => {
     const today = new Date().toISOString().split("T")[0];
     const cacheKey = `my20fit_food_${today}`;
@@ -141,12 +147,13 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
       localStorage.setItem(cacheKey, JSON.stringify({ data: result.data, timestamp: now }));
       setRecommendation(result.data);
       setCachedTimestamp(now);
+      showToast("Rekomendasi nutrisi diperbarui ✓");
     } catch {
       setError("Gagal memuat rekomendasi. Coba lagi.");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [showToast]);
 
   useEffect(() => {
     generateRecommendation(false);
@@ -226,45 +233,29 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
           {/* Empty state — no data at all */}
           {!hasAnyData && !loading && !recommendation && !error && (
-            <div style={{ textAlign: "center", padding: "60px 20px" }}>
-              <UtensilsCrossed size={48} style={{ color: "var(--muted)", opacity: 0.3, marginBottom: 16, margin: "0 auto 16px", display: "block" }} />
-              <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 22, color: "var(--text)", marginBottom: 8 }}>BELUM ADA DATA</div>
-              <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)", maxWidth: 280, margin: "0 auto 24px", lineHeight: 1.5 }}>
-                Lengkapi data kesehatanmu untuk mendapatkan rekomendasi nutrisi yang personal.
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                <button onClick={() => setLocation("/")} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, cursor: "pointer" }}>
-                  UPLOAD MCU DULU →
-                </button>
-                <button onClick={() => generateRecommendation(true)} style={{ background: "transparent", border: "1.5px solid var(--border-subtle, #E5E1D8)", borderRadius: 12, padding: "12px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, color: "var(--muted)", cursor: "pointer" }}>
-                  GENERATE DENGAN DATA UMUM
-                </button>
-              </div>
-            </div>
+            <EmptyState
+              icon={<UtensilsCrossed size={28} />}
+              title="BELUM ADA DATA"
+              description="Lengkapi data kesehatanmu untuk mendapatkan rekomendasi nutrisi yang personal."
+              primaryAction={{ label: "UPLOAD MCU DULU →", onClick: () => setLocation("/") }}
+              secondaryAction={{ label: "Generate dengan data umum", onClick: () => generateRecommendation(true) }}
+            />
           )}
 
           {/* Loading state */}
           {loading && (
-            <div style={{ textAlign: "center", padding: "40px 20px" }}>
-              <div className="spin-anim" style={{ width: 48, height: 48, borderRadius: "50%", border: "3px solid #C41101", borderTopColor: "transparent", margin: "0 auto 16px" }} />
-              <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 18, letterSpacing: 0.5, color: "var(--text)", marginBottom: 8 }}>
-                MENYUSUN REKOMENDASI
-              </div>
-              <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 13, color: "var(--muted)" }}>
-                AI sedang menganalisis kondisi kesehatanmu...
-              </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <SkeletonCard rows={2} />
+              {[1,2,3,4].map(i => <SkeletonCard key={i} rows={3} />)}
             </div>
           )}
 
           {/* Error */}
           {error && !loading && (
-            <div style={{ textAlign: "center", padding: "40px 20px" }}>
-              <AlertTriangle size={40} style={{ color: "#D97706", margin: "0 auto 12px", display: "block" }} />
-              <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, color: "var(--muted)", marginBottom: 16 }}>{error}</div>
-              <button onClick={() => generateRecommendation(true)} style={{ background: "#C41101", color: "#fff", border: "none", borderRadius: 10, padding: "10px 24px", fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, letterSpacing: 1, cursor: "pointer" }}>
-                COBA LAGI
-              </button>
-            </div>
+            <ErrorState
+              message={error}
+              onRetry={() => generateRecommendation(true)}
+            />
           )}
 
           {/* Recommendation content */}

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dumbbell, CloudRain, CloudLightning, Wind, Thermometer, PersonStanding } from "lucide-react";
+import { SkeletonBlock } from "./Skeleton";
+import ErrorState from "./ErrorState";
 
 interface HourlyItem {
   time: string;
@@ -199,8 +201,12 @@ export default function WeatherCard() {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
+    setError(false);
+
     // Inject pulse keyframes once
     if (!document.getElementById("wc-pulse-style")) {
       const tag = document.createElement("style");
@@ -210,18 +216,20 @@ export default function WeatherCard() {
     }
 
     // Check cache — invalidate if missing hourly (old format)
-    try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (raw) {
-        const { data, timestamp } = JSON.parse(raw);
-        if (Date.now() - timestamp < CACHE_TTL && Array.isArray(data?.hourly)) {
-          setWeather(data);
-          setLoading(false);
-          return;
+    if (retryKey === 0) {
+      try {
+        const raw = localStorage.getItem(CACHE_KEY);
+        if (raw) {
+          const { data, timestamp } = JSON.parse(raw);
+          if (Date.now() - timestamp < CACHE_TTL && Array.isArray(data?.hourly)) {
+            setWeather(data);
+            setLoading(false);
+            return;
+          }
         }
-      }
-    } catch { /* ignore */ }
-    localStorage.removeItem(CACHE_KEY);
+      } catch { /* ignore */ }
+      localStorage.removeItem(CACHE_KEY);
+    }
 
     const load = async (lat: number, lon: number) => {
       try {
@@ -239,7 +247,7 @@ export default function WeatherCard() {
       pos => load(pos.coords.latitude, pos.coords.longitude),
       () => load(-6.2088, 106.8456),
     );
-  }, []);
+  }, [retryKey]);
 
   const card: React.CSSProperties = {
     backgroundColor: "var(--card)",
@@ -266,6 +274,34 @@ export default function WeatherCard() {
   const recPillBg = isIndoor ? "#FEE2E2" : "#DCFCE7";
 
   const minAgo = weather ? Math.floor((Date.now() - weather.fetchedAt) / 60000) : 0;
+
+  if (loading) return (
+    <div style={{ background: "var(--card)", borderRadius: 16, padding: 20, boxShadow: "0 1px 8px rgba(0,0,0,0.06)", marginBottom: 24 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <SkeletonBlock height={10} width={120} />
+          <SkeletonBlock height={64} width={140} />
+          <SkeletonBlock height={12} width={180} />
+        </div>
+        <SkeletonBlock height={100} width={80} borderRadius={12} />
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 8 }}>
+        {[1,2,3,4].map(i => <SkeletonBlock key={i} height={48} />)}
+      </div>
+      <div style={{ display: "flex", gap: 6, marginTop: 16, overflow: "hidden" }}>
+        {[1,2,3,4,5].map(i => <SkeletonBlock key={i} height={90} width={64} style={{ flexShrink: 0 }} />)}
+      </div>
+    </div>
+  );
+
+  if (error) return (
+    <div style={{ marginBottom: 24 }}>
+      <ErrorState
+        message="Gagal memuat data cuaca. Periksa koneksi internetmu."
+        onRetry={() => setRetryKey(k => k + 1)}
+      />
+    </div>
+  );
 
   return (
     <div style={card} data-testid="card-weather">

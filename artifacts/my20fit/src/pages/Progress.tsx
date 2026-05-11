@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import {
   ResponsiveContainer, AreaChart, Area, LineChart, Line,
@@ -15,6 +16,8 @@ import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
 import TrendBadge from "@/components/TrendBadge";
+import EmptyState from "@/components/EmptyState";
+import { useToast } from "@/contexts/ToastContext";
 import {
   getSleepHistory, getWaterHistory, getWellnessHistory,
   calculateTrend, getMultiPointTrend,
@@ -315,6 +318,7 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function Progress({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
+  const [, setLocation] = useLocation();
   const [dateRange, setDateRange] = useState<DateRange>("3M");
   const [entries, setEntries] = useState<ProgressEntry[]>([]);
   const [workouts, setWorkouts] = useState<Workout[]>([]);
@@ -426,6 +430,8 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
     [wellnessData]
   );
 
+  const { showToast } = useToast();
+
   function saveHealthEntry() {
     if (!fDate) return;
     const newH = fHeightInput ? parseFloat(fHeightInput) : undefined;
@@ -450,6 +456,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
     setShowModal(false);
     setFWeight(""); setFBmi(""); setFBodyFat(""); setFRestingHr("");
     setFWaist(""); setFBpSys(""); setFBpDia(""); setFNote(""); setFHeightInput("");
+    showToast("Data kesehatan berhasil ditambahkan ✓");
   }
 
   function saveWorkout() {
@@ -537,22 +544,14 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
           {/* Empty state */}
           {!hasAnyData ? (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, paddingBottom: 80 }}>
-              <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--card2)", border: "1px solid var(--border-subtle)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Activity size={32} style={{ color: "var(--muted)" }} />
-              </div>
-              <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 22, letterSpacing: "0.5px", color: "var(--text)" }}>BELUM ADA DATA</h2>
-              <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--muted)", textAlign: "center", maxWidth: 280 }}>
-                Upload MCU atau tambah data manual untuk mulai tracking kesehatanmu
-              </p>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button
-                  onClick={() => setShowModal(true)}
-                  style={{ background: "#C41101", color: "#fff", fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "1px", padding: "10px 20px", borderRadius: 8, cursor: "pointer" }}
-                >
-                  TAMBAH DATA MANUAL
-                </button>
-              </div>
+            <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <EmptyState
+                icon={<TrendingUp size={28} />}
+                title="BELUM ADA DATA PROGRESS"
+                description="Upload MCU atau tambah data manual untuk mulai tracking kesehatanmu."
+                primaryAction={{ label: "TAMBAH DATA →", onClick: () => setShowModal(true) }}
+                secondaryAction={{ label: "Upload MCU", onClick: () => setLocation("/") }}
+              />
             </div>
           ) : (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-5">

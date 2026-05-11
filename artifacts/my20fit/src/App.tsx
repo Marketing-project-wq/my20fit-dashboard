@@ -9,6 +9,7 @@ import Nutrition from "@/pages/Nutrition";
 import Profile from "@/pages/Profile";
 import ComingSoon from "@/pages/ComingSoon";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { useScrollRestore } from "@/hooks/useScrollRestore";
 
 function RedirectHome() {
   const [, setLocation] = useLocation();
@@ -19,6 +20,7 @@ function RedirectHome() {
 const queryClient = new QueryClient();
 
 function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
+  useScrollRestore();
   return (
     <Switch>
       <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />

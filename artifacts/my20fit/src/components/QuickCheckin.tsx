@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Heart, Smile, Moon, Droplets } from "lucide-react";
 import BottomSheet from "./BottomSheet";
+import { useToast } from "@/contexts/ToastContext";
 
 // ---- Types ----
 interface CycleData { lastPeriod: string; cycleLength: number; }
@@ -132,6 +133,8 @@ const MOODS = [
 
 // ---- Main Component ----
 export default function QuickCheckin() {
+  const { showToast } = useToast();
+
   // Modal visibility
   const [showGenderModal, setShowGenderModal] = useState(false);
   const [showCycleModal, setShowCycleModal] = useState(false);
@@ -228,6 +231,7 @@ export default function QuickCheckin() {
     localStorage.setItem("my20fit_cycle", JSON.stringify(data));
     setCycleData(data);
     setShowCycleModal(false);
+    showToast("Siklus menstruasi diperbarui ✓");
   };
 
   // ---- Tile 2 handlers ----
@@ -244,6 +248,7 @@ export default function QuickCheckin() {
     localStorage.setItem(`my20fit_wellness_${todayKey()}`, JSON.stringify(data));
     setWellnessData(data);
     setShowWellnessModal(false);
+    showToast("Wellness check-in tersimpan ✓");
   };
 
   // ---- Tile 3 handlers ----
@@ -258,6 +263,7 @@ export default function QuickCheckin() {
     localStorage.setItem(`my20fit_sleep_${todayKey()}`, JSON.stringify(data));
     setSleepData(data);
     setShowSleepModal(false);
+    showToast("Data tidur tersimpan ✓");
   };
 
   // ---- Tile 4 handlers ----
@@ -273,6 +279,7 @@ export default function QuickCheckin() {
       saveLogs(updated, weight);
       return updated;
     });
+    showToast(`+${ml}ml tercatat`, "info");
   };
 
   const resetWater = () => {

@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, RotateCcw, AlertCircle, AlertTriangle, Check } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 
 interface McuMetric {
   label: string;
@@ -71,6 +72,7 @@ function nameSimilarity(name1: string | null | undefined, name2: string): number
 
 export default function MedicalCheckup() {
   const { profile } = useAuth();
+  const { showToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [state, setState] = useState<State>("empty");
   const [result, setResult] = useState<McuResult | null>(null);
@@ -192,6 +194,7 @@ export default function MedicalCheckup() {
     setState("success");
     setShowConfirmation(false);
     setPendingResult(null);
+    showToast("Hasil MCU berhasil dianalisis ✓");
   };
 
   const handleConfirmCancel = () => {

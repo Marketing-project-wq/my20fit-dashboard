@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Check, Circle } from "lucide-react";
+import { useToast } from "@/contexts/ToastContext";
 
 interface Task {
   id: string;
@@ -76,6 +77,7 @@ function loadChecklist(): Task[] {
 const todayISO = () => new Date().toISOString().split("T")[0];
 
 export default function TodaysChecklist() {
+  const { showToast } = useToast();
   const [tasks, setTasks] = useState<Task[]>(loadChecklist);
   const [isMcuPersonalized, setIsMcuPersonalized] = useState(() => {
     try {
@@ -133,10 +135,11 @@ export default function TodaysChecklist() {
   useEffect(() => {
     if (allDone) {
       setShowConfetti(true);
+      showToast("Semua checklist hari ini selesai! 🎉");
       const timer = setTimeout(() => setShowConfetti(false), 3000);
       return () => clearTimeout(timer);
     }
-  }, [allDone]);
+  }, [allDone, showToast]);
 
   const toggleTask = (id: string) => {
     setTasks(prev => {
