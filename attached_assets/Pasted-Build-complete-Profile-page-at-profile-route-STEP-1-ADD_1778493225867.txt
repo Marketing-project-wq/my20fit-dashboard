@@ -1,0 +1,744 @@
+Build complete Profile page at /profile route.
+
+---
+
+## STEP 1: ADD ROUTE
+
+In App.jsx add:
+import Profile from './pages/Profile'
+<Route path="/profile" element={<Profile />} />
+
+---
+
+## STEP 2: CREATE src/pages/Profile.jsx
+
+---
+
+### DATA SOURCES
+
+Load from localStorage on mount:
+
+const getProfileData = () => {
+  // Basic info
+  const mcuRaw = localStorage.getItem('my20fit_mcu_result')
+  const mcu = mcuRaw ? JSON.parse(mcuRaw) : null
+  
+  // Progress entries for latest metrics
+  const entriesRaw = localStorage.getItem('my20fit_progress_entries')
+  const entries = entriesRaw ? JSON.parse(entriesRaw) : []
+  const latestEntry = entries.sort((a,b) => 
+    new Date(b.date) - new Date(a.date)
+  )[0] || null
+
+  // Gender
+  const gender = localStorage.getItem('my20fit_gender')
+  
+  // Height
+  const height = localStorage.getItem('my20fit_height')
+  
+  // Theme preference
+  const theme = localStorage.getItem('my20fit_theme') || 'light'
+
+  return { mcu, latestEntry, gender, height, theme }
+}
+
+// Mock user data (replace with auth later)
+const mockUser = {
+  name: 'ZIDNI',
+  email: 'zidni@20fit.id',
+  phone: '+62 812-3456-7890',
+  joinDate: '2026-01-15',
+  isPlusMember: true,
+  avatarInitials: 'ZD',
+  role: '20FIT Member'
+}
+
+---
+
+### SECTION 1: PROFILE HERO
+
+Full-width card with dark gradient background
+(always dark even in light mode, same as Plus card):
+
+<div style={{
+  background: 'linear-gradient(135deg, #0A0908 0%, #1A1A0F 100%)',
+  borderRadius: 16,
+  padding: '28px 20px 24px',
+  marginBottom: 16,
+  position: 'relative',
+  overflow: 'hidden'
+}}>
+  {/* Dot grid texture */}
+  <div style={{
+    position:'absolute', inset:0,
+    backgroundImage:'radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px)',
+    backgroundSize:'20px 20px'
+  }}/>
+
+  {/* Edit button top right */}
+  <button
+    onClick={() => setShowEditModal(true)}
+    style={{
+      position:'absolute', top:16, right:16,
+      background:'rgba(255,255,255,.1)',
+      border:'1px solid rgba(255,255,255,.15)',
+      borderRadius:8, padding:'6px 12px',
+      display:'flex', alignItems:'center', gap:6,
+      cursor:'pointer', zIndex:1
+    }}
+  >
+    <Pencil size={12} color="rgba(255,255,255,.7)"/>
+    <span style={{
+      fontFamily:"'Anton', sans-serif",
+      fontSize:11, letterSpacing:1,
+      color:'rgba(255,255,255,.7)'
+    }}>EDIT</span>
+  </button>
+
+  {/* Avatar */}
+  <div style={{
+    position:'relative', zIndex:1,
+    display:'flex', flexDirection:'column',
+    alignItems:'center', gap:12
+  }}>
+    <div style={{
+      width:80, height:80, borderRadius:'50%',
+      background:'#C41101',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      border:'3px solid rgba(255,255,255,.15)',
+      fontSize:28,
+      fontFamily:"'Anton', sans-serif",
+      color:'#fff'
+    }}>
+      {mockUser.avatarInitials}
+    </div>
+
+    <div style={{ textAlign:'center' }}>
+      <div style={{
+        fontFamily:"'Anton', sans-serif",
+        fontSize:26, color:'#fff', letterSpacing:1
+      }}>{mockUser.name}</div>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:13,
+        color:'rgba(255,255,255,.55)', marginTop:2
+      }}>{mockUser.email}</div>
+    </div>
+
+    {/* Badges row */}
+    <div style={{ display:'flex', gap:8, flexWrap:'wrap', justifyContent:'center' }}>
+      {mockUser.isPlusMember && (
+        <span style={{
+          background:'linear-gradient(135deg, #D4A800, #FFD700)',
+          color:'#0A0908',
+          fontFamily:"'Anton', sans-serif",
+          fontSize:10, letterSpacing:1.5,
+          padding:'4px 12px', borderRadius:99
+        }}>⭐ PLUS MEMBER</span>
+      )}
+      <span style={{
+        background:'rgba(255,255,255,.1)',
+        border:'1px solid rgba(255,255,255,.15)',
+        color:'rgba(255,255,255,.7)',
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:10, letterSpacing:1.5,
+        padding:'4px 12px', borderRadius:99
+      }}>
+        Member sejak {new Date(mockUser.joinDate).toLocaleDateString('id-ID', {
+          month:'long', year:'numeric'
+        })}
+      </span>
+    </div>
+  </div>
+</div>
+
+---
+
+### SECTION 2: HEALTH SNAPSHOT
+
+3-column quick stats from latest data:
+
+const stats = [
+  { 
+    label:'BERAT', 
+    value: latestEntry?.weight || mcu?.metrics?.find(m=>m.label?.toLowerCase().includes('berat'))?.value || '—',
+    unit:'kg', icon:<Weight size={14}/>
+  },
+  { 
+    label:'BMI', 
+    value: latestEntry?.bmi || mcu?.metrics?.find(m=>m.label?.toLowerCase().includes('bmi'))?.value || '—',
+    unit:'', icon:<Activity size={14}/>
+  },
+  { 
+    label:'TINGGI', 
+    value: localStorage.getItem('my20fit_height') || '—',
+    unit:'cm', icon:<Ruler size={14}/>
+  },
+]
+
+<div style={{
+  display:'grid', gridTemplateColumns:'repeat(3,1fr)',
+  gap:10, marginBottom:16
+}}>
+  {stats.map(stat => (
+    <div key={stat.label} style={{
+      background:'var(--card)',
+      borderRadius:14, padding:'14px 12px',
+      boxShadow:'var(--shadow)', textAlign:'center'
+    }}>
+      <div style={{
+        display:'flex', justifyContent:'center',
+        color:'var(--muted)', marginBottom:6
+      }}>{stat.icon}</div>
+      <div style={{
+        fontFamily:"'JetBrains Mono', monospace",
+        fontSize:22, fontWeight:700,
+        color:'var(--text)', lineHeight:1
+      }}>
+        {stat.value}
+        {stat.unit && (
+          <span style={{
+            fontFamily:"'Barlow Condensed', sans-serif",
+            fontWeight:900, fontSize:12,
+            color:'var(--muted)', marginLeft:2
+          }}>{stat.unit}</span>
+        )}
+      </div>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:10,
+        letterSpacing:1.5, color:'var(--muted)', marginTop:4
+      }}>{stat.label}</div>
+    </div>
+  ))}
+</div>
+
+---
+
+### SECTION 3: PERSONAL INFO
+
+Section title: "INFORMASI PERSONAL"
+
+Info rows in a card:
+
+const infoRows = [
+  { icon:<User size={16}/>, label:'Nama Lengkap', value:mockUser.name },
+  { icon:<Mail size={16}/>, label:'Email', value:mockUser.email },
+  { icon:<Phone size={16}/>, label:'Nomor HP', value:mockUser.phone },
+  { 
+    icon:<Calendar size={16}/>, label:'Jenis Kelamin', 
+    value: gender === 'male' ? 'Laki-laki' : gender === 'female' ? 'Perempuan' : 'Belum diisi'
+  },
+  { icon:<Ruler size={16}/>, label:'Tinggi Badan', value: height ? height + ' cm' : 'Belum diisi' },
+]
+
+Each row:
+<div style={{
+  display:'flex', alignItems:'center',
+  padding:'14px 0',
+  borderBottom:'0.5px solid var(--border-subtle,#E5E1D8)'
+}}>
+  <div style={{ color:'var(--muted)', marginRight:12 }}>{row.icon}</div>
+  <div style={{ flex:1 }}>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:11,
+      letterSpacing:1.5, color:'var(--muted)',
+      marginBottom:2
+    }}>{row.label}</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:15,
+      color: row.value === 'Belum diisi' ? 'var(--muted)' : 'var(--text)'
+    }}>{row.value}</div>
+  </div>
+  <ChevronRight size={14} color="var(--muted)"/>
+</div>
+
+Tap any row → opens Edit Modal with that field focused.
+
+---
+
+### SECTION 4: MCU STATUS
+
+<div style={{
+  background:'var(--card)', borderRadius:14,
+  padding:'16px 20px', boxShadow:'var(--shadow)',
+  marginBottom:16
+}}>
+  <div style={{
+    fontFamily:"'Barlow Condensed', sans-serif",
+    fontWeight:900, fontSize:11,
+    letterSpacing:2, color:'var(--muted)', marginBottom:12
+  }}>STATUS MCU</div>
+
+  {mcu ? (
+    <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+      {/* Grade badge */}
+      <div style={{
+        width:48, height:48, borderRadius:'50%',
+        background: mcu.grade==='A' ? '#16A34A' :
+                    mcu.grade==='B' ? '#2563EB' :
+                    mcu.grade==='C' ? '#D97706' : '#DC2626',
+        display:'flex', alignItems:'center', justifyContent:'center',
+        flexShrink:0
+      }}>
+        <span style={{
+          fontFamily:"'Anton', sans-serif",
+          fontSize:22, color:'#fff'
+        }}>{mcu.grade}</span>
+      </div>
+      <div style={{ flex:1 }}>
+        <div style={{
+          fontFamily:"'Anton', sans-serif",
+          fontSize:16, color:'var(--text)', marginBottom:2
+        }}>Grade {mcu.grade} · Health Baseline</div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:12,
+          color:'var(--muted)'
+        }}>
+          Dianalisis {mcu.reviewed_at || 'baru-baru ini'}
+        </div>
+      </div>
+      <button
+        onClick={() => {
+          if(confirm('Hapus data MCU dan upload yang baru?')) {
+            localStorage.removeItem('my20fit_mcu_result')
+            window.location.reload()
+          }
+        }}
+        style={{
+          background:'none', border:'none',
+          color:'var(--muted)', cursor:'pointer'
+        }}
+      >
+        <Trash2 size={14}/>
+      </button>
+    </div>
+  ) : (
+    <div style={{
+      display:'flex', alignItems:'center',
+      justifyContent:'space-between', gap:12
+    }}>
+      <div>
+        <div style={{
+          fontFamily:"'Anton', sans-serif",
+          fontSize:15, color:'var(--text)', marginBottom:2
+        }}>Belum ada MCU</div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:12, color:'var(--muted)'
+        }}>Upload untuk program personal</div>
+      </div>
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          background:'#C41101', color:'#fff',
+          border:'none', borderRadius:10,
+          padding:'8px 16px', cursor:'pointer',
+          fontFamily:"'Anton', sans-serif",
+          fontSize:13, letterSpacing:1,
+          flexShrink:0
+        }}
+      >UPLOAD</button>
+    </div>
+  )}
+</div>
+
+---
+
+### SECTION 5: 20FIT PLUS
+
+{mockUser.isPlusMember ? (
+  // Active Plus card
+  <div style={{
+    background:'linear-gradient(135deg, #1A1A0F, #0A0A05)',
+    borderRadius:14, padding:'20px',
+    marginBottom:16
+  }}>
+    <div style={{
+      display:'flex', justifyContent:'space-between',
+      alignItems:'flex-start'
+    }}>
+      <div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:10,
+          letterSpacing:2, color:'#D4A800',
+          marginBottom:4
+        }}>⭐ 20FIT PLUS AKTIF</div>
+        <div style={{
+          fontFamily:"'Anton', sans-serif",
+          fontSize:20, color:'#fff'
+        }}>MEMBER AKTIF</div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:12,
+          color:'rgba(255,255,255,.5)', marginTop:4
+        }}>Berlaku hingga: 31 Des 2026</div>
+      </div>
+      <div style={{
+        fontFamily:"'JetBrains Mono', monospace",
+        fontSize:24, fontWeight:700, color:'#D4A800'
+      }}>✓</div>
+    </div>
+
+    {/* Benefit pills */}
+    <div style={{
+      display:'flex', flexWrap:'wrap', gap:6, marginTop:16
+    }}>
+      {['10% Arena','10% Clinic','10% PT','10% Shop'].map(b => (
+        <span key={b} style={{
+          background:'rgba(212,168,0,.15)',
+          border:'1px solid rgba(212,168,0,.3)',
+          color:'#D4A800',
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:11,
+          letterSpacing:1, padding:'4px 10px',
+          borderRadius:99
+        }}>{b}</span>
+      ))}
+    </div>
+  </div>
+) : (
+  // Upgrade CTA
+  <div style={{
+    background:'linear-gradient(135deg, #1A1A0F, #0A0A05)',
+    borderRadius:14, padding:'20px', marginBottom:16
+  }}>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:10,
+      letterSpacing:2, color:'rgba(255,255,255,.4)',
+      marginBottom:6
+    }}>⭐ 20FIT PLUS</div>
+    <div style={{
+      fontFamily:"'Anton', sans-serif",
+      fontSize:22, color:'#fff', marginBottom:4
+    }}>UPGRADE SEKARANG</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:13,
+      color:'rgba(255,255,255,.55)', marginBottom:16
+    }}>Hemat 10% di semua layanan 20FIT</div>
+    <div style={{
+      display:'flex', alignItems:'center',
+      justifyContent:'space-between'
+    }}>
+      <div style={{
+        fontFamily:"'JetBrains Mono', monospace",
+        fontSize:20, fontWeight:700, color:'#D4A800'
+      }}>Rp 49.000<span style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:13,
+        color:'rgba(255,255,255,.4)'
+      }}>/bulan</span></div>
+      <button style={{
+        background:'linear-gradient(135deg, #D4A800, #FFD700)',
+        color:'#0A0908', border:'none',
+        borderRadius:10, padding:'10px 20px',
+        fontFamily:"'Anton', sans-serif",
+        fontSize:14, letterSpacing:1,
+        cursor:'pointer'
+      }}>UPGRADE →</button>
+    </div>
+  </div>
+)}
+
+---
+
+### SECTION 6: SETTINGS
+
+Settings list in a card:
+
+const settings = [
+  {
+    icon: <Bell size={16}/>,
+    label: 'Notifikasi',
+    sublabel: 'Reminder checklist, event, MCU',
+    type: 'toggle',
+    key: 'notifications',
+    defaultValue: true
+  },
+  {
+    icon: theme === 'dark' ? <Sun size={16}/> : <Moon size={16}/>,
+    label: 'Dark Mode',
+    sublabel: theme === 'dark' ? 'Aktif' : 'Nonaktif',
+    type: 'toggle',
+    key: 'theme',
+    defaultValue: theme === 'dark'
+  },
+  {
+    icon: <Globe size={16}/>,
+    label: 'Bahasa',
+    sublabel: 'Indonesia',
+    type: 'chevron',
+    action: () => {}
+  },
+  {
+    icon: <Shield size={16}/>,
+    label: 'Privasi & Keamanan',
+    sublabel: 'Data, password, akun',
+    type: 'chevron',
+    action: () => setShowPrivacyModal(true)
+  },
+  {
+    icon: <HelpCircle size={16}/>,
+    label: 'Bantuan & FAQ',
+    sublabel: 'Panduan penggunaan app',
+    type: 'chevron',
+    action: () => {}
+  },
+  {
+    icon: <Star size={16}/>,
+    label: 'Rate App',
+    sublabel: 'Beri rating di App Store',
+    type: 'chevron',
+    action: () => {}
+  },
+]
+
+Toggle component:
+function Toggle({ value, onChange }) {
+  return (
+    <div
+      onClick={() => onChange(!value)}
+      style={{
+        width:44, height:24, borderRadius:99,
+        background: value ? '#C41101' : 'var(--border-subtle,#E5E1D8)',
+        position:'relative', cursor:'pointer',
+        transition:'background .2s',
+        flexShrink:0
+      }}
+    >
+      <div style={{
+        position:'absolute',
+        top:3, left: value ? 23 : 3,
+        width:18, height:18, borderRadius:'50%',
+        background:'#fff',
+        transition:'left .2s',
+        boxShadow:'0 1px 3px rgba(0,0,0,.2)'
+      }}/>
+    </div>
+  )
+}
+
+Each setting row:
+<div
+  key={s.key || s.label}
+  onClick={s.type === 'chevron' ? s.action : undefined}
+  style={{
+    display:'flex', alignItems:'center',
+    padding:'14px 0', gap:12,
+    borderBottom:'0.5px solid var(--border-subtle,#E5E1D8)',
+    cursor: s.type === 'chevron' ? 'pointer' : 'default'
+  }}
+>
+  <div style={{
+    width:36, height:36, borderRadius:10,
+    background:'var(--bg)',
+    display:'flex', alignItems:'center', justifyContent:'center',
+    color:'var(--muted)', flexShrink:0
+  }}>{s.icon}</div>
+  <div style={{ flex:1 }}>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:15, color:'var(--text)'
+    }}>{s.label}</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:12, color:'var(--muted)'
+    }}>{s.sublabel}</div>
+  </div>
+  {s.type === 'toggle' ? (
+    <Toggle
+      value={settingValues[s.key]}
+      onChange={(val) => handleSettingChange(s.key, val)}
+    />
+  ) : (
+    <ChevronRight size={14} color="var(--muted)"/>
+  )}
+</div>
+
+handleSettingChange:
+function handleSettingChange(key, value) {
+  setSettingValues(prev => ({ ...prev, [key]: value }))
+  if (key === 'theme') {
+    localStorage.setItem('my20fit_theme', value ? 'dark' : 'light')
+    document.documentElement.setAttribute('data-theme', value ? 'dark' : 'light')
+    // Trigger theme change same as existing toggle
+  }
+  localStorage.setItem(`my20fit_setting_${key}`, JSON.stringify(value))
+}
+
+---
+
+### SECTION 7: APP INFO
+
+<div style={{
+  textAlign:'center', padding:'20px 0 8px',
+  marginBottom:16
+}}>
+  <div style={{
+    fontFamily:"'Anton', sans-serif",
+    fontSize:18, color:'var(--text)', marginBottom:2
+  }}>my20FIT</div>
+  <div style={{
+    fontFamily:"'Barlow Condensed', sans-serif",
+    fontWeight:900, fontSize:12, color:'var(--muted)'
+  }}>Version 1.0.0 · Build 2026.05</div>
+  <div style={{
+    fontFamily:"'Barlow Condensed', sans-serif",
+    fontWeight:900, fontSize:11,
+    color:'var(--muted)', marginTop:4
+  }}>© 2026 20FIT · PT Kredo Aum</div>
+</div>
+
+---
+
+### SECTION 8: LOGOUT BUTTON
+
+<button
+  onClick={() => {
+    if(confirm('Yakin ingin keluar?')) {
+      // Clear session data (keep health data)
+      localStorage.removeItem('my20fit-supabase-auth')
+      navigate('/login')
+    }
+  }}
+  style={{
+    width:'100%', padding:'14px',
+    background:'transparent',
+    border:'1.5px solid #EF4444',
+    borderRadius:12, cursor:'pointer',
+    display:'flex', alignItems:'center',
+    justifyContent:'center', gap:8,
+    marginBottom:32,
+    transition:'all .2s'
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.background = 'rgba(239,68,68,.08)'
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.background = 'transparent'
+  }}
+>
+  <LogOut size={16} color="#EF4444"/>
+  <span style={{
+    fontFamily:"'Anton', sans-serif",
+    fontSize:15, letterSpacing:1.5,
+    color:'#EF4444'
+  }}>KELUAR DARI AKUN</span>
+</button>
+
+---
+
+### EDIT PROFILE MODAL (bottom sheet)
+
+Triggered by "EDIT" button on hero card or tapping info rows.
+
+Title: "EDIT PROFIL"
+
+Form fields:
+1. Nama Lengkap (text input)
+2. Nomor HP (tel input, +62 prefix)
+3. Jenis Kelamin (pill selector: Laki-laki / Perempuan)
+4. Tinggi Badan (number input, suffix "cm")
+5. Berat Badan (number input, suffix "kg")
+   → Auto-calculate BMI preview below:
+   "BMI: 23.4 (Normal)" in green/orange/red
+
+Each field uses same input style as Quick Check-in modals:
+- Label: Barlow Condensed 900, 11px, tracked, muted
+- Input: full width, 16px font, border 1.5px, border-radius 10px
+- Font: Barlow Condensed 900
+
+Save button: "SIMPAN PERUBAHAN" (red, Anton, full width)
+
+On save:
+- Update localStorage keys
+- Update display name in hero
+- Close modal
+- Show brief success toast: "Profil berhasil diperbarui ✓"
+
+Success toast:
+<div style={{
+  position:'fixed', bottom:80, left:'50%',
+  transform:'translateX(-50%)',
+  background:'rgba(10,10,10,.88)',
+  border:'1px solid rgba(255,255,255,.12)',
+  backdropFilter:'blur(16px)',
+  borderRadius:99, padding:'10px 20px 10px 14px',
+  display:'flex', alignItems:'center', gap:8,
+  zIndex:300, whiteSpace:'nowrap',
+  animation:'toastSlideUp .4s cubic-bezier(.34,1.56,.64,1) both'
+}}>
+  <div style={{
+    width:22, height:22, borderRadius:'50%',
+    background:'#16A34A',
+    display:'flex', alignItems:'center', justifyContent:'center'
+  }}>
+    <Check size={12} color="#fff"/>
+  </div>
+  <span style={{
+    fontFamily:"'Barlow Condensed', sans-serif",
+    fontWeight:900, fontSize:13, color:'#fff'
+  }}>Profil berhasil diperbarui</span>
+</div>
+
+Auto-dismiss toast after 2.5s.
+
+---
+
+### PRIVACY MODAL
+
+Title: "PRIVASI & KEAMANAN"
+Content:
+- "Reset Data Kesehatan" → confirm dialog → clear all health localStorage keys
+- "Hapus Riwayat Checklist" → confirm → clear checklist data
+- "Hapus Data Nutrisi" → confirm → clear food cache
+- "Export Data Saya" → download JSON of all localStorage data
+- "Hapus Akun" → red button, double confirm dialog
+
+Export data function:
+function exportMyData() {
+  const data = {}
+  const keys = Object.keys(localStorage).filter(k => k.startsWith('my20fit_'))
+  keys.forEach(k => {
+    try { data[k] = JSON.parse(localStorage.getItem(k)) }
+    catch { data[k] = localStorage.getItem(k) }
+  })
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `my20fit-data-${new Date().toISOString().split('T')[0]}.json`
+  a.click()
+}
+
+---
+
+## IMPORTS NEEDED
+
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import {
+  User, Mail, Phone, Calendar, Ruler, Weight,
+  Activity, Bell, Moon, Sun, Globe, Shield,
+  HelpCircle, Star, ChevronRight, LogOut,
+  Pencil, Trash2, Check, X
+} from 'lucide-react'
+
+---
+
+## SIDEBAR UPDATE
+
+In Sidebar.jsx, add Profile NavLink:
+- Icon: User from lucide-react
+- Label: "PROFILE"
+- Path: /profile
+
+---
+
+After all changes: npm run build — fix all errors.
