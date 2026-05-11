@@ -1,0 +1,286 @@
+Add MCU upload validation and safety checks.
+Implement these critical layers only.
+
+---
+
+## LAYER 1: FILE VALIDATION (client side, before upload)
+
+In MedicalCheckup.jsx, validate before sending to server:
+
+function validateFile(file) {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf']
+  const maxSize = 10 * 1024 * 1024 // 10MB
+
+  if (!allowedTypes.includes(file.type)) {
+    return { valid: false, error: 'Format file tidak didukung. Gunakan JPG, PNG, atau PDF.' }
+  }
+  if (file.size > maxSize) {
+    return { valid: false, error: 'Ukuran file terlalu besar. Maksimal 10MB.' }
+  }
+  return { valid: true }
+}
+
+Show error message below upload button if validation fails.
+
+---
+
+## LAYER 2: CLAUDE PRE-CHECK (server side)
+
+In server.js, BEFORE full MCU analysis, add validation step:
+
+// Step 1: Validate document first
+const validationPrompt = `Look at this document carefully.
+Answer with JSON only, no other text:
+{
+  "is_mcu": true or false,
+  "confidence": 0-100,
+  "document_type": "what this document actually is",
+  "patient_name": "name found in document or null",
+  "has_required_fields": true or false,
+  "missing_fields": ["list of missing required fields"],
+  "reason": "brief explanation in Bahasa Indonesia"
+}
+
+Required fields for a valid MCU: patient name, examination date, 
+and at least 3 of these: blood pressure, cholesterol, blood sugar, 
+BMI, hemoglobin, heart rate, body weight.`
+
+const validation = await anthropic.messages.create({
+  model: 'claude-opus-4-5',
+  max_tokens: 300,
+  messages: [{
+    role: 'user',
+    content: [
+      { 
+        type: fileType === 'application/pdf' ? 'document' : 'image',
+        source: { type: 'base64', media_type: fileType, data: base64Data }
+      },
+      { type: 'text', text: validationPrompt }
+    ]
+  }]
+})
+
+// Parse validation result
+let validationResult
+try {
+  const text = validation.content[0].text
+  validationResult = JSON.parse(text.replace(/```json|```/g, '').trim())
+} catch {
+  validationResult = { is_mcu: false, reason: 'Gagal membaca dokumen' }
+}
+
+// Reject if not MCU
+if (!validationResult.is_mcu || validationResult.confidence < 60) {
+  return res.status(400).json({
+    error: 'not_mcu',
+    document_type: validationResult.document_type,
+    message: `Dokumen ini bukan hasil MCU. Terdeteksi: ${validationResult.document_type}. ${validationResult.reason}`
+  })
+}
+
+// Reject if missing required fields
+if (!validationResult.has_required_fields) {
+  return res.status(400).json({
+    error: 'incomplete_mcu',
+    missing: validationResult.missing_fields,
+    message: `Dokumen MCU tidak lengkap. Field yang tidak ditemukan: ${validationResult.missing_fields?.join(', ')}`
+  })
+}
+
+// Pass patient_name to next step for name matching
+const detectedPatientName = validationResult.patient_name
+
+// Step 2: Only if validation passes, run full analysis
+// ... existing full analysis code here ...
+
+// Add patient_name to response
+analysisResult.patient_name = detectedPatientName
+
+---
+
+## LAYER 3: NAME MATCHING WARNING (client side)
+
+In MedicalCheckup.jsx, after receiving analysis result,
+check name match before showing confirmation:
+
+// Simple name similarity check
+function nameSimilarity(name1, name2) {
+  if (!name1 || !name2) return 0
+  const n1 = name1.toLowerCase().trim()
+  const n2 = name2.toLowerCase().trim()
+  if (n1 === n2) return 1
+  // Check if one contains the other
+  if (n1.includes(n2) || n2.includes(n1)) return 0.8
+  // Check word overlap
+  const words1 = n1.split(' ')
+  const words2 = n2.split(' ')
+  const overlap = words1.filter(w => words2.includes(w)).length
+  return overlap / Math.max(words1.length, words2.length)
+}
+
+// After API returns result:
+const patientName = result.patient_name
+const userName = profile?.full_name || 'User' // from useAuth()
+const similarity = nameSimilarity(patientName, userName)
+const hasNameMismatch = patientName && similarity < 0.5
+
+// Store mismatch state
+setNameMismatch(hasNameMismatch)
+setDetectedName(patientName)
+setPendingResult(result) // hold result, don't save yet
+setShowConfirmation(true) // show confirmation modal
+
+---
+
+## LAYER 4: ACKNOWLEDGMENT MODAL (client side)
+
+Show this modal after analysis, before saving to localStorage.
+User MUST check all 3 boxes before can save.
+
+Modal design (bottom sheet, same style as Quick Check-in modals):
+- Title: "Konfirmasi Dokumen MCU" (Bebas Neue 22px)
+- Drag handle at top
+
+If name mismatch detected, show warning card at top:
+<div style={{
+  background: '#FEF3C7',
+  border: '1px solid #FCD34D', 
+  borderRadius: '12px',
+  padding: '14px 16px',
+  marginBottom: '16px',
+  display: 'flex',
+  gap: '10px',
+  alignItems: 'flex-start'
+}}>
+  <AlertTriangle size={18} color="#D97706" style={{flexShrink:0, marginTop:2}}/>
+  <div>
+    <div style={{
+      fontFamily:"'Bebas Neue'",
+      fontSize:'13px',
+      letterSpacing:'1px',
+      color:'#92400E',
+      marginBottom:'4px'
+    }}>NAMA TIDAK SESUAI</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed'",
+      fontSize:'13px',
+      color:'#78350F',
+      lineHeight:1.4
+    }}>
+      Nama di dokumen: <strong>{detectedName}</strong><br/>
+      Nama akun kamu: <strong>{userName}</strong><br/>
+      Pastikan ini adalah hasil MCU milikmu sendiri.
+    </div>
+  </div>
+</div>
+
+Show detected info:
+- "Nama pasien terdeteksi: [name]"
+- "Jenis dokumen: Medical Checkup / Lab Result"
+- "Tanggal pemeriksaan: [date if detected]"
+
+3 Checkboxes (all required):
+1. "Dokumen ini adalah hasil MCU milik saya sendiri"
+2. "Saya memahami analisis ini dilakukan AI, bukan pengganti 
+    diagnosis dokter"  
+3. "Saya bertanggung jawab atas keakuratan dokumen yang diupload"
+
+Custom checkbox style:
+- Unchecked: border 2px solid #E5E1D8, border-radius 4px
+- Checked: red background #C41101, white checkmark
+- Label: Barlow Condensed 13px
+
+"SIMPAN HASIL MCU →" button:
+- Disabled (gray, not clickable) until all 3 checked
+- When all checked: red background, clickable
+- onClick: save to localStorage + close modal + show results
+
+"Batal" link below button (small, muted)
+
+---
+
+## LAYER 5: ERROR STATES IN UI
+
+In MedicalCheckup.jsx, handle these error responses:
+
+// not_mcu error
+if (error.type === 'not_mcu') {
+  setUploadError({
+    icon: '🚫',
+    title: 'Bukan Hasil MCU',
+    message: error.message,
+    hint: 'Upload dokumen hasil pemeriksaan kesehatan dari klinik atau rumah sakit, bukan foto biasa atau dokumen lain.'
+  })
+}
+
+// incomplete_mcu error  
+if (error.type === 'incomplete_mcu') {
+  setUploadError({
+    icon: '📋',
+    title: 'Dokumen MCU Tidak Lengkap',
+    message: error.message,
+    hint: 'Pastikan dokumen memuat hasil pemeriksaan darah, tekanan darah, atau parameter kesehatan lainnya.'
+  })
+}
+
+// generic error
+setUploadError({
+  icon: '⚠️',
+  title: 'Gagal Menganalisis',
+  message: 'Terjadi kesalahan. Coba lagi atau gunakan file yang berbeda.',
+  hint: null
+})
+
+Error card design (show below upload button, replace loading state):
+<div style={{
+  background: '#FEF2F2',
+  border: '1px solid #FECACA',
+  borderRadius: '14px',
+  padding: '20px',
+  textAlign: 'center'
+}}>
+  <div style={{fontSize:'32px', marginBottom:'8px'}}>{error.icon}</div>
+  <div style={{
+    fontFamily:"'Bebas Neue'",
+    fontSize:'18px',
+    color:'#991B1B',
+    marginBottom:'6px'
+  }}>{error.title}</div>
+  <div style={{
+    fontFamily:"'Barlow Condensed'",
+    fontSize:'13px',
+    color:'#7F1D1D',
+    lineHeight:1.5,
+    marginBottom: error.hint ? '10px' : '16px'
+  }}>{error.message}</div>
+  {error.hint && (
+    <div style={{
+      fontFamily:"'Barlow Condensed'",
+      fontSize:'12px',
+      color:'#6E665C',
+      background:'rgba(0,0,0,.04)',
+      borderRadius:'8px',
+      padding:'10px 12px',
+      marginBottom:'16px',
+      lineHeight:1.4
+    }}>{error.hint}</div>
+  )}
+  <button onClick={() => setUploadError(null)} style={{
+    background:'#C41101', color:'#fff',
+    border:'none', borderRadius:'10px',
+    padding:'10px 24px',
+    fontFamily:"'Bebas Neue'",
+    fontSize:'14px', letterSpacing:'1.5px',
+    cursor:'pointer'
+  }}>COBA LAGI</button>
+</div>
+
+---
+
+## IMPORTANT
+
+- Keep all existing MCU functionality intact
+- Acknowledgment modal must block saving until all boxes checked
+- Name mismatch is WARNING only, not rejection — user can still proceed
+- All error messages in Bahasa Indonesia
+- After all changes: npm run build — fix all errors
