@@ -1,0 +1,147 @@
+Fix Google OAuth so it redirects to my20fit dashboard, 
+not to 20FIT Photo. The Supabase project is shared with 
+20FIT Photo so we cannot change the Site URL.
+
+Solution: use PKCE flow with explicit redirectTo.
+
+STEP 1: Update src/lib/supabase.js
+
+import { createClient } from '@supabase/supabase-js'
+
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      storage: localStorage,
+      storageKey: 'my20fit-supabase-auth',
+      flowType: 'pkce',
+      detectSessionInUrl: true,
+    }
+  }
+)
+
+STEP 2: Update handleGoogleLogin in Login.jsx
+
+async function handleGoogleLogin() {
+  setError(null)
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://my-20-fit-marketing20fit.replit.app/auth/callback',
+      skipBrowserRedirect: false,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'select_account',
+      }
+    }
+  })
+  if (error) setError(error.message)
+}
+
+STEP 3: Create src/pages/AuthCallback.jsx
+
+This page handles the OAuth callback and redirects to dashboard.
+
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+
+export default function AuthCallback() {
+  const navigate = useNavigate()
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    // Exchange code for session
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        setError(error.message)
+        setTimeout(() => navigate('/login'), 3000)
+        return
+      }
+      if (session) {
+        navigate('/', { replace: true })
+      } else {
+        // Try to exchange the code from URL
+        const code = new URLSearchParams(window.location.search).get('code')
+        if (code) {
+          supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+            if (error) {
+              setError(error.message)
+              setTimeout(() => navigate('/login'), 3000)
+            } else {
+              navigate('/', { replace: true })
+            }
+          })
+        } else {
+          navigate('/login', { replace: true })
+        }
+      }
+    })
+  }, [navigate])
+
+  if (error) return (
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: '#F4F2EE',
+      fontFamily: "'Barlow Condensed', sans-serif"
+    }}>
+      <div style={{ color: '#C41101', fontSize: '16px' }}>
+        Login gagal: {error}
+      </div>
+      <div style={{ color: '#6E665C', fontSize: '13px', marginTop: '8px' }}>
+        Mengalihkan ke halaman login...
+      </div>
+    </div>
+  )
+
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center',
+      height: '100vh', background: '#F4F2EE',
+      gap: '16px'
+    }}>
+      <div style={{
+        width: '40px', height: '40px', borderRadius: '50%',
+        border: '3px solid #C41101',
+        borderTopColor: 'transparent',
+        animation: 'spin 0.7s linear infinite'
+      }}/>
+      <div style={{
+        fontFamily: "'Bebas Neue', sans-serif",
+        fontSize: '16px', letterSpacing: '2px', color: '#0A0908'
+      }}>
+        MENGHUBUNGKAN AKUN...
+      </div>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg) } }
+      `}</style>
+    </div>
+  )
+}
+
+STEP 4: Add route in App.jsx
+
+Add this route (public, no auth required):
+/auth/callback → <AuthCallback />
+
+Full routes:
+- /login → <Login /> (public)
+- /auth/callback → <AuthCallback /> (public)
+- / → <ProtectedRoute><Dashboard /></ProtectedRoute>
+- /progress → <ProtectedRoute><Progress /></ProtectedRoute>
+- /events → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+- /moments → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+- /profile → <ProtectedRoute><ComingSoon /></ProtectedRoute>
+
+STEP 5: Add redirect URL in Supabase
+
+Print this instruction:
+"Add this URL to Supabase → Authentication → URL Configuration → Redirect URLs:
+https://my-20-fit-marketing20fit.replit.app/auth/callback"
+
+After all changes: npm run build — fix all errors.

@@ -9,6 +9,7 @@ import Progress from "@/pages/Progress";
 import ComingSoon from "@/pages/ComingSoon";
 import Login from "@/pages/Login";
 import ResetPassword from "@/pages/ResetPassword";
+import AuthCallback from "@/pages/AuthCallback";
 import WelcomeOverlay from "@/components/WelcomeOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -60,6 +61,7 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
     <Switch>
       <Route path="/login" component={() => <Login />} />
       <Route path="/reset-password" component={() => <ResetPassword />} />
+      <Route path="/auth/callback" component={() => <AuthCallback />} />
       <Route path="/" component={() => <ProtectedRoute><Dashboard theme={theme} toggleTheme={toggleTheme} /></ProtectedRoute>} />
       <Route path="/progress" component={() => <ProtectedRoute><Progress theme={theme} toggleTheme={toggleTheme} /></ProtectedRoute>} />
       <Route path="/events" component={() => <ProtectedRoute><ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} /></ProtectedRoute>} />
