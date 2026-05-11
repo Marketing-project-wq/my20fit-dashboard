@@ -1,13 +1,18 @@
 import { useEffect, useState } from "react";
-import { Switch, Route, Router as WouterRouter } from "wouter";
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import Progress from "@/pages/Progress";
 import ComingSoon from "@/pages/ComingSoon";
 import { AuthProvider } from "@/contexts/AuthContext";
+
+function RedirectHome() {
+  const [, setLocation] = useLocation();
+  useEffect(() => { setLocation("/"); }, [setLocation]);
+  return null;
+}
 
 const queryClient = new QueryClient();
 
@@ -19,7 +24,7 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
       <Route path="/events" component={() => <ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
       <Route path="/profile" component={() => <ComingSoon title="PROFILE" theme={theme} toggleTheme={toggleTheme} />} />
-      <Route component={NotFound} />
+      <Route component={RedirectHome} />
     </Switch>
   );
 }
