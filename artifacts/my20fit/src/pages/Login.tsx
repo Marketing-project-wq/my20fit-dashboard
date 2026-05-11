@@ -103,7 +103,10 @@ export default function Login() {
       const { data, error: err } = await supabase.auth.signUp({
         email: regEmail,
         password: regPassword,
-        options: { data: { full_name: regName, phone: regPhone } },
+        options: {
+          data: { full_name: regName, phone: regPhone },
+          emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
+        },
       });
       if (err) { setError(err.message); return; }
       if (data.user && !data.session) {
