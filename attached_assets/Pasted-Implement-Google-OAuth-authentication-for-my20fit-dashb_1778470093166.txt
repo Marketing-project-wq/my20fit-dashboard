@@ -1,0 +1,437 @@
+Implement Google OAuth authentication for my20fit dashboard.
+This connects to an existing 20FIT Photo user base in photo_user_mirror table.
+
+---
+
+## CONTEXT
+
+- photo_user_mirror table has 318 existing users, 176 with google_id
+- auth_user_id column exists but all NULL (not yet linked)
+- Goal: when user signs in with Google, auto-link to their 20FIT Photo account
+- Primary match: by email. Secondary: by google_id
+
+---
+
+## STEP 1: SUPABASE SETUP (manual - do not automate)
+
+Print these instructions for the user:
+
+"Before running, configure in Supabase Dashboard:
+1. Go to Authentication → Providers → Google
+2. Enable Google provider
+3. Add Client ID and Client Secret from Google Cloud Console
+4. In Authentication → URL Configuration:
+   - Site URL: [your Replit app URL]
+   - Redirect URLs: [your Replit app URL]/**"
+
+---
+
+## STEP 2: UPDATE src/lib/supabase.js
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    storage: localStorage,
+    storageKey: 'my20fit-supabase-auth',
+  }
+})
+
+---
+
+## STEP 3: UPDATE AuthContext.jsx
+
+Replace loadProfiles function with this enhanced version
+that handles photo_user_mirror linking:
+
+async function loadProfiles(authUser) {
+  setLoading(true)
+  try {
+    // 1. Try to find existing link in photo_user_mirror
+    // Match by email (primary) or google_id (secondary)
+    const googleId = authUser.user_metadata?.sub ||
+                     authUser.user_metadata?.provider_id ||
+                     null
+
+    // Check by email first
+    let { data: mirrorData } = await supabase
+      .from('photo_user_mirror')
+      .select('*')
+      .eq('email', authUser.email)
+      .maybeSingle()
+
+    // If not found by email, try google_id
+    if (!mirrorData && googleId) {
+      const { data } = await supabase
+        .from('photo_user_mirror')
+        .select('*')
+        .eq('google_id', googleId)
+        .maybeSingle()
+      mirrorData = data
+    }
+
+    if (mirrorData) {
+      // Link auth_user_id if not yet linked
+      if (!mirrorData.auth_user_id) {
+        await supabase
+          .from('photo_user_mirror')
+          .update({
+            auth_user_id: authUser.id,
+            last_login: new Date().toISOString(),
+            email_verified: true,
+          })
+          .eq('id', mirrorData.id)
+      } else {
+        // Just update last_login
+        await supabase
+          .from('photo_user_mirror')
+          .update({ last_login: new Date().toISOString() })
+          .eq('id', mirrorData.id)
+      }
+      setPhotoProfile({ ...mirrorData, auth_user_id: authUser.id })
+    } else {
+      // New user — insert into photo_user_mirror
+      const newMirrorRow = {
+        id: crypto.randomUUID(),
+        email: authUser.email,
+        name: authUser.user_metadata?.full_name ||
+              authUser.user_metadata?.name ||
+              authUser.email.split('@')[0],
+        google_id: googleId,
+        auth_user_id: authUser.id,
+        email_verified: true,
+        auth_type: 'google',
+        last_login: new Date().toISOString(),
+      }
+      const { data: inserted } = await supabase
+        .from('photo_user_mirror')
+        .insert(newMirrorRow)
+        .select()
+        .single()
+      setPhotoProfile(inserted)
+    }
+
+    // 2. Load or create my20fit_profile
+    let { data: myProfile } = await supabase
+      .from('my20fit_profile')
+      .select('*')
+      .eq('auth_user_id', authUser.id)
+      .maybeSingle()
+
+    if (!myProfile) {
+      // Create profile using data from photo_user_mirror
+      const displayName = mirrorData?.name ||
+                          authUser.user_metadata?.full_name ||
+                          authUser.user_metadata?.name ||
+                          authUser.email.split('@')[0]
+
+      const { data: created } = await supabase
+        .from('my20fit_profile')
+        .insert({
+          auth_user_id: authUser.id,
+          email: authUser.email,
+          full_name: displayName,
+          phone: mirrorData?.phone || null,
+        })
+        .select()
+        .single()
+      myProfile = created
+    }
+
+    setProfile(myProfile)
+
+  } catch (err) {
+    console.error('Error loading profiles:', err)
+  } finally {
+    setLoading(false)
+  }
+}
+
+Also add isExistingPhotoUser to context value:
+const isExistingPhotoUser = !!photoProfile?.google_id
+
+---
+
+## STEP 4: UPDATE Login.jsx
+
+GOOGLE OAUTH BUTTON (primary, most prominent):
+
+async function handleGoogleLogin() {
+  setGoogleLoading(true)
+  setError(null)
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + '/',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        }
+      }
+    })
+    if (error) setError(error.message)
+  } catch (err) {
+    setError('Gagal login dengan Google. Coba lagi.')
+    setGoogleLoading(false)
+  }
+}
+
+EMAIL LOGIN (secondary):
+
+async function handleEmailLogin(email, password) {
+  setLoading(true)
+  setError(null)
+  try {
+    const { error } = await supabase.auth.signInWithPassword({
+      email, password
+    })
+    if (error) {
+      // Check if email exists in photo_user_mirror
+      const { data: mirror } = await supabase
+        .from('photo_user_mirror')
+        .select('email, name, google_id')
+        .eq('email', email)
+        .maybeSingle()
+
+      if (mirror?.google_id) {
+        setError(
+          'Akun ini terdaftar via Google. ' +
+          'Gunakan tombol "Masuk dengan Google" di bawah.'
+        )
+      } else if (mirror) {
+        setError('Password salah. Lupa password?')
+      } else {
+        setError('Email belum terdaftar. Silakan daftar terlebih dahulu.')
+      }
+    } else {
+      navigate('/')
+    }
+  } finally {
+    setLoading(false)
+  }
+}
+
+EMAIL REGISTER:
+
+async function handleEmailRegister(name, email, phone, password) {
+  setLoading(true)
+  setError(null)
+  try {
+    // Check if email already in photo_user_mirror
+    const { data: existing } = await supabase
+      .from('photo_user_mirror')
+      .select('email, google_id, auth_user_id')
+      .eq('email', email)
+      .maybeSingle()
+
+    // If existing user has google_id, suggest Google login
+    if (existing?.google_id) {
+      setError(
+        'Email ini terdaftar di 20FIT via Google. ' +
+        'Gunakan "Masuk dengan Google" untuk masuk.'
+      )
+      setLoading(false)
+      return
+    }
+
+    // If already linked to Supabase Auth
+    if (existing?.auth_user_id) {
+      setError('Email ini sudah terdaftar. Silakan masuk.')
+      setActiveTab('login')
+      setLoading(false)
+      return
+    }
+
+    // Register new user
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: name, phone }
+      }
+    })
+
+    if (error) { setError(error.message); return }
+
+    // Update phone in profile
+    if (data.user) {
+      await supabase
+        .from('my20fit_profile')
+        .update({ phone, full_name: name })
+        .eq('auth_user_id', data.user.id)
+    }
+
+    navigate('/')
+
+  } finally {
+    setLoading(false)
+  }
+}
+
+---
+
+## STEP 5: LOGIN PAGE UI
+
+DESIGN (match existing my20fit-login.html exactly):
+
+Left dark panel (desktop only, 54% width, sticky):
+- Always dark #0A0A0A background
+- Red stripe top (2px, animated grow)
+- Dot grid texture overlay
+- Red glow blob top-left
+- Logo: "my20FIT" Bebas Neue, red "20"
+- Badge: "Member App" small pill
+- Wordmark 3 lines with stagger animation:
+  * "ELEVATE." white with red shimmer sweep
+  * "EVERY." muted opacity .28, glitch pulse
+  * "METRIC." solid red #C41101
+- Chips row: "AI Health Analysis" | "Daily Checklist" | "Sport Events"
+- Feature list (4 items, Lucide icons):
+  * Heart: "Program Khusus Untukmu"
+  * TrendingUp: "Pantau Progress Real-time"
+  * Calendar: "Event & HYROX Registration"
+  * Shield: "Data Kamu, Milik Kamu"
+
+Right light panel (#F4F2EE):
+- Heading label: "Selamat datang" (Bebas Neue 10px tracked muted)
+- Title: "Masuk ke my20fit." (Bebas Neue 28px)
+
+FORM LAYOUT:
+
+// Tab switcher (Masuk | Daftar)
+Two tabs, active = dark bg white text
+
+// GOOGLE BUTTON — most prominent, at TOP
+<button onClick={handleGoogleLogin}>
+  Google icon + "Masuk dengan Google"
+</button>
+Style: white bg, subtle shadow, border, full width
+Height: 48px, border-radius 12px
+Loading state: spinner + "Menghubungkan..."
+
+// Divider
+"atau masuk dengan email"
+
+// Email + Password fields (below Google)
+// Forgot password link
+// Submit button "MASUK →" (red)
+
+// Register tab:
+// Google button at top (same)
+// Divider
+// Name + Email + Phone + Password fields
+// Submit "DAFTAR GRATIS →"
+
+// Note below form:
+// If login tab: "Belum punya akun?" → switch to daftar
+// If daftar tab: "Sudah punya akun?" → switch to masuk
+
+// Bottom note (small, muted):
+"Pengguna 20FIT Photo dapat langsung masuk dengan Google"
+
+---
+
+## STEP 6: WELCOME SCREEN AFTER FIRST LOGIN
+
+After successful login, check if onboarding_completed in my20fit_profile.
+If false (new user or first time): show welcome overlay before dashboard.
+
+Welcome overlay (full screen, dark bg rgba 0,0,0,.85):
+Center card (white, border-radius 20px, max-width 400px, padding 32px):
+
+Header:
+  Avatar from Google (user.user_metadata.avatar_url) or initials circle
+  "Halo, [firstName]! 👋" (Bebas Neue 28px)
+  
+  If isExistingPhotoUser:
+    Green badge: "✓ Akun 20FIT terhubung"
+    Text: "Akun 20FIT Photo kamu berhasil terhubung ke my20fit."
+  Else:
+    Text: "Selamat datang di my20fit!"
+
+Onboarding checklist:
+  ✓ Akun berhasil dibuat (always checked, green)
+  ○ Upload MCU untuk program personal
+  ○ Set up Quick Check-in (cycle, wellness, sleep, water)
+  ○ Scan wajah untuk My Moments
+
+Each unchecked item has small "→" arrow that scrolls to that section.
+
+CTA Button: "MULAI DASHBOARD →" (red, Bebas Neue, full width)
+onClick: 
+  - Set onboarding_completed = true in my20fit_profile
+  - Close overlay
+  - User sees dashboard
+
+Small text below: "Kamu bisa kembali ke panduan ini di halaman Profile"
+
+---
+
+## STEP 7: UPDATE SIDEBAR with user data
+
+Use useAuth() to get user, profile, photoProfile:
+
+Avatar:
+  - If user has Google avatar: <img src={user.user_metadata.avatar_url} />
+  - Else: initials circle (first letter of name, red bg)
+
+Name: profile?.full_name || photoProfile?.name || user?.email
+
+Email: user?.email (small, muted, below name)
+
+Badge: 
+  - If photoProfile exists: "⭐ 20FIT MEMBER"
+  - If profile?.is_plus_member: "⭐ PLUS MEMBER"
+
+Logout button at bottom:
+  Icon: LogOut from lucide-react
+  Text: "KELUAR"
+  onClick: signOut() then navigate('/login')
+
+---
+
+## STEP 8: RLS POLICY FOR photo_user_mirror
+
+Run this SQL in Supabase SQL Editor:
+
+-- Allow authenticated users to read their own mirror row
+CREATE POLICY "Users can read own mirror"
+ON photo_user_mirror FOR SELECT
+USING (auth_user_id = auth.uid() OR email = auth.jwt()->>'email');
+
+-- Allow authenticated users to update their own mirror row
+CREATE POLICY "Users can update own mirror"
+ON photo_user_mirror FOR UPDATE
+USING (auth_user_id = auth.uid() OR email = auth.jwt()->>'email');
+
+-- Allow insert for new users
+CREATE POLICY "Users can insert own mirror"
+ON photo_user_mirror FOR INSERT
+WITH CHECK (auth_user_id = auth.uid());
+
+-- Enable RLS if not already enabled
+ALTER TABLE photo_user_mirror ENABLE ROW LEVEL SECURITY;
+
+---
+
+## IMPORTANT NOTES
+
+- Google OAuth button must be PRIMARY (top of form, most prominent)
+- Email/password is SECONDARY (below divider)
+- storageKey must be 'my20fit-supabase-auth' (different from 20FIT Photo)
+- Login page must NOT show sidebar or bottom nav
+- After OAuth redirect, AuthContext.loadProfiles handles all linking automatically
+- npm run build at the end, fix all errors
+
+Print reminder for user:
+"MANUAL STEP REQUIRED:
+1. Supabase Dashboard → Auth → Providers → Enable Google
+   (Need Google Cloud Console OAuth Client ID + Secret)
+2. Auth → URL Configuration → Set Site URL to your Replit URL
+3. Run the RLS SQL policies in Supabase SQL Editor"

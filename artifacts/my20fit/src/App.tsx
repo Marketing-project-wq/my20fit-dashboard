@@ -9,6 +9,7 @@ import Progress from "@/pages/Progress";
 import ComingSoon from "@/pages/ComingSoon";
 import Login from "@/pages/Login";
 import ResetPassword from "@/pages/ResetPassword";
+import WelcomeOverlay from "@/components/WelcomeOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 
 const queryClient = new QueryClient();
@@ -23,16 +24,35 @@ function LoadingScreen() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) setLocation("/login");
   }, [user, loading, setLocation]);
 
+  useEffect(() => {
+    if (!user || !profile) return;
+    // Check if welcome overlay should be shown (first login)
+    const localKey = `my20fit_onboarded_${user.id}`;
+    const alreadyOnboarded =
+      profile.onboarding_completed === true ||
+      localStorage.getItem(localKey) === "1";
+    setShowWelcome(!alreadyOnboarded);
+  }, [user, profile]);
+
   if (loading) return <LoadingScreen />;
   if (!user) return null;
-  return <>{children}</>;
+
+  return (
+    <>
+      {showWelcome && (
+        <WelcomeOverlay onDismiss={() => setShowWelcome(false)} />
+      )}
+      {children}
+    </>
+  );
 }
 
 function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
