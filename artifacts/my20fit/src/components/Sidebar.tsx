@@ -1,4 +1,4 @@
-import { Home, Target, Calendar, Camera, User, Sun, Moon, LogOut } from "lucide-react";
+import { Home, Target, Calendar, Camera, User, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -11,8 +11,8 @@ const navItems = [
 ];
 
 export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
-  const [location, setLocation] = useLocation();
-  const { user, profile, photoProfile, signOut } = useAuth();
+  const [location] = useLocation();
+  const { user, profile, photoProfile } = useAuth();
 
   const displayName =
     profile?.full_name ||
@@ -22,11 +22,6 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
 
   const initials = displayName.slice(0, 2).toUpperCase();
   const isPlusMember = profile?.is_plus_member ?? false;
-
-  async function handleSignOut() {
-    await signOut();
-    setLocation("/login");
-  }
 
   return (
     <aside
@@ -108,24 +103,6 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
           data-testid="sidebar-theme-toggle"
         >
           {theme === "light" ? <><Moon size={13} /><span>DARK MODE</span></> : <><Sun size={13} /><span>LIGHT MODE</span></>}
-        </button>
-
-        <button
-          onClick={handleSignOut}
-          className="flex items-center justify-center gap-2 w-full py-2.5 transition-all duration-200"
-          style={{
-            backgroundColor: "transparent",
-            color: "rgba(255,255,255,0.4)",
-            fontFamily: "'Bebas Neue', sans-serif",
-            letterSpacing: "2px",
-            fontSize: "12px",
-            borderRadius: "6px",
-            border: "1px solid rgba(255,255,255,0.08)",
-          }}
-          data-testid="sidebar-signout"
-        >
-          <LogOut size={13} />
-          <span>KELUAR</span>
         </button>
       </div>
     </aside>
