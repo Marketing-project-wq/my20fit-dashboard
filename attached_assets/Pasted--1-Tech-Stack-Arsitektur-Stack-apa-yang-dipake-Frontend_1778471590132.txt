@@ -1,0 +1,92 @@
+## 1. Tech Stack & Arsitektur
+- Stack apa yang dipake? (Frontend framework, backend, database)
+- Pake monolith atau split frontend/backend?
+- Hosting di mana? (Replit deployment, Vercel, VPS, dll)
+- Domain 20fit.id udah pointing ke mana? Setup DNS-nya gimana?
+## 2. Database & Data Model
+- Database apa yang dipake? (PostgreSQL, MySQL, MongoDB, Supabase, dll)
+- Tabel/collection apa aja yang udah ada? Kasih schema lengkapnya
+- Data 174 komunitas itu di-seed manual atau ada admin yang input?
+- Ada relasi user <-> community <-> event <-> ticket belum?
+- ORM yang dipake apa? (Prisma, Drizzle, TypeORM, Sequelize, dll)
+## 3. Authentication
+- Auth system pake apa? (Custom JWT, Supabase Auth, NextAuth, Clerk, Firebase)
+- Role yang ada apa aja sekarang? (super admin, organizer, member?)
+- Kenapa `/admin/login` muncul HTTP 404? Itu bug atau emang belum implement?
+- Google OAuth udah disiapin slot-nya belum?
+- Password udah di-hash dengan bcrypt/argon2?
+- Session management pake apa? (cookies, localStorage, JWT refresh)
+## 4. Admin Organizer Dashboard
+- Setelah organizer login berhasil, dia bisa ngapain aja?
+- Bisa CRUD community profile sendiri?
+- Bisa create/edit event di calendar?
+- Bisa liat analytics (views, clicks, leads)?
+- Approval flow organizer baru gimana? (auto approve atau manual review 20fit admin?)
+- Multi-organizer per komunitas support ada belum?
+## 5. Super Admin 20FIT Dashboard
+- Udah ada panel buat tim 20fit?
+- Bisa moderate/approve organizer application?
+- Bisa edit komunitas yang udah listed?
+- Bisa liat metric global (total leads, revenue, traffic)?
+- Bisa manage partner tier & sponsor placement?
+## 6. Directory & Search
+- Search engine pake apa? (Postgres full-text, Algolia, Meilisearch, ElasticSearch?)
+- Filter by city, sport, tag udah jalan?
+- Pagination cara handle-nya gimana? (server-side atau client-side)
+- Trending logic-nya gimana? (manual flag atau algorithmic?)
+- Performance kalau data udah 1000+ komunitas gimana?
+## 7. Calendar & Events
+- Event itu standalone atau attached ke community?
+- Struktur data event-nya kayak gimana? (start time, end time, capacity, price, location)
+- Field "24/37" itu capacity tracking — udah connect ke registration system belum?
+- Recurring event support ada belum?
+- Timezone handling gimana?
+## 8. Contact & Partner Form
+- Form "Get in Touch" submit ke mana? (database, email, webhook?)
+- Ada notifikasi otomatis ke email Marketing@20fit.id pas ada submission?
+- Spam protection (reCAPTCHA, honeypot) ada belum?
+- Form validation client + server side?
+## 9. Lead Generation (Buat Komunitas)
+- Pas user klik "Join community", flow-nya ke mana sekarang?
+- Data lead di-store di mana? Bisa diakses organizer komunitas?
+- Ada notifikasi WA/email ke organizer pas dapet lead baru?
+- Lead attribution tracking ada? (dari mana user dateng)
+## 10. Payment & Ticketing (kemungkinan belum)
+- Payment gateway udah integrasi belum? (Midtrans, Xendit, DOKU, Stripe)
+- Kalau belum, ada plan/preference pake yang mana?
+- E-ticket / QR code system udah pernah dipikirin?
+- Refund flow udah dipikirin?
+- Tax/PPN handling gimana?
+## 11. Mobile App
+- Tombol "GET THE APP" itu link ke aplikasi yang udah ada atau coming soon?
+- Kalau ada app, dia share backend dengan web?
+- Native (React Native, Flutter) atau PWA?
+## 12. Integrations
+- WhatsApp Business API udah integrate? (Buat notif ke organizer)
+- Email service pake apa? (Resend, SendGrid, Mailgun, SMTP)
+- Analytics tool? (GA4, Mixpanel, Posthog)
+- CDN buat image? (Cloudinary, Cloudflare R2, S3)
+- Map/location service? (Google Maps, Mapbox)
+## 13. Known Issues & TODO
+- Ada bug list atau todo list yang masih open?
+- Fitur apa yang udah half-built (started but not finished)?
+- Performance issue ada? (slow query, large bundle, dll)
+- Security issue yang udah teridentifikasi?
+## 14. Code Quality & DevOps
+- Ada test suite (unit/integration/e2e)?
+- CI/CD pipeline udah ada?
+- Environment management (.env staging vs production) gimana?
+- Backup database routine ada?
+- Error monitoring? (Sentry, Bugsnag, dll)
+## 15. SEO & Marketing
+- Meta tags + Open Graph udah set per komunitas / event?
+- Sitemap.xml & robots.txt udah ada?
+- Schema.org structured data udah pasang?
+- Server-side rendering (SSR) atau client-side rendering (CSR)?
+---
+ 
+## Bonus — Tanyain Juga
+- Berapa total file/komponen yang udah dibuat?
+- Berapa baris code total?
+- Kira-kira % completion menuju "MVP launch-ready" itu di angka berapa menurut lu?
+- Top 3 prioritas yang lu rekomendasiin buat dikerjain duluan?

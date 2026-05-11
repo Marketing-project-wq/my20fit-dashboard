@@ -12,18 +12,16 @@ const navItems = [
 
 export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   const [location, setLocation] = useLocation();
-  const { user, profile, photoProfile, isExistingPhotoUser, signOut } = useAuth();
+  const { user, profile, photoProfile, signOut } = useAuth();
 
   const displayName =
     profile?.full_name ||
     photoProfile?.name ||
-    user?.user_metadata?.full_name ||
     user?.email?.split("@")[0]?.toUpperCase() ||
     "MEMBER";
 
   const initials = displayName.slice(0, 2).toUpperCase();
   const isPlusMember = profile?.is_plus_member ?? false;
-  const avatarUrl: string | null = user?.user_metadata?.avatar_url ?? null;
 
   async function handleSignOut() {
     await signOut();
@@ -75,31 +73,19 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
 
       <div className="mt-auto px-6 pb-6 flex flex-col gap-3">
         <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-          {/* Avatar: Google photo or initials */}
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={displayName}
-              className="h-9 w-9 rounded-full shrink-0 object-cover"
-              style={{ border: "2px solid #C41101" }}
-            />
-          ) : (
-            <div
-              className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-bold"
-              style={{ backgroundColor: "#C41101", fontFamily: "'Bebas Neue', sans-serif" }}
-            >
-              {initials}
-            </div>
-          )}
+          <div
+            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm font-bold"
+            style={{ backgroundColor: "#C41101", fontFamily: "'Bebas Neue', sans-serif" }}
+          >
+            {initials}
+          </div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-white text-sm truncate" style={{ fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "1px" }}>
               {displayName}
             </span>
-            {isExistingPhotoUser && !isPlusMember && (
-              <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "1.5px" }}>
-                ⭐ 20FIT MEMBER
-              </span>
-            )}
+            <span className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Barlow Condensed', sans-serif" }}>
+              {user?.email}
+            </span>
             {isPlusMember && (
               <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Bebas Neue', sans-serif", letterSpacing: "1.5px" }}>
                 ⭐ PLUS MEMBER
@@ -121,7 +107,7 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
           }}
           data-testid="sidebar-theme-toggle"
         >
-          {theme === "light" ? <><Moon size={13} /> <span>DARK MODE</span></> : <><Sun size={13} /> <span>LIGHT MODE</span></>}
+          {theme === "light" ? <><Moon size={13} /><span>DARK MODE</span></> : <><Sun size={13} /><span>LIGHT MODE</span></>}
         </button>
 
         <button

@@ -61,11 +61,9 @@ export default function Login() {
 
   // Shared
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  // Auto-dismiss error after 5s
   useEffect(() => {
     if (!error) return;
     const t = setTimeout(() => setError(null), 5000);
@@ -81,19 +79,12 @@ export default function Login() {
         password: loginPassword,
       });
       if (err) {
-        // Check photo_user_mirror for better error guidance
-        const { data: mirror } = await supabase
-          .from("photo_user_mirror")
-          .select("email, name, google_id")
-          .eq("email", loginEmail)
-          .maybeSingle();
-
-        if (mirror?.google_id) {
-          setError("Akun ini terdaftar via Google. Gunakan tombol \"Masuk dengan Google\" di atas.");
-        } else if (mirror) {
-          setError("Password salah. Lupa password?");
+        if (err.message.toLowerCase().includes("email not confirmed")) {
+          setError("Email belum diverifikasi. Cek inbox kamu dan klik link konfirmasi.");
+        } else if (err.message.toLowerCase().includes("invalid login")) {
+          setError("Email atau password salah.");
         } else {
-          setError("Email belum terdaftar. Silakan daftar terlebih dahulu.");
+          setError(err.message);
         }
         return;
       }
@@ -109,67 +100,21 @@ export default function Login() {
     if (regPassword.length < 8) { setError("Password minimal 8 karakter."); return; }
     setLoading(true); setError(null);
     try {
-      // Check if email already in photo_user_mirror
-      const { data: existing } = await supabase
-        .from("photo_user_mirror")
-        .select("email, google_id, auth_user_id")
-        .eq("email", regEmail)
-        .maybeSingle();
-
-      if (existing?.google_id) {
-        setError("Email ini terdaftar di 20FIT via Google. Gunakan \"Masuk dengan Google\" untuk masuk.");
-        return;
-      }
-      if (existing?.auth_user_id) {
-        setError("Email ini sudah terdaftar. Silakan masuk.");
-        setTab("login");
-        return;
-      }
-
       const { data, error: err } = await supabase.auth.signUp({
         email: regEmail,
         password: regPassword,
         options: { data: { full_name: regName, phone: regPhone } },
       });
       if (err) { setError(err.message); return; }
-      if (data.user) {
-        await supabase
-          .from("my20fit_profile")
-          .update({ phone: regPhone, full_name: regName })
-          .eq("auth_user_id", data.user.id);
-      }
-      if (!data.session) {
-        setSuccessMsg("Cek email kamu untuk verifikasi akun, lalu masuk.");
+      if (data.user && !data.session) {
+        setSuccessMsg("Link verifikasi telah dikirim ke " + regEmail + ". Cek inbox kamu lalu masuk.");
         setTab("login");
-      } else {
+        setLoginEmail(regEmail);
+      } else if (data.session) {
         setLocation("/");
       }
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleGoogleLogin() {
-    setGoogleLoading(true);
-    setError(null);
-    try {
-      const { error: err } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + import.meta.env.BASE_URL,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
-      });
-      if (err) {
-        setError(err.message);
-        setGoogleLoading(false);
-      }
-    } catch {
-      setError("Gagal login dengan Google. Coba lagi.");
-      setGoogleLoading(false);
     }
   }
 
@@ -187,10 +132,11 @@ export default function Login() {
     }
   }
 
-  const btnStyle: React.CSSProperties = {
+  const redBtn: React.CSSProperties = {
     width: "100%", padding: "13px", borderRadius: 10, cursor: "pointer",
     fontFamily: "'Bebas Neue', sans-serif", fontSize: 14, letterSpacing: "2.5px",
-    border: "none", transition: "transform 0.2s ease, box-shadow 0.2s ease",
+    border: "none", background: "#C41101", color: "#fff",
+    transition: "transform 0.2s ease, box-shadow 0.2s ease",
     opacity: loading ? 0.7 : 1,
   };
 
@@ -210,11 +156,9 @@ export default function Login() {
           backgroundSize: "auto, 24px 24px",
         }}
       >
-        {/* Red top stripe */}
         <div style={{ height: 3, background: "linear-gradient(90deg, #C41101, #FF4444, #C41101)", backgroundSize: "200% 100%", animation: "stripeShimmer 3s linear infinite" }} />
 
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "48px 56px" }}>
-          {/* Logo + badge */}
           <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} style={{ marginBottom: 40 }}>
             <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 36, color: "#fff", letterSpacing: "4px", margin: 0 }}>
               my<span style={{ color: "#C41101" }}>20</span>FIT
@@ -228,7 +172,6 @@ export default function Login() {
             </span>
           </motion.div>
 
-          {/* Wordmark */}
           <div style={{ marginBottom: 48 }}>
             {[
               { text: "ELEVATE.", style: { color: "#fff", backgroundImage: "linear-gradient(90deg, #fff 0%, #C41101 40%, #fff 60%, #fff 100%)", backgroundSize: "200% auto", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", animation: "shimmer 5s linear infinite" } as React.CSSProperties },
@@ -247,7 +190,6 @@ export default function Login() {
             ))}
           </div>
 
-          {/* Chips */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 48 }}>
             {["AI Health Analysis", "Daily Checklist", "Sport Events"].map(chip => (
               <span key={chip} style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 11, letterSpacing: "1.5px", color: "rgba(255,255,255,0.6)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "4px 12px" }}>
@@ -256,7 +198,6 @@ export default function Login() {
             ))}
           </motion.div>
 
-          {/* Feature list */}
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.85 }} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             {features.map(({ icon: Icon, text }) => (
               <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -279,7 +220,6 @@ export default function Login() {
       >
         <div style={{ width: "100%", maxWidth: 400 }}>
 
-          {/* Mobile logo */}
           <div className="lg:hidden" style={{ marginBottom: 28, textAlign: "center" }}>
             <h1 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 32, color: "#0A0908", letterSpacing: "3px" }}>
               my<span style={{ color: "#C41101" }}>20</span>FIT
@@ -291,7 +231,8 @@ export default function Login() {
             {/* ── FORGOT PASSWORD ── */}
             {formState === "forgot" && (
               <motion.div key="forgot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
-                <button onClick={() => { setFormState("normal"); setForgotSuccess(false); setError(null); }} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#6E665C", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, marginBottom: 20 }}>
+                <button onClick={() => { setFormState("normal"); setForgotSuccess(false); setError(null); }}
+                  style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#6E665C", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, marginBottom: 20 }}>
                   ← Kembali ke Masuk
                 </button>
                 <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 24, letterSpacing: "2px", color: "#0A0908", marginBottom: 6 }}>LUPA PASSWORD</h2>
@@ -299,7 +240,9 @@ export default function Login() {
                 {forgotSuccess ? (
                   <div style={{ background: "#DCFCE7", border: "1px solid #86EFAC", borderRadius: 10, padding: "16px", display: "flex", gap: 10, alignItems: "flex-start" }}>
                     <CheckCircle size={18} style={{ color: "#16A34A", flexShrink: 0, marginTop: 1 }} />
-                    <p style={{ fontSize: 13, color: "#166534" }}>Email reset telah dikirim ke <strong>{forgotEmail}</strong>. Cek inbox kamu.</p>
+                    <p style={{ fontSize: 13, color: "#166534" }}>
+                      Link reset telah dikirim ke <strong>{forgotEmail}</strong>. Cek inbox kamu.
+                    </p>
                   </div>
                 ) : (
                   <form onSubmit={handleForgotPassword} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -308,8 +251,8 @@ export default function Login() {
                       <label style={labelStyle}>EMAIL</label>
                       <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="kamu@email.com" required style={inputBase} />
                     </div>
-                    <button type="submit" disabled={loading} style={{ ...btnStyle, background: "#C41101", color: "#fff" }}>
-                      {loading ? "MENGIRIM…" : "KIRIM RESET PASSWORD →"}
+                    <button type="submit" disabled={loading} style={redBtn}>
+                      {loading ? "MENGIRIM…" : "KIRIM LINK RESET →"}
                     </button>
                   </form>
                 )}
@@ -319,14 +262,13 @@ export default function Login() {
             {/* ── LOGIN / REGISTER ── */}
             {formState === "normal" && (
               <motion.div key="normal" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
-                {/* Heading */}
                 <p style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 10, letterSpacing: "2px", color: "#6E665C", marginBottom: 4 }}>SELAMAT DATANG</p>
                 <h2 style={{ fontFamily: "'Bebas Neue', sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", marginBottom: 20 }}>
                   Masuk ke my20fit.
                 </h2>
 
                 {/* Tab switcher */}
-                <div style={{ display: "flex", gap: 0, marginBottom: 24, borderRadius: 10, overflow: "hidden", border: "1px solid #E5E1D8", background: "#fff" }}>
+                <div style={{ display: "flex", marginBottom: 24, borderRadius: 10, overflow: "hidden", border: "1px solid #E5E1D8", background: "#fff" }}>
                   {(["login", "register"] as Tab[]).map(t => (
                     <button key={t} onClick={() => { setTab(t); setError(null); setSuccessMsg(null); }}
                       style={{ flex: 1, padding: "11px", fontFamily: "'Bebas Neue', sans-serif", fontSize: 13, letterSpacing: "2px", cursor: "pointer", transition: "all 0.2s", border: "none",
@@ -338,111 +280,98 @@ export default function Login() {
 
                 {error && <ErrorAlert msg={error} />}
                 {successMsg && (
-                  <div style={{ background: "#DCFCE7", border: "1px solid #86EFAC", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 10, alignItems: "center", marginBottom: 14 }}>
-                    <CheckCircle size={16} style={{ color: "#16A34A", flexShrink: 0 }} />
-                    <p style={{ fontSize: 13, color: "#166534" }}>{successMsg}</p>
+                  <div style={{ background: "#DCFCE7", border: "1px solid #86EFAC", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14 }}>
+                    <CheckCircle size={16} style={{ color: "#16A34A", flexShrink: 0, marginTop: 2 }} />
+                    <p style={{ fontSize: 13, color: "#166534", lineHeight: 1.5 }}>{successMsg}</p>
                   </div>
                 )}
 
                 <AnimatePresence mode="wait">
                   {tab === "login" ? (
-                    <motion.div key="login-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                      {/* Google button — PRIMARY, at top */}
-                      <GoogleBtn onClick={handleGoogleLogin} label="Masuk dengan Google" loading={googleLoading} />
-
-                      <Divider label="atau masuk dengan email" />
-
-                      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                        <div>
-                          <label style={labelStyle}>EMAIL</label>
-                          <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="kamu@email.com" required style={inputBase} />
-                        </div>
-                        <div>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                            <label style={{ ...labelStyle, marginBottom: 0 }}>PASSWORD</label>
-                            <button type="button" onClick={() => { setFormState("forgot"); setForgotEmail(loginEmail); setError(null); }}
-                              style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#C41101" }}>
-                              Lupa password?
-                            </button>
-                          </div>
-                          <div style={{ position: "relative" }}>
-                            <input type={showLoginPw ? "text" : "password"} value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="Password" required style={{ ...inputBase, paddingRight: 44 }} />
-                            <button type="button" onClick={() => setShowLoginPw(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6E665C" }}>
-                              {showLoginPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                          </div>
-                        </div>
-                        <button type="submit" disabled={loading}
-                          style={{ ...btnStyle, background: "#C41101", color: "#fff", marginTop: 4 }}
-                          onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 20px rgba(196,17,1,0.35)"; } }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
-                          {loading ? "MEMPROSES…" : "MASUK →"}
-                        </button>
-                        <p style={{ textAlign: "center", fontSize: 13, color: "#6E665C", margin: "4px 0 0" }}>
-                          Belum punya akun?{" "}
-                          <button type="button" onClick={() => setTab("register")} style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 600 }}>
-                            Daftar gratis
+                    <motion.form key="login-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+                      onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      <div>
+                        <label style={labelStyle}>EMAIL</label>
+                        <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="kamu@email.com" required style={inputBase} />
+                      </div>
+                      <div>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                          <label style={{ ...labelStyle, marginBottom: 0 }}>PASSWORD</label>
+                          <button type="button" onClick={() => { setFormState("forgot"); setForgotEmail(loginEmail); setError(null); }}
+                            style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#C41101" }}>
+                            Lupa password?
                           </button>
-                        </p>
-                      </form>
-                    </motion.div>
+                        </div>
+                        <div style={{ position: "relative" }}>
+                          <input type={showLoginPw ? "text" : "password"} value={loginPassword} onChange={e => setLoginPassword(e.target.value)}
+                            placeholder="Password" required style={{ ...inputBase, paddingRight: 44 }} />
+                          <button type="button" onClick={() => setShowLoginPw(s => !s)}
+                            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6E665C" }}>
+                            {showLoginPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                        </div>
+                      </div>
+                      <button type="submit" disabled={loading} style={{ ...redBtn, marginTop: 4 }}
+                        onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 20px rgba(196,17,1,0.35)"; } }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
+                        {loading ? "MEMPROSES…" : "MASUK →"}
+                      </button>
+                      <p style={{ textAlign: "center", fontSize: 13, color: "#6E665C", marginTop: 4 }}>
+                        Belum punya akun?{" "}
+                        <button type="button" onClick={() => { setTab("register"); setError(null); setSuccessMsg(null); }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 600 }}>
+                          Daftar gratis
+                        </button>
+                      </p>
+                    </motion.form>
                   ) : (
-                    <motion.div key="reg-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-                      {/* Google button — PRIMARY, at top */}
-                      <GoogleBtn onClick={handleGoogleLogin} label="Daftar dengan Google" loading={googleLoading} />
-
-                      <Divider label="atau daftar dengan email" />
-
-                      <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                        <div>
-                          <label style={labelStyle}>NAMA LENGKAP</label>
-                          <input type="text" value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nama lengkap" required style={inputBase} />
+                    <motion.form key="reg-form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
+                      onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      <div>
+                        <label style={labelStyle}>NAMA LENGKAP</label>
+                        <input type="text" value={regName} onChange={e => setRegName(e.target.value)} placeholder="Nama lengkap" required style={inputBase} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>EMAIL</label>
+                        <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="kamu@email.com" required style={inputBase} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>NOMOR HP</label>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#0A0908", background: "#fff", border: "1px solid #E5E1D8", borderRadius: 10, padding: "12px 12px", flexShrink: 0 }}>+62</span>
+                          <input type="tel" value={regPhone} onChange={e => setRegPhone(e.target.value)} placeholder="812xxxxxxxx" style={{ ...inputBase, flex: 1 }} />
                         </div>
-                        <div>
-                          <label style={labelStyle}>EMAIL</label>
-                          <input type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} placeholder="kamu@email.com" required style={inputBase} />
-                        </div>
-                        <div>
-                          <label style={labelStyle}>NOMOR HP</label>
-                          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                            <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#0A0908", background: "#fff", border: "1px solid #E5E1D8", borderRadius: 10, padding: "12px 12px", flexShrink: 0 }}>+62</span>
-                            <input type="tel" value={regPhone} onChange={e => setRegPhone(e.target.value)} placeholder="812xxxxxxxx" style={{ ...inputBase, flex: 1 }} />
-                          </div>
-                        </div>
-                        <div>
-                          <label style={labelStyle}>PASSWORD</label>
-                          <div style={{ position: "relative" }}>
-                            <input type={showRegPw ? "text" : "password"} value={regPassword} onChange={e => setRegPassword(e.target.value)} placeholder="Min. 8 karakter" required style={{ ...inputBase, paddingRight: 44 }} />
-                            <button type="button" onClick={() => setShowRegPw(s => !s)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6E665C" }}>
-                              {showRegPw ? <EyeOff size={16} /> : <Eye size={16} />}
-                            </button>
-                          </div>
-                        </div>
-                        <div>
-                          <label style={labelStyle}>KONFIRMASI PASSWORD</label>
-                          <input type="password" value={regConfirm} onChange={e => setRegConfirm(e.target.value)} placeholder="Ulangi password" required style={inputBase} />
-                        </div>
-                        <button type="submit" disabled={loading}
-                          style={{ ...btnStyle, background: "#C41101", color: "#fff", marginTop: 4 }}
-                          onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 20px rgba(196,17,1,0.35)"; } }}
-                          onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
-                          {loading ? "MEMPROSES…" : "DAFTAR GRATIS →"}
-                        </button>
-                        <p style={{ textAlign: "center", fontSize: 13, color: "#6E665C", margin: "4px 0 0" }}>
-                          Sudah punya akun?{" "}
-                          <button type="button" onClick={() => setTab("login")} style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 600 }}>
-                            Masuk
+                      </div>
+                      <div>
+                        <label style={labelStyle}>PASSWORD</label>
+                        <div style={{ position: "relative" }}>
+                          <input type={showRegPw ? "text" : "password"} value={regPassword} onChange={e => setRegPassword(e.target.value)}
+                            placeholder="Min. 8 karakter" required style={{ ...inputBase, paddingRight: 44 }} />
+                          <button type="button" onClick={() => setShowRegPw(s => !s)}
+                            style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "#6E665C" }}>
+                            {showRegPw ? <EyeOff size={16} /> : <Eye size={16} />}
                           </button>
-                        </p>
-                      </form>
-                    </motion.div>
+                        </div>
+                      </div>
+                      <div>
+                        <label style={labelStyle}>KONFIRMASI PASSWORD</label>
+                        <input type="password" value={regConfirm} onChange={e => setRegConfirm(e.target.value)} placeholder="Ulangi password" required style={inputBase} />
+                      </div>
+                      <button type="submit" disabled={loading} style={{ ...redBtn, marginTop: 4 }}
+                        onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 8px 20px rgba(196,17,1,0.35)"; } }}
+                        onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}>
+                        {loading ? "MEMPROSES…" : "DAFTAR GRATIS →"}
+                      </button>
+                      <p style={{ textAlign: "center", fontSize: 13, color: "#6E665C", marginTop: 4 }}>
+                        Sudah punya akun?{" "}
+                        <button type="button" onClick={() => { setTab("login"); setError(null); setSuccessMsg(null); }}
+                          style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 600 }}>
+                          Masuk
+                        </button>
+                      </p>
+                    </motion.form>
                   )}
                 </AnimatePresence>
-
-                {/* 20FIT Photo hint */}
-                <p style={{ textAlign: "center", fontSize: 11, color: "#B0A89E", marginTop: 20, lineHeight: 1.5 }}>
-                  Pengguna 20FIT Photo dapat langsung masuk dengan Google
-                </p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -472,59 +401,5 @@ function ErrorAlert({ msg }: { msg: string }) {
       <AlertCircle size={16} style={{ color: "#C41101", flexShrink: 0, marginTop: 1 }} />
       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#7F1D1D", lineHeight: 1.4 }}>{msg}</p>
     </div>
-  );
-}
-
-function Divider({ label = "atau" }: { label?: string }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0" }}>
-      <div style={{ flex: 1, height: 1, background: "#E5E1D8" }} />
-      <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#6E665C", whiteSpace: "nowrap" }}>{label}</span>
-      <div style={{ flex: 1, height: 1, background: "#E5E1D8" }} />
-    </div>
-  );
-}
-
-function GoogleBtn({ onClick, label, loading }: { onClick: () => void; label: string; loading?: boolean }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      style={{
-        width: "100%", height: 48, padding: "0 16px", borderRadius: 12, cursor: loading ? "default" : "pointer",
-        fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "0.3px",
-        border: "1.5px solid #E5E1D8", background: "#fff", color: "#0A0908",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-        transition: "box-shadow 0.2s, transform 0.2s",
-        boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-        opacity: loading ? 0.75 : 1,
-      }}
-      onMouseEnter={e => { if (!loading) { (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 14px rgba(0,0,0,0.1)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; } }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 1px 4px rgba(0,0,0,0.06)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
-    >
-      {loading ? (
-        <>
-          <div style={{ width: 18, height: 18, borderRadius: "50%", border: "2px solid #D1C9BF", borderTopColor: "#C41101", animation: "spin 0.7s linear infinite", flexShrink: 0 }} />
-          Menghubungkan…
-        </>
-      ) : (
-        <>
-          <GoogleIcon />
-          {label}
-        </>
-      )}
-    </button>
-  );
-}
-
-function GoogleIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18">
-      <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
-      <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/>
-      <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
-      <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-    </svg>
   );
 }
