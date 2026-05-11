@@ -21,9 +21,9 @@ interface McuChecklist {
 }
 
 const DEFAULT_TASKS: Task[] = [
-  { id: "1", title: "30-min cardio", desc: "based on your cholesterol", tags: ["HIGH", "30 MIN", "GYM"], done: true },
-  { id: "2", title: "Hit fiber target", desc: "30g today", tags: ["HOME"], done: true },
-  { id: "3", title: "10-min stretch", desc: "before bed", tags: ["10 MIN", "HOME"], done: true },
+  { id: "1", title: "30-min cardio", desc: "based on your cholesterol", tags: ["HIGH", "30 MIN", "GYM"], done: false },
+  { id: "2", title: "Hit fiber target", desc: "30g today", tags: ["HOME"], done: false },
+  { id: "3", title: "10-min stretch", desc: "before bed", tags: ["10 MIN", "HOME"], done: false },
   { id: "4", title: "Skip fried food", desc: "recovery day", tags: ["MED"], done: false },
   { id: "5", title: "Sleep by 23:00", desc: "7h+ target", tags: ["HIGH"], done: false },
 ];
@@ -39,40 +39,88 @@ function mcuChecklistToTasks(items: McuChecklist[]): Task[] {
       title: item.title,
       desc: item.reason ?? "",
       tags,
-      done: false,
+      done: false, // always start unchecked
       icon: item.icon,
     };
   });
 }
 
-export default function TodaysChecklist() {
-  const [tasks, setTasks] = useState<Task[]>(DEFAULT_TASKS);
-  const [isMcuPersonalized, setIsMcuPersonalized] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+function loadChecklist(): Task[] {
+  try {
+    const saved = localStorage.getItem("my20fit_mcu_result");
+    if (saved) {
+      const data = JSON.parse(saved);
+      if (Array.isArray(data.checklist) && data.checklist.length > 0) {
+        return data.checklist.map((item: McuChecklist, i: number) => {
+          const tags: string[] = [];
+          if (item.priority) tags.push(item.priority.toUpperCase());
+          if (item.duration) tags.push(`${item.duration} MIN`);
+          if (item.location && item.location !== "null") tags.push(item.location.toUpperCase());
+          return {
+            id: String(i + 1),
+            title: item.title,
+            desc: item.reason ?? "",
+            tags,
+            done: false, // always start unchecked
+            icon: item.icon,
+          };
+        });
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return DEFAULT_TASKS;
+}
 
-  // Load from localStorage on mount
-  useEffect(() => {
+const todayISO = () => new Date().toISOString().split("T")[0];
+
+export default function TodaysChecklist() {
+  const [tasks, setTasks] = useState<Task[]>(loadChecklist);
+  const [isMcuPersonalized, setIsMcuPersonalized] = useState(() => {
     try {
       const saved = localStorage.getItem("my20fit_mcu_result");
       if (saved) {
         const data = JSON.parse(saved);
-        if (Array.isArray(data.checklist) && data.checklist.length > 0) {
-          setTasks(mcuChecklistToTasks(data.checklist));
-          setIsMcuPersonalized(true);
-        }
+        return Array.isArray(data.checklist) && data.checklist.length > 0;
       }
-    } catch {
-      // ignore
+    } catch { /* ignore */ }
+    return false;
+  });
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Daily reset logic
+  useEffect(() => {
+    const today = todayISO();
+    const savedDate = localStorage.getItem("my20fit_checklist_date");
+
+    if (savedDate !== today) {
+      // New day — reset all to unchecked and save today's date
+      localStorage.setItem("my20fit_checklist_date", today);
+      localStorage.removeItem("my20fit_checklist_states");
+      setTasks(prev => prev.map(item => ({ ...item, done: false })));
+    } else {
+      // Same day — restore saved check states
+      try {
+        const savedStates = localStorage.getItem("my20fit_checklist_states");
+        if (savedStates) {
+          const states: boolean[] = JSON.parse(savedStates);
+          setTasks(prev => prev.map((item, i) => ({ ...item, done: states[i] ?? false })));
+        }
+      } catch { /* ignore */ }
     }
   }, []);
 
-  // Listen for mcu-analyzed event
+  // Listen for mcu-analyzed event (new MCU uploaded → replace tasks, reset states)
   useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
       if (Array.isArray(detail?.checklist) && detail.checklist.length > 0) {
-        setTasks(mcuChecklistToTasks(detail.checklist));
+        const newTasks = mcuChecklistToTasks(detail.checklist);
+        setTasks(newTasks);
         setIsMcuPersonalized(true);
+        localStorage.removeItem("my20fit_checklist_states");
+        localStorage.setItem("my20fit_checklist_date", todayISO());
       }
     };
     window.addEventListener("mcu-analyzed", handler);
@@ -91,7 +139,15 @@ export default function TodaysChecklist() {
   }, [allDone]);
 
   const toggleTask = (id: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+    setTasks(prev => {
+      const updated = prev.map(t => t.id === id ? { ...t, done: !t.done } : t);
+      // Persist check states for the current day
+      localStorage.setItem(
+        "my20fit_checklist_states",
+        JSON.stringify(updated.map(t => t.done))
+      );
+      return updated;
+    });
   };
 
   const today = new Date();
@@ -216,9 +272,7 @@ export default function TodaysChecklist() {
             </div>
 
             <div className="flex-1 min-w-0">
-              {task.icon && (
-                <span className="mr-1">{task.icon}</span>
-              )}
+              {task.icon && <span className="mr-1">{task.icon}</span>}
               <span
                 style={{
                   fontFamily: "'Barlow Condensed', system-ui",

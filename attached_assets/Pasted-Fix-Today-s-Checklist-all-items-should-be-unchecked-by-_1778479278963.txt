@@ -1,0 +1,71 @@
+Fix Today's Checklist — all items should be unchecked by default.
+
+In TodaysChecklist.jsx:
+
+1. Initial state — all items unchecked:
+   The checklist items should initialize with done: false for all items.
+   
+   When loading from localStorage 'my20fit_mcu_result',
+   extract the checklist array but ALWAYS set done: false initially:
+   
+   const loadChecklist = () => {
+     const saved = localStorage.getItem('my20fit_mcu_result')
+     if (!saved) return []
+     const mcu = JSON.parse(saved)
+     return (mcu.checklist || []).map(item => ({
+       ...item,
+       done: false  // always start unchecked
+     }))
+   }
+   
+   const [items, setItems] = useState(loadChecklist)
+
+2. Daily reset logic — checklist resets every new day:
+   On component mount, check if today's date matches 
+   localStorage 'my20fit_checklist_date':
+   
+   useEffect(() => {
+     const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
+     const savedDate = localStorage.getItem('my20fit_checklist_date')
+     
+     if (savedDate !== today) {
+       // New day — reset all to unchecked
+       localStorage.setItem('my20fit_checklist_date', today)
+       setItems(prev => prev.map(item => ({ ...item, done: false })))
+       // Reset all-done header state too
+       setAllDone(false)
+     } else {
+       // Same day — load saved check states
+       const savedStates = localStorage.getItem('my20fit_checklist_states')
+       if (savedStates) {
+         const states = JSON.parse(savedStates)
+         setItems(prev => prev.map((item, i) => ({
+           ...item,
+           done: states[i] ?? false
+         })))
+       }
+     }
+   }, [])
+
+3. Save check states when item is toggled:
+   When user checks/unchecks an item, save current states:
+   
+   const toggleItem = (index) => {
+     setItems(prev => {
+       const updated = prev.map((item, i) => 
+         i === index ? { ...item, done: !item.done } : item
+       )
+       // Save states to localStorage
+       localStorage.setItem(
+         'my20fit_checklist_states',
+         JSON.stringify(updated.map(item => item.done))
+       )
+       return updated
+     })
+   }
+
+4. Progress bar shows 0/5 on fresh load (all unchecked).
+
+5. Header shows normal state (not green ALL DONE) on fresh load.
+
+After changes: npm run build — fix all errors.
