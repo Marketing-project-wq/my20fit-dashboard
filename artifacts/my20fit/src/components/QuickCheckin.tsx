@@ -425,13 +425,15 @@ export default function QuickCheckin() {
             <Droplets size={18} style={{ color: "#06B6D4" }} />
             <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>AIR</span>
           </div>
-          <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "var(--text)" }}>
-            {totalCups}<span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", margin: "0 2px" }}>/</span>{targetCups}
+          <div style={{ display: "flex", alignItems: "baseline" }}>
+            <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "var(--text)" }}>{(totalCups * 0.25).toFixed(1)}L</span>
+            <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", margin: "0 4px" }}>/</span>
+            <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "var(--muted)" }}>{(targetCups * 0.25).toFixed(1)}L</span>
           </div>
           <div style={{ height: 4, background: "rgba(255,255,255,.1)", borderRadius: 99, marginTop: 6, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${waterPct}%`, background: "#06B6D4", borderRadius: 99, transition: "width .4s ease" }} />
           </div>
-          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 10, color: "var(--muted)", marginTop: 3 }}>gelas hari ini</div>
+          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 10, color: "var(--muted)", marginTop: 3 }}>hari ini</div>
         </div>
       </div>
 
@@ -481,7 +483,7 @@ export default function QuickCheckin() {
       {/* ========== MODAL: CYCLE ========== */}
       <BottomSheet isOpen={showCycleModal} onClose={() => setShowCycleModal(false)} title="Siklus Menstruasi">
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 2.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
             HARI PERTAMA HAID TERAKHIR
           </label>
           <input
@@ -491,24 +493,24 @@ export default function QuickCheckin() {
             style={{
               width: "100%", padding: "12px 14px",
               border: "1.5px solid var(--border-subtle, #E5E1D8)",
-              borderRadius: 10, fontSize: 16,
-              fontFamily: "'Barlow Condensed'",
+              borderRadius: 10, fontSize: 15,
+              fontFamily: "'JetBrains Mono', monospace", fontWeight: 400,
               background: "var(--card)", color: "var(--text)",
               boxSizing: "border-box",
             }}
           />
         </div>
         <div style={{ marginBottom: 20 }}>
-          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
+          <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 2.5, color: "var(--muted)", display: "block", marginBottom: 8 }}>
             PANJANG SIKLUS RATA-RATA
           </label>
           <div style={{ display: "flex", alignItems: "center", gap: 16, justifyContent: "center" }}>
-            <button onClick={() => setCycleLength(l => Math.max(21, l - 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontSize: 20, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+            <button onClick={() => setCycleLength(l => Math.max(21, l - 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontFamily: "'JetBrains Mono', monospace", fontWeight: 400, fontSize: 18, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
             <div style={{ textAlign: "center" }}>
-              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 28, fontWeight: 400, color: "var(--text)" }}>{cycleLength}</span>
-              <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: "var(--muted)", marginLeft: 6 }}>hari</span>
+              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 32, fontWeight: 700, color: "var(--text)" }}>{cycleLength}</span>
+              <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 14, color: "var(--muted)", marginLeft: 6 }}>hari</span>
             </div>
-            <button onClick={() => setCycleLength(l => Math.min(35, l + 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontSize: 20, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+            <button onClick={() => setCycleLength(l => Math.min(35, l + 1))} style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--border-subtle, #E5E1D8)", background: "var(--card)", fontFamily: "'JetBrains Mono', monospace", fontWeight: 400, fontSize: 18, cursor: "pointer", color: "var(--text)", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
           </div>
         </div>
         {lastPeriod && (() => {
@@ -526,7 +528,7 @@ export default function QuickCheckin() {
         })()}
         <button
           onClick={saveCycle} disabled={!lastPeriod}
-          style={{ width: "100%", padding: 14, background: lastPeriod ? "#C41101" : "#ccc", color: "#fff", border: "none", borderRadius: 12, cursor: lastPeriod ? "pointer" : "not-allowed", fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1 }}
+          style={{ width: "100%", padding: 14, background: lastPeriod ? "#C41101" : "#ccc", color: "#fff", border: "none", borderRadius: 12, cursor: lastPeriod ? "pointer" : "not-allowed", fontFamily: "'Anton', sans-serif", fontSize: 16, letterSpacing: 1 }}
         >SIMPAN</button>
       </BottomSheet>
 

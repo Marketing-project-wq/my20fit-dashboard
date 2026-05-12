@@ -404,7 +404,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
             ) : (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
                 <div>
-                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 15, color: "var(--text)", marginBottom: 2 }}>
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: "var(--text)", marginBottom: 2 }}>
                     Belum ada MCU
                   </div>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
@@ -416,7 +416,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   style={{
                     background: "#C41101", color: "#fff", border: "none", borderRadius: 10,
                     padding: "8px 16px", cursor: "pointer",
-                    fontFamily: "'Anton', sans-serif", fontSize: 13, letterSpacing: 1, flexShrink: 0,
+                    fontFamily: "'Anton', sans-serif", fontSize: 14, letterSpacing: 1, flexShrink: 0,
                   }}
                 >UPLOAD</button>
               </div>
@@ -431,8 +431,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: 2, color: "#D4A800", marginBottom: 4 }}>
                     ⭐ 20FIT PLUS AKTIF
                   </div>
-                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 20, color: "#fff" }}>MEMBER AKTIF</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
+                  <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, color: "#fff" }}>MEMBER AKTIF</div>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "rgba(255,255,255,.45)", marginTop: 4 }}>
                     Berlaku hingga: 31 Des 2026
                   </div>
                 </div>
@@ -492,7 +492,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   color: "var(--muted)", flexShrink: 0,
                 }}>{s.icon}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 15, color: "var(--text)" }}>{s.label}</div>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontSize: 15, color: "var(--text)" }}>{s.label}</div>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{s.sublabel}</div>
                 </div>
                 {s.type === "toggle" ? (
