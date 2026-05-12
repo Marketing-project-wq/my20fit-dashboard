@@ -190,7 +190,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                 <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 30, letterSpacing: 0.5, color: "var(--text)" }}>
                   NUTRISI HARIAN
                 </div>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, color: "var(--muted)" }}>
+                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 14, color: "var(--muted)" }}>
                   {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}
                 </div>
               </div>
@@ -223,7 +223,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                   <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, letterSpacing: 1.5, color: "#92400E", marginBottom: 2 }}>
                     REKOMENDASI UMUM
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "#78350F", lineHeight: 1.4 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "#78350F", lineHeight: 1.4 }}>
                     Upload hasil MCU untuk rekomendasi yang lebih personal berdasarkan kondisi kesehatanmu.
                   </div>
                 </div>
@@ -324,7 +324,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                     }} />
                   </div>
 
-                  <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>
                     {recommendation.hydration.reminder}
                   </div>
                 </div>
@@ -366,7 +366,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                                 </span>
                               )}
                             </div>
-                            <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)" }}>{meal.time_range}</div>
+                            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: "var(--muted)" }}>{meal.time_range}</div>
                           </div>
                         </div>
                         <ChevronDown size={16} color="var(--muted)" style={{ transform: isExpanded ? "rotate(180deg)" : "none", transition: "transform .2s" }} />
@@ -378,8 +378,8 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           {meal.suggestions.map((s, i) => (
                             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                               <div>
-                                <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</span>
-                                <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>{s.portion}</span>
+                                <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 14, color: "var(--text)" }}>{s.name}</span>
+                                <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>{s.portion}</span>
                                 {s.tags?.map(tag => (
                                   <span key={tag} style={{ display: "inline-block", background: "rgba(196,17,1,.08)", color: "#C41101", fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: 1, padding: "2px 6px", borderRadius: 4, marginLeft: 6 }}>
                                     {tag}
@@ -414,7 +414,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           {meal.reason && (
                             <div style={{ marginTop: 10, background: "var(--bg)", borderRadius: 8, padding: "10px 12px", display: "flex", gap: 8 }}>
                               <Info size={14} color="var(--muted)" style={{ flexShrink: 0, marginTop: 2 }} />
-                              <span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>{meal.reason}</span>
+                              <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>{meal.reason}</span>
                             </div>
                           )}
                         </div>
@@ -438,8 +438,8 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           <X size={14} color="#EF4444" />
                         </div>
                         <div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 14, fontWeight: 600, color: "var(--text)" }}>{item.food}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{item.reason}</div>
+                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 14, color: "var(--text)" }}>{item.food}</div>
+                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{item.reason}</div>
                         </div>
                       </div>
                     ))}
@@ -459,11 +459,11 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                         <div>
                           <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)" }}>{s.reason}</div>
+                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{s.reason}</div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           <div style={{ fontFamily: "'JetBrains Mono'", fontWeight: 700, fontSize: 12, color: "#C41101" }}>{s.dose}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)" }}>{s.timing}</div>
+                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 11, color: "var(--muted)" }}>{s.timing}</div>
                         </div>
                       </div>
                     ))}
@@ -476,7 +476,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
               {/* Section 6: Disclaimer */}
               <div style={{ padding: "12px 16px", background: "var(--bg)", borderRadius: 10, marginBottom: 8 }}>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)", lineHeight: 1.5, textAlign: "center" }}>
+                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontStyle: "italic", fontSize: 11, color: "var(--muted)", lineHeight: 1.5, textAlign: "center" }}>
                   🤖 Rekomendasi ini dibuat oleh AI berdasarkan data kesehatanmu.
                   Bukan pengganti saran dokter atau ahli gizi.
                   Selalu konsultasikan perubahan diet signifikan dengan tenaga medis.

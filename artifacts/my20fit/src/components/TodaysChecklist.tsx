@@ -267,7 +267,7 @@ export default function TodaysChecklist() {
               {task.desc && (
                 <p
                   className="truncate"
-                  style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "12px", color: "var(--muted)" }}
+                  style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
                 >
                   {task.desc}
                 </p>

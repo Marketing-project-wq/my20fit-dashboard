@@ -1,0 +1,209 @@
+Fix font hierarchy across the entire app.
+The problem: everything looks the same weight and style.
+Apply strict font rules by element type.
+
+---
+
+## THE RULE (apply everywhere, no exceptions):
+
+Anton → ONLY for: page titles, section titles, 
+card headlines, button text, nav labels, modal titles,
+grade letters, ALL CAPS display text.
+Weight: normal (Anton has no bold variant)
+Never use on body text, descriptions, or labels.
+
+Barlow Condensed 900 → ONLY for: 
+uppercase tracked labels (HUMIDITY, TODAY, COMPLETE, HIGH),
+tag/badge/pill text, small caps metadata.
+Always: fontWeight: 900, letterSpacing: '1.5px or more'
+Never use for long descriptions or body paragraphs.
+
+Barlow Condensed 900 Italic → ONLY for:
+body descriptions, subtitles, condition text,
+AI-generated summaries, tips, hints, motivational text,
+anything that is a sentence or paragraph.
+Always: fontWeight: 900, fontStyle: 'italic'
+
+JetBrains Mono → ONLY for:
+ALL numbers — temperature, AQI, BMI, weight, time,
+progress counters, percentages, calories, distances.
+Never use on words.
+
+---
+
+## SEARCH AND FIX ALL FILES IN src/
+
+For every element in every component, ask:
+"Is this a number?" → JetBrains Mono
+"Is this a short uppercase label/tag?" → Barlow 900 tracked
+"Is this a sentence/description?" → Barlow 900 italic  
+"Is this a title/headline/button?" → Anton
+
+---
+
+## SPECIFIC FIXES PER COMPONENT:
+
+### Greeting:
+- "SELAMAT SIANG · SENIN 4 MEI" → Barlow 900, 9px, tracked 3px, NOT italic
+- "ZIDNI" (name) → Anton 48px
+- "Stay consistent, stay strong." → Barlow 900 ITALIC 11px
+- Chip labels ("🔥 3 HARI STREAK") → Barlow 900, 9px, tracked 1.5px, NOT italic
+
+### WeatherCard:
+- "SIMPRUG · SEKARANG" → Barlow 900, 8px, tracked 2px
+- Temperature "27" → JetBrains Mono 52px
+- "°" degree → JetBrains Mono 20px
+- "Hujan deras disertai petir" → Barlow 900 ITALIC 10px
+- "AQI" label → Barlow 900, 7px, tracked 2px
+- "167" number → JetBrains Mono 22px
+- "UNHEALTHY" → Barlow 900, 7px, tracked 1.5px
+- "89%" "1.2" "9" "62" stat values → JetBrains Mono 14px
+- "HUMIDITY" "UV INDEX" "WIND" "PM2.5" → Barlow 900, 7px, tracked 1.5px
+- "INDOOR HARI INI" rec title → Anton 13px
+- "AQI berbahaya + petir" → Barlow 900 ITALIC 9px
+
+### TodaysChecklist:
+- "TODAY'S CHECKLIST" section header → Barlow 900, 9px, tracked 3px
+- "TODAY" label → Barlow 900, 7px, tracked 2px
+- "Mon 4 May" date → Anton 17px
+- "3" "/" "5" progress → JetBrains Mono 24px
+- "COMPLETE" label → Barlow 900, 7px, tracked 1.5px
+- Item name "30-min cardio" → Barlow 900, 13px, NOT italic
+- Item sub "based on your cholesterol" → Barlow 900 ITALIC 10px
+- Tags "HIGH" "30 MIN" "GYM" → Barlow 900, 8px, tracked 1px
+
+### MedicalCheckup:
+- "MEDICAL CHECKUP" section → Barlow 900, 9px, tracked 3px
+- "NO MCU ON FILE YET" → Anton 20px
+- Description paragraph → Barlow 900 ITALIC 13px
+- Feature tile labels "Reviewed by doctor" → Barlow 900, 12px, NOT italic
+- "UPLOAD MCU RESULTS" button → Anton 14px, tracked 1.5px
+- Grade "A"/"B"/"C"/"D" → Anton 32px
+- "YOUR HEALTH BASELINE" → Anton 16px
+- MCU summary paragraph → Barlow 900 ITALIC 13px
+- Metric label "BMI" "Kolesterol" → Barlow 900, 10px, tracked 1.5px
+- Metric value "23.4" "210" → JetBrains Mono 18px
+
+### QuickCheckin:
+- "QUICK CHECK-IN" section → Barlow 900, 9px, tracked 3px
+- Tile title "MENSTRUAL CYCLE" → Anton 12px
+- Tile value "Luteal · Hari 22" → Barlow 900 ITALIC 9px
+- Modal title "Siklus Menstruasi" → Anton 22px
+- Modal field label "HARI PERTAMA HAID TERAKHIR" → Barlow 900, 10px, tracked 2px
+- Cycle day number "22" → JetBrains Mono 28px
+- "hari" unit → Barlow 900 ITALIC 13px
+- Phase "Luteal" → Barlow 900, 12px, tracked 1px
+- Mood label "SUASANA HATI" → Barlow 900, 10px, tracked 2px
+- Mood text "Luar Biasa" → Barlow 900 ITALIC 10px
+- Slider value "7" → JetBrains Mono 16px
+- Slider label "ENERGI LEVEL" → Barlow 900, 10px, tracked 2px
+- Energy text "Normal" → Barlow 900 ITALIC 10px
+- Sleep duration "7" "30" → JetBrains Mono 36px
+- "jam" "menit" units → Barlow 900 ITALIC 13px
+- Quality badge "Ideal" → Barlow 900, 11px, tracked 1px
+- Tip text → Barlow 900 ITALIC 12px
+- Water "8" "/" "21" → JetBrains Mono 40px
+- "gelas" → Barlow 900 ITALIC 13px
+- Quick add button "+1 Gelas" → Anton 14px
+- "250ml" → JetBrains Mono 10px
+
+### Progress:
+- "PROGRESS" title → Anton 32px
+- "Pantau perkembangan..." → Barlow 900 ITALIC 14px
+- "1M" "3M" filter pills → Barlow 900, 11px, tracked 1px
+- "RINGKASAN TREN" → Barlow 900, 10px, tracked 2.5px
+- "BERAT BADAN" metric label → Barlow 900, 10px, tracked 2px
+- Weight value "72.5" → JetBrains Mono 28px
+- "kg" unit → Barlow 900 ITALIC 12px
+- Status "Normal" "Overweight" → Barlow 900, 10px, tracked 1px
+- "vs entri sebelumnya" → Barlow 900 ITALIC 11px
+- Trend "+0.5%" → JetBrains Mono 12px
+- Chart axis labels → JetBrains Mono 10px
+- "RIWAYAT LATIHAN" → Barlow 900, 10px, tracked 2.5px
+- Workout type "CARDIO" → Anton 14px
+- Duration "45" → JetBrains Mono 16px
+- "menit" → Barlow 900 ITALIC 11px
+- "Minggu ini · 3 sesi · 210 menit" → Barlow 900, 11px
+
+### Nutrition:
+- "NUTRISI HARIAN" → Anton 32px
+- Date text → Barlow 900 ITALIC 14px
+- "REFRESH" button → Barlow 900, 12px, tracked 2px
+- "GOAL NUTRISI HARI INI" → Barlow 900, 10px, tracked 2.5px
+- Goal sentence → Barlow 900 ITALIC 15px
+- "KALORI" "PROTEIN" "KARBO" "LEMAK" → Barlow 900, 8px, tracked 2px
+- Calorie values "1800" "130g" → JetBrains Mono 18px
+- Meal time "Sarapan" → Anton 16px
+- Time range "06:00 - 09:00" → JetBrains Mono 11px
+- Food name "Oatmeal + telur rebus" → Barlow 900, 14px, NOT italic
+- Portion "1 porsi" → Barlow 900 ITALIC 11px
+- Calorie "350" → JetBrains Mono 13px
+- Tag "Protein Tinggi" → Barlow 900, 9px, tracked 1px
+- "HINDARI" label → Barlow 900, 10px, tracked 2px, color red
+- Reason text → Barlow 900 ITALIC 12px
+- Insight paragraph → Barlow 900 ITALIC 13px
+- "SUPLEMEN REKOMENDASI" → Barlow 900, 10px, tracked 2.5px
+- Supplement name → Anton 15px
+- Dose "500mg" → JetBrains Mono 13px
+- Timing "Setelah makan" → Barlow 900 ITALIC 11px
+- Disclaimer → Barlow 900 ITALIC 11px
+
+### Profile:
+- "ZIDNI" name → Anton 26px
+- Email → Barlow 900 ITALIC 13px
+- "⭐ PLUS MEMBER" badge → Barlow 900, 10px, tracked 1.5px
+- "Member sejak..." → Barlow 900 ITALIC 11px
+- "BERAT" "BMI" "TINGGI" quick stat labels → Barlow 900, 8px, tracked 2px
+- Stat values "72" "23.4" "175" → JetBrains Mono 22px
+- Units "kg" "cm" → Barlow 900 ITALIC 11px
+- "INFORMASI PERSONAL" section → Barlow 900, 9px, tracked 3px
+- Row label "Nama Lengkap" → Barlow 900, 11px, tracked 1px
+- Row value "ZIDNI DHIRA" → Barlow 900, 15px, NOT italic
+- "STATUS MCU" → Barlow 900, 9px, tracked 3px
+- "Grade B · Health Baseline" → Anton 16px
+- "Dianalisis baru-baru ini" → Barlow 900 ITALIC 12px
+- Settings label "Notifikasi" → Barlow 900, 15px, NOT italic
+- Settings sub "Reminder checklist..." → Barlow 900 ITALIC 12px
+- "KELUAR DARI AKUN" button → Anton 15px, tracked 1.5px
+- "my20FIT" app name → Anton 18px
+- "Version 1.0.0" → JetBrains Mono 12px
+- Copyright → Barlow 900 ITALIC 11px
+
+### Sidebar:
+- "MY20FIT" logo → Anton 18px (keep as is)
+- Nav labels "HOME" "PROGRESS" etc → Anton 14px, tracked 1px (keep as is)
+- Username → Anton 14px
+- "PLUS MEMBER" badge → Barlow 900, 10px, tracked 1.5px
+- Email → Barlow 900 ITALIC 11px
+- "DARK MODE" "KELUAR" buttons → Anton 12px, tracked 1px
+
+### Login:
+- "ELEVATE" "EVERY" "METRIC" → Anton large
+- Tab "Masuk" "Daftar" → Anton 14px
+- Form title "Masuk ke my20fit." → Anton 26px
+- Field label "EMAIL" "PASSWORD" → Barlow 900, 10px, tracked 2px
+- Field placeholder → Barlow 900 ITALIC, color muted
+- Button "MASUK →" "DAFTAR GRATIS →" → Anton 15px, tracked 1.5px
+- "atau masuk dengan email" → Barlow 900 ITALIC 12px
+- Terms text → Barlow 900 ITALIC 11px
+- Switch "Belum punya akun?" → Barlow 900 ITALIC 12px
+- Feature title "Program Khusus Untukmu" → Anton 14px
+- Feature desc → Barlow 900 ITALIC 12px
+
+### BottomNav:
+- Tab labels "Home" "Nutrition" etc → Anton 10px
+
+---
+
+## FINAL CHECKS
+
+After updating all files:
+1. grep -r "fontWeight.*700\|fontWeight.*600\|fontWeight.*800" src/ 
+   → All should be either 900 (Barlow) or removed (Anton/JetBrains)
+2. grep -r "Orbitron\|Bebas Neue" src/
+   → Should return empty
+3. Any text that is a number → verify JetBrains Mono
+4. Any text over 2 words that is a sentence → verify italic
+5. Any short uppercase label → verify tracked letterSpacing
+
+npm run build — fix all errors before finishing.

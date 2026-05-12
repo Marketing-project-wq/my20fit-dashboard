@@ -224,7 +224,7 @@ export default function MedicalCheckup() {
           <button
             onClick={handleClear}
             className="flex items-center gap-1 transition-opacity hover:opacity-70"
-            style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "12px", color: "var(--muted)" }}
+            style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
             data-testid="button-upload-new-mcu"
           >
             <RotateCcw size={11} />
@@ -262,7 +262,7 @@ export default function MedicalCheckup() {
             <h3 className="mb-2" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "20px", letterSpacing: "0.5px", color: "var(--text)" }}>
               No MCU on file yet
             </h3>
-            <p className="mb-6 max-w-[280px]" style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "14px", color: "var(--muted)", lineHeight: 1.5 }}>
+            <p className="mb-6 max-w-[280px]" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "14px", color: "var(--muted)", lineHeight: 1.5 }}>
               Upload your medical checkup results and 20FIT Sport Clinic will review them to give you a training &amp; nutrition program tailored to your body.
             </p>
             <div className="grid grid-cols-2 gap-3 w-full mb-6">
@@ -283,7 +283,7 @@ export default function MedicalCheckup() {
                 UPLOAD MCU RESULTS
               </button>
               {fileValidationError && (
-                <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "#C41101", textAlign: "center" }}>
+                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "#C41101", textAlign: "center" }}>
                   {fileValidationError}
                 </p>
               )}
@@ -312,7 +312,7 @@ export default function MedicalCheckup() {
             <p className="mb-1" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "18px", letterSpacing: "1px", color: "var(--text)" }}>
               Menganalisis dokumen MCU kamu...
             </p>
-            <p className="mb-6" style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "var(--muted)" }}>
+            <p className="mb-6" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "var(--muted)" }}>
               AI sedang membaca hasil pemeriksaan
             </p>
             <div className="w-full rounded-full overflow-hidden" style={{ backgroundColor: "var(--card2)", height: "6px" }}>
@@ -332,11 +332,11 @@ export default function MedicalCheckup() {
               <div style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "17px", color: "#991B1B", marginBottom: "6px" }}>
                 {uploadError.title}
               </div>
-              <div style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "#7F1D1D", lineHeight: 1.5, marginBottom: uploadError.hint ? "10px" : "16px" }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "#7F1D1D", lineHeight: 1.5, marginBottom: uploadError.hint ? "10px" : "16px" }}>
                 {uploadError.message}
               </div>
               {uploadError.hint && (
-                <div style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "12px", color: "#6E665C", background: "rgba(0,0,0,.04)", borderRadius: "8px", padding: "10px 12px", marginBottom: "16px", lineHeight: 1.4 }}>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "#6E665C", background: "rgba(0,0,0,.04)", borderRadius: "8px", padding: "10px 12px", marginBottom: "16px", lineHeight: 1.4 }}>
                   {uploadError.hint}
                 </div>
               )}
@@ -356,13 +356,13 @@ export default function MedicalCheckup() {
           <motion.div key="success" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="app-card !p-6 flex flex-col gap-5">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${gradeColor[result.grade]}20` }}>
-                <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "32px", fontWeight: 700, color: gradeColor[result.grade] }}>
+                <span style={{ fontFamily: "'Anton', sans-serif", fontSize: "32px", color: gradeColor[result.grade] }}>
                   {result.grade}
                 </span>
               </div>
               <div>
                 <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "11px", letterSpacing: "1px", color: "var(--muted)" }}>YOUR HEALTH BASELINE</p>
-                <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "14px", color: "var(--text)", lineHeight: 1.5, marginTop: "2px" }}>{result.summary}</p>
+                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "14px", color: "var(--text)", lineHeight: 1.5, marginTop: "2px" }}>{result.summary}</p>
               </div>
             </div>
 
@@ -375,11 +375,11 @@ export default function MedicalCheckup() {
                     return (
                       <div key={i} className="rounded-lg p-3" style={{ backgroundColor: "var(--card2)" }}>
                         <div className="flex items-center justify-between mb-1">
-                          <span style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "11px", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "1px" }}>{m.label}</span>
+                          <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "11px", color: "var(--muted)", textTransform: "uppercase", letterSpacing: "1px" }}>{m.label}</span>
                           <span className="px-1.5 py-0.5 rounded" style={{ backgroundColor: badge.bg, color: badge.text, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "1px" }}>{badge.label}</span>
                         </div>
                         <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "14px", fontWeight: 600, color: "var(--text)" }}>{m.value}</p>
-                        {m.note && <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "11px", color: "var(--muted)", marginTop: "2px" }}>{m.note}</p>}
+                        {m.note && <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "11px", color: "var(--muted)", marginTop: "2px" }}>{m.note}</p>}
                       </div>
                     );
                   })}
@@ -390,7 +390,7 @@ export default function MedicalCheckup() {
             {result.doctor_notes && (
               <div className="rounded-lg p-4" style={{ backgroundColor: "var(--card2)", borderLeft: "3px solid var(--red)" }}>
                 <p className="mb-1" style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "10px", letterSpacing: "1.5px", color: "var(--red)" }}>CATATAN DOKTER</p>
-                <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "var(--text-soft)", lineHeight: 1.5 }}>{result.doctor_notes}</p>
+                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "var(--text-soft)", lineHeight: 1.5 }}>{result.doctor_notes}</p>
               </div>
             )}
 
@@ -401,7 +401,7 @@ export default function MedicalCheckup() {
                   {result.recommendations.map((r, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ backgroundColor: "var(--red)" }} />
-                      <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "var(--text-soft)", lineHeight: 1.4 }}>{r}</p>
+                      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "var(--text-soft)", lineHeight: 1.4 }}>{r}</p>
                     </div>
                   ))}
                 </div>
@@ -409,11 +409,11 @@ export default function MedicalCheckup() {
             )}
 
             <div className="flex items-center justify-between pt-3" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-              <p style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "11px", color: "var(--muted)" }}>Reviewed by AI · {result.reviewed_at}</p>
+              <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "11px", color: "var(--muted)" }}>Reviewed by AI · {result.reviewed_at}</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="flex items-center gap-1 transition-opacity hover:opacity-70"
-                style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "12px", color: "var(--muted)" }}
+                style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
                 data-testid="button-reupload-mcu"
               >
                 <Upload size={11} />
@@ -455,7 +455,7 @@ export default function MedicalCheckup() {
                   <AlertTriangle size={18} color="#D97706" style={{ flexShrink: 0, marginTop: 2 }} />
                   <div>
                     <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "13px", letterSpacing: "1px", color: "#92400E", marginBottom: "4px" }}>NAMA TIDAK SESUAI</div>
-                    <div style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: "13px", color: "#78350F", lineHeight: 1.4 }}>
+                    <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "13px", color: "#78350F", lineHeight: 1.4 }}>
                       Nama di dokumen: <strong>{detectedName}</strong><br />
                       Nama akun kamu: <strong>{userName}</strong><br />
                       Pastikan ini adalah hasil MCU milikmu sendiri.
@@ -469,12 +469,12 @@ export default function MedicalCheckup() {
                 {detectedName && (
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: "1.5px", color: "#6E665C", minWidth: 130 }}>NAMA PASIEN</span>
-                    <span style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: 13, color: "#0A0908" }}>{detectedName}</span>
+                    <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 13, color: "#0A0908" }}>{detectedName}</span>
                   </div>
                 )}
                 <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: "1.5px", color: "#6E665C", minWidth: 130 }}>JENIS DOKUMEN</span>
-                  <span style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: 13, color: "#0A0908" }}>Medical Checkup / Lab Result</span>
+                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 13, color: "#0A0908" }}>Medical Checkup / Lab Result</span>
                 </div>
                 {pendingResult?.grade && (
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -506,7 +506,7 @@ export default function MedicalCheckup() {
                     </div>
                     <span
                       onClick={() => setChecks((prev) => prev.map((v, idx) => (idx === i ? !v : v)))}
-                      style={{ fontFamily: "'Barlow Condensed', system-ui", fontSize: 13, color: "#0A0908", lineHeight: 1.5 }}
+                      style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 13, color: "#0A0908", lineHeight: 1.5 }}
                     >
                       {label}
                     </span>
@@ -533,7 +533,7 @@ export default function MedicalCheckup() {
 
               <button
                 onClick={handleConfirmCancel}
-                style={{ display: "block", width: "100%", marginTop: 12, background: "none", border: "none", cursor: "pointer", fontFamily: "'Barlow Condensed', system-ui", fontSize: 13, color: "#9E9891", textAlign: "center" }}
+                style={{ display: "block", width: "100%", marginTop: 12, background: "none", border: "none", cursor: "pointer", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 13, color: "#9E9891", textAlign: "center" }}
               >
                 Batal
               </button>

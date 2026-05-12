@@ -286,7 +286,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 26, color: "#fff", letterSpacing: 1 }}>
                   {mockUser.name}
                 </div>
-                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 13, color: "rgba(255,255,255,.55)", marginTop: 2 }}>
+                <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 13, color: "rgba(255,255,255,.55)", marginTop: 2 }}>
                   {mockUser.email}
                 </div>
               </div>
@@ -295,7 +295,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 {mockUser.isPlusMember && (
                   <span style={{
                     background: "linear-gradient(135deg, #D4A800, #FFD700)", color: "#0A0908",
-                    fontFamily: "'Anton', sans-serif", fontSize: 10, letterSpacing: 1.5,
+                    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: 1.5,
                     padding: "4px 12px", borderRadius: 99,
                   }}>⭐ PLUS MEMBER</span>
                 )}
@@ -324,7 +324,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 22, fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>
                   {stat.value}
                   {stat.unit && (
-                    <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "var(--muted)", marginLeft: 2 }}>
+                    <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginLeft: 2 }}>
                       {stat.unit}
                     </span>
                   )}
@@ -385,7 +385,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 16, color: "var(--text)", marginBottom: 2 }}>
                     Grade {mcu.grade} · Health Baseline
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "var(--muted)" }}>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
                     Dianalisis {mcu.reviewed_at || "baru-baru ini"}
                   </div>
                 </div>
@@ -407,7 +407,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 15, color: "var(--text)", marginBottom: 2 }}>
                     Belum ada MCU
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "var(--muted)" }}>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
                     Upload untuk program personal
                   </div>
                 </div>
@@ -432,7 +432,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     ⭐ 20FIT PLUS AKTIF
                   </div>
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 20, color: "#fff" }}>MEMBER AKTIF</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "rgba(255,255,255,.5)", marginTop: 4 }}>
                     Berlaku hingga: 31 Des 2026
                   </div>
                 </div>
@@ -454,7 +454,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 ⭐ 20FIT PLUS
               </div>
               <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, color: "#fff", marginBottom: 4 }}>UPGRADE SEKARANG</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 16 }}>
+              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 16 }}>
                 Hemat 10% di semua layanan 20FIT
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -493,7 +493,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 }}>{s.icon}</div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 15, color: "var(--text)" }}>{s.label}</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "var(--muted)" }}>{s.sublabel}</div>
+                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{s.sublabel}</div>
                 </div>
                 {s.type === "toggle" ? (
                   <Toggle
@@ -512,10 +512,10 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
             <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: "var(--text)", marginBottom: 2 }}>
               my<span style={{ color: "#C41101" }}>20</span>FIT
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 12, color: "var(--muted)" }}>
+            <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, color: "var(--muted)" }}>
               Version 1.0.0 · Build 2026.05
             </div>
-            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
+            <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: 11, color: "var(--muted)", marginTop: 4 }}>
               © 2026 20FIT · PT Kredo Aum
             </div>
           </div>
