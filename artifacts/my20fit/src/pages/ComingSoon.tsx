@@ -20,7 +20,6 @@ export default function ComingSoon({
         color: 'var(--text)',
       }}
     >
-      <div className="top-fade-overlay" />
       <Sidebar theme={theme} toggleTheme={toggleTheme} />
       <main className="flex-1 w-full lg:pl-[220px]">
         <div className="max-w-[720px] mx-auto w-full px-4 md:px-6 lg:px-8 pb-24 pt-2 lg:pt-8 min-h-screen flex flex-col">

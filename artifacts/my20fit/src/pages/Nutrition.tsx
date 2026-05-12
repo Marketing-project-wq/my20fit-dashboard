@@ -176,7 +176,6 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
         .spin-slow { animation: spin 1s linear infinite; }
       `}</style>
 
-      <div className="top-fade-overlay" />
       <Sidebar theme={theme} toggleTheme={toggleTheme} />
 
       <main className="flex-1 w-full lg:pl-[220px]">

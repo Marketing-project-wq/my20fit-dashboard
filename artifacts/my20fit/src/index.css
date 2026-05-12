@@ -313,20 +313,6 @@
   box-shadow: 0 10px 24px rgba(196,17,1,0.3);
 }
 
-/* Top fade overlay */
-.top-fade-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 120px;
-  pointer-events: none;
-  z-index: 40;
-  background: linear-gradient(to bottom, rgba(244,242,238,1) 0%, transparent 100%);
-}
-.dark .top-fade-overlay {
-  background: linear-gradient(to bottom, rgba(10,10,10,1) 0%, transparent 100%);
-}
 
 .section-header {
   display: flex;

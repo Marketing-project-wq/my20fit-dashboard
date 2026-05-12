@@ -34,7 +34,6 @@ export default function Dashboard({ theme, toggleTheme }: { theme: string; toggl
       }}
     >
       {/* Top fade overlay */}
-      <div className="top-fade-overlay" />
 
       <Sidebar theme={theme} toggleTheme={toggleTheme} />
 

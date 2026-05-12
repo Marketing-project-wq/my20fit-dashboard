@@ -514,7 +514,6 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
       className="min-h-screen w-full flex"
       style={{ background: `radial-gradient(circle at 20% 10%, rgba(196,17,1,0.08) 0%, transparent 40%), var(--bg)`, color: "var(--text)" }}
     >
-      <div className="top-fade-overlay" />
       <Sidebar theme={theme} toggleTheme={toggleTheme} />
 
       <main className="flex-1 w-full lg:pl-[220px]">
