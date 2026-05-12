@@ -1,0 +1,565 @@
+Redesign and add new features to the Profile page.
+Keep all existing functionality — redesign layout + add new sections.
+
+---
+
+## STEP 1: HERO CARD REDESIGN
+
+Replace current hero with:
+
+<div style={{
+  background: 'linear-gradient(145deg, #0A0908 0%, #1C1710 55%, #221A08 100%)',
+  borderRadius: 22,
+  overflow: 'hidden',
+  position: 'relative',
+  padding: '24px 20px 20px',
+}}>
+  {/* Glows */}
+  <div style={{
+    position:'absolute', top:-50, right:-30,
+    width:180, height:180,
+    background:'radial-gradient(circle, rgba(196,17,1,.25) 0%, transparent 65%)',
+    pointerEvents:'none'
+  }}/>
+  <div style={{
+    position:'absolute', bottom:-40, left:-20,
+    width:150, height:150,
+    background:'radial-gradient(circle, rgba(212,168,0,.1) 0%, transparent 65%)',
+    pointerEvents:'none'
+  }}/>
+  {/* Texture */}
+  <div style={{
+    position:'absolute', inset:0,
+    backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,255,255,.008) 3px,rgba(255,255,255,.008) 4px)',
+    pointerEvents:'none'
+  }}/>
+
+  {/* Content */}
+  <div style={{ position:'relative', zIndex:1 }}>
+    {/* Top row: avatar + badge */}
+    <div style={{
+      display:'flex', alignItems:'flex-start',
+      justifyContent:'space-between', marginBottom:16
+    }}>
+      {/* Avatar with edit button */}
+      <div style={{ position:'relative' }}>
+        <div style={{
+          width:72, height:72, borderRadius:'50%',
+          background:'linear-gradient(135deg, #C41101, #8B0000)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontFamily:"'Anton', sans-serif", fontSize:26, color:'#fff',
+          border:'2px solid rgba(255,255,255,.12)',
+          cursor:'pointer'
+        }} onClick={() => setShowEditModal(true)}>
+          {getInitials(displayName)}
+        </div>
+        {/* Edit overlay on avatar */}
+        <div
+          onClick={() => setShowEditModal(true)}
+          style={{
+            position:'absolute', bottom:0, right:0,
+            width:22, height:22, borderRadius:'50%',
+            background:'#1A1710',
+            border:'1.5px solid rgba(255,255,255,.15)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            cursor:'pointer', zIndex:1
+          }}
+        >
+          <Pencil size={10} color="rgba(255,255,255,.6)"/>
+        </div>
+      </div>
+
+      {/* Plus badge */}
+      {isPlusMember ? (
+        <div style={{
+          background:'linear-gradient(135deg, rgba(212,168,0,.2), rgba(212,168,0,.1))',
+          border:'0.5px solid rgba(212,168,0,.35)',
+          borderRadius:99, padding:'5px 12px',
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:8,
+          letterSpacing:'1.5px', color:'#D4A800'
+        }}>⭐ PLUS MEMBER</div>
+      ) : (
+        <div style={{
+          background:'rgba(255,255,255,.06)',
+          border:'0.5px solid rgba(255,255,255,.1)',
+          borderRadius:99, padding:'5px 12px',
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:8,
+          letterSpacing:'1.5px', color:'rgba(255,255,255,.35)'
+        }}>FREE MEMBER</div>
+      )}
+    </div>
+
+    {/* Name */}
+    <div style={{
+      fontFamily:"'Anton', sans-serif",
+      fontSize:36, color:'#fff',
+      lineHeight:.95, letterSpacing:-0.5,
+      marginBottom:3
+    }}>{displayName.toUpperCase()}</div>
+
+    {/* Email + join date */}
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:400, fontStyle:'italic',
+      fontSize:12, color:'rgba(255,255,255,.4)',
+      marginBottom:16
+    }}>
+      {userEmail} · Member sejak {joinDate}
+    </div>
+
+    {/* Stats row */}
+    <div style={{
+      display:'grid', gridTemplateColumns:'repeat(3,1fr)',
+      borderTop:'0.5px solid rgba(255,255,255,.08)',
+      paddingTop:14, gap:0
+    }}>
+      {[
+        { value: totalWorkouts || '0', label: 'SESI' },
+        { value: currentStreak || '0', label: 'STREAK' },
+        { value: mcuGrade || '—', label: 'GRADE' },
+      ].map((s, i) => (
+        <div key={i} style={{
+          textAlign:'center',
+          borderRight: i < 2 ? '0.5px solid rgba(255,255,255,.08)' : 'none',
+          padding:'0 4px'
+        }}>
+          <div style={{
+            fontFamily:"'JetBrains Mono', monospace",
+            fontSize:18, fontWeight:700, color:'#fff', lineHeight:1
+          }}>{s.value}</div>
+          <div style={{
+            fontFamily:"'Barlow Condensed', sans-serif",
+            fontWeight:900, fontSize:7,
+            letterSpacing:'2px', color:'rgba(255,255,255,.25)',
+            marginTop:3
+          }}>{s.label}</div>
+        </div>
+      ))}
+    </div>
+
+    {/* Divider line red to gold */}
+    <div style={{
+      height:'0.5px',
+      background:'linear-gradient(90deg, rgba(196,17,1,.5), rgba(212,168,0,.2), transparent)',
+      marginTop:14
+    }}/>
+  </div>
+</div>
+
+Compute these values:
+- displayName: from localStorage my20fit profile or mock
+- userEmail: from auth or mock
+- joinDate: format as "Jan 2026"
+- totalWorkouts: from localStorage my20fit_workouts array length
+- currentStreak: from localStorage my20fit_checklist_date streaks
+- mcuGrade: from localStorage my20fit_mcu_result?.grade || '—'
+- isPlusMember: true (mock for now)
+
+function getInitials(name) {
+  return name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()
+}
+
+---
+
+## STEP 2: PERSONAL INFO SECTION
+
+Replace current info rows with icon box style:
+
+{[
+  { icon: <User size={16}/>, label:'NAMA LENGKAP', value: displayName, mono: false },
+  { icon: <Mail size={16}/>, label:'EMAIL', value: userEmail, mono: false },
+  { icon: <Phone size={16}/>, label:'NOMOR HP', value: userPhone, mono: true },
+  { icon: <Venus size={16}/>, label:'JENIS KELAMIN',
+    value: gender==='male'?'Laki-laki': gender==='female'?'Perempuan':'Belum diisi',
+    mono: false },
+  { icon: <Ruler size={16}/>, label:'TINGGI BADAN',
+    value: height, unit:'cm', mono: true },
+].map((row, i) => (
+  <div key={i} onClick={() => setShowEditModal(true)} style={{
+    display:'flex', alignItems:'center',
+    padding:'13px 16px', gap:12,
+    borderBottom: i < 4 ? '0.5px solid rgba(20,17,12,.05)' : 'none',
+    cursor:'pointer'
+  }}>
+    {/* Icon box */}
+    <div style={{
+      width:32, height:32, borderRadius:8,
+      background:'#F4F0E8',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      color:'#9E8E7A', flexShrink:0
+    }}>{row.icon}</div>
+
+    <div style={{ flex:1, minWidth:0 }}>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:10,
+        letterSpacing:'1.5px', color:'#B0A090'
+      }}>{row.label}</div>
+      <div style={{
+        fontFamily: row.mono ? "'JetBrains Mono', monospace" : "'Barlow Condensed', sans-serif",
+        fontWeight:400, fontSize: row.mono ? 13 : 14,
+        color: row.value==='Belum diisi' ? '#C8BFB0' : 'var(--text)',
+        marginTop:1
+      }}>
+        {row.value}
+        {row.unit && (
+          <span style={{
+            fontFamily:"'Barlow Condensed', sans-serif",
+            fontWeight:400, fontStyle:'italic',
+            fontSize:11, color:'#9E8E7A', marginLeft:3
+          }}>{row.unit}</span>
+        )}
+      </div>
+    </div>
+
+    <ChevronRight size={14} color="#D0C8BC"/>
+  </div>
+))}
+
+---
+
+## STEP 3: HEALTH SNAPSHOT SECTION (NEW)
+
+Add new section "KESEHATAN" between info and MCU:
+
+Read from localStorage:
+- latestEntry: most recent my20fit_progress_entries item
+- mcuData: my20fit_mcu_result
+- latestWeight: latestEntry?.weight || from mcuData metrics
+- latestBMI: latestEntry?.bmi
+- latestHR: latestEntry?.restingHr
+
+{/* Health snapshot card */}
+<div style={{
+  background:'var(--card)', borderRadius:16,
+  padding:16, boxShadow:'var(--shadow-sm)'
+}}>
+  {/* Header */}
+  <div style={{
+    display:'flex', alignItems:'center',
+    justifyContent:'space-between', marginBottom:12
+  }}>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:9,
+      letterSpacing:'2px', color:'var(--muted)'
+    }}>SNAPSHOT TERKINI</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:400, fontStyle:'italic',
+      fontSize:10, color:'var(--muted)'
+    }}>
+      {latestEntry ? `Update ${formatRelativeDate(latestEntry.date)}` : 'Belum ada data'}
+    </div>
+  </div>
+
+  {/* 3-col metric grid */}
+  <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8 }}>
+    {[
+      {
+        label:'BERAT', value:latestWeight, unit:'kg',
+        color:'#C41101', trend:weightTrend
+      },
+      {
+        label:'BMI', value:latestBMI, unit:'',
+        color:'#3B82F6', status:getBMIStatus(latestBMI)
+      },
+      {
+        label:'RESTING HR', value:latestHR, unit:'bpm',
+        color:'#EF4444', status:getHRStatus(latestHR)
+      },
+    ].map((m, i) => (
+      <div key={i} style={{
+        background:'#F4F0E8',
+        borderRadius:10, padding:'10px 8px',
+        textAlign:'center', position:'relative',
+        overflow:'hidden'
+      }}>
+        {/* Top color bar */}
+        <div style={{
+          position:'absolute', top:0, left:0, right:0,
+          height:2.5, background:m.color, borderRadius:0
+        }}/>
+        <div style={{
+          fontFamily:"'JetBrains Mono', monospace",
+          fontSize:18, fontWeight:700,
+          color:'var(--text)', lineHeight:1, marginTop:4
+        }}>
+          {m.value || '—'}
+          {m.unit && (
+            <span style={{
+              fontFamily:"'Barlow Condensed', sans-serif",
+              fontWeight:400, fontStyle:'italic',
+              fontSize:9, color:'var(--muted)', marginLeft:2
+            }}>{m.unit}</span>
+          )}
+        </div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:900, fontSize:7,
+          letterSpacing:'1.5px', color:'var(--muted)',
+          marginTop:3
+        }}>{m.label}</div>
+        {m.status && (
+          <div style={{
+            fontFamily:"'Barlow Condensed', sans-serif",
+            fontWeight:400, fontStyle:'italic',
+            fontSize:8, marginTop:2,
+            color: m.status==='Normal'||m.status==='Baik'||m.status==='Excellent'
+              ? '#22C55E' : '#EAB308'
+          }}>{m.status}</div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  {/* MCU grade bar */}
+  {mcuData && (
+    <div style={{
+      marginTop:10, background:'#F4F0E8',
+      borderRadius:10, padding:'10px 12px',
+      display:'flex', alignItems:'center', gap:8
+    }}>
+      <div style={{ fontSize:18 }}>🩺</div>
+      <div style={{ flex:1 }}>
+        <div style={{
+          fontFamily:"'Anton', sans-serif",
+          fontSize:13, color:'var(--text)'
+        }}>HEALTH GRADE {mcuData.grade}</div>
+        <div style={{
+          fontFamily:"'Barlow Condensed', sans-serif",
+          fontWeight:400, fontStyle:'italic',
+          fontSize:10, color:'var(--muted)', marginTop:1
+        }}>Dianalisis dari MCU · {mcuData.reviewed_at || 'baru-baru ini'}</div>
+      </div>
+      <button
+        onClick={() => navigate('/')}
+        style={{
+          background:'none', border:'none',
+          fontFamily:"'Anton', sans-serif",
+          fontSize:11, color:'#C41101',
+          cursor:'pointer', letterSpacing:'0.5px'
+        }}
+      >LIHAT →</button>
+    </div>
+  )}
+</div>
+
+Helper functions:
+function getBMIStatus(bmi) {
+  if (!bmi) return null
+  if (bmi < 18.5) return 'Underweight'
+  if (bmi < 25) return 'Normal'
+  if (bmi < 30) return 'Overweight'
+  return 'Obese'
+}
+function getHRStatus(hr) {
+  if (!hr) return null
+  if (hr < 60) return 'Athlete'
+  if (hr < 70) return 'Excellent'
+  if (hr < 80) return 'Baik'
+  if (hr < 90) return 'Average'
+  return 'Tinggi'
+}
+function formatRelativeDate(dateStr) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 86400000)
+  if (diff === 0) return 'hari ini'
+  if (diff === 1) return 'kemarin'
+  return `${diff} hari lalu`
+}
+
+---
+
+## STEP 4: ACTIVITY STATS SECTION (NEW)
+
+Add new section "AKTIVITAS" after health snapshot:
+
+Read from localStorage my20fit_workouts:
+const workouts = JSON.parse(localStorage.getItem('my20fit_workouts') || '[]')
+const totalWorkouts = workouts.length
+const totalMinutes = workouts.reduce((s,w) => s + (w.duration||0), 0)
+const activeWeeks = new Set(workouts.map(w => {
+  const d = new Date(w.date)
+  return `${d.getFullYear()}-W${Math.ceil(d.getDate()/7)}`
+})).size
+
+const consistencyPct = activeWeeks > 0
+  ? Math.round((activeWeeks / 12) * 100)
+  : 0
+
+{/* Stats grid */}
+<div style={{
+  display:'grid', gridTemplateColumns:'repeat(4,1fr)',
+  gap:6, marginBottom:8
+}}>
+  {[
+    { value: totalWorkouts, label:'SESI' },
+    { value: totalMinutes > 999 ? `${(totalMinutes/1000).toFixed(1)}k` : totalMinutes, label:'MENIT' },
+    { value: activeWeeks, label:'MINGGU' },
+    { value: `${consistencyPct}%`, label:'KONSISTEN' },
+  ].map((s, i) => (
+    <div key={i} style={{
+      background:'#F4F0E8', borderRadius:10,
+      padding:'10px 6px', textAlign:'center'
+    }}>
+      <div style={{
+        fontFamily:"'JetBrains Mono', monospace",
+        fontSize:16, fontWeight:700, color:'var(--text)'
+      }}>{s.value || '0'}</div>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight:900, fontSize:7,
+        letterSpacing:'1px', color:'var(--muted)', marginTop:2
+      }}>{s.label}</div>
+    </div>
+  ))}
+</div>
+
+{/* Streak card */}
+<div style={{
+  background:'linear-gradient(135deg, rgba(196,17,1,.06), rgba(196,17,1,.03))',
+  border:'0.5px solid rgba(196,17,1,.12)',
+  borderRadius:12, padding:'12px 14px',
+  display:'flex', alignItems:'center', gap:10
+}}>
+  <div style={{ fontSize:20 }}>🔥</div>
+  <div style={{ flex:1 }}>
+    <div style={{
+      fontFamily:"'JetBrains Mono', monospace",
+      fontSize:22, fontWeight:700,
+      color:'#C41101', lineHeight:1
+    }}>{currentStreak}</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:900, fontSize:9,
+      letterSpacing:'1.5px', color:'rgba(196,17,1,.6)'
+    }}>HARI STREAK</div>
+    <div style={{
+      fontFamily:"'Barlow Condensed', sans-serif",
+      fontWeight:400, fontStyle:'italic',
+      fontSize:10, color:'var(--muted)', marginTop:2
+    }}>Terbaik: {bestStreak} hari berturut-turut</div>
+  </div>
+</div>
+
+---
+
+## STEP 5: 20FIT PLUS CARD UPDATE
+
+Update button text based on member status:
+- isPlusMember: button = "PERPANJANG →"
+- not member: button = "UPGRADE →"
+
+Add expiry date if plus member:
+"Berlaku hingga 31 Des 2026"
+→ fontWeight:400, fontStyle:'italic', fontSize:12, color rgba(255,255,255,.35)
+
+---
+
+## STEP 6: SETTINGS SECTION — UPDATE STYLING
+
+Setting label (Notifikasi, Dark Mode, etc):
+fontWeight: 400 — NOT 900
+fontSize: 15px
+
+Setting sublabel:
+fontWeight: 400
+fontStyle: 'italic'
+fontSize: 12px
+color: var(--muted)
+
+Icon box for each setting:
+width:32, height:32, borderRadius:8
+background: '#F4F0E8'
+Use Lucide icons instead of emoji:
+- Notifikasi: <Bell size={16}/>
+- Dark Mode: <Moon size={16}/> or <Sun size={16}/>
+- Bahasa: <Globe size={16}/>
+- Privasi: <Shield size={16}/>
+- Bantuan: <HelpCircle size={16}/>
+- Rate App: <Star size={16}/>
+
+---
+
+## STEP 7: LOGOUT BUTTON
+
+<button
+  onClick={handleLogout}
+  style={{
+    width:'100%', padding:14,
+    background:'transparent',
+    border:'1.5px solid rgba(239,68,68,.3)',
+    borderRadius:14, cursor:'pointer',
+    display:'flex', alignItems:'center',
+    justifyContent:'center', gap:8,
+    transition:'all .2s'
+  }}
+  onMouseEnter={e => {
+    e.currentTarget.style.background='rgba(239,68,68,.06)'
+    e.currentTarget.style.borderColor='rgba(239,68,68,.5)'
+  }}
+  onMouseLeave={e => {
+    e.currentTarget.style.background='transparent'
+    e.currentTarget.style.borderColor='rgba(239,68,68,.3)'
+  }}
+>
+  <LogOut size={16} color="#EF4444"/>
+  <span style={{
+    fontFamily:"'Anton', sans-serif",
+    fontSize:14, letterSpacing:'1.5px', color:'#EF4444'
+  }}>KELUAR DARI AKUN</span>
+</button>
+
+---
+
+## STEP 8: APP INFO
+
+<div style={{ textAlign:'center', padding:'12px 0 8px' }}>
+  <div style={{
+    fontFamily:"'Anton', sans-serif",
+    fontSize:14, color:'var(--muted)'
+  }}>my20FIT</div>
+  <div style={{
+    fontFamily:"'JetBrains Mono', monospace",
+    fontWeight:400, fontSize:10,
+    color:'#C8BFB0', marginTop:2
+  }}>v1.0.0 · © 2026 20FIT</div>
+</div>
+
+---
+
+## IMPORTS NEEDED
+
+import {
+  User, Mail, Phone, Ruler, Venus,
+  ChevronRight, Bell, Moon, Sun,
+  Globe, Shield, HelpCircle, Star,
+  LogOut, Pencil, TrendingUp, TrendingDown
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+---
+
+## SECTION ORDER (top to bottom):
+
+1. Hero card (avatar + name + stats)
+2. SectionHeader "INFORMASI PERSONAL"
+3. Info card (5 rows)
+4. SectionHeader "KESEHATAN"
+5. Health snapshot card (3 metrics + grade bar)
+6. SectionHeader "STATUS MCU"
+7. MCU status card (existing)
+8. SectionHeader "AKTIVITAS"
+9. Activity stats (4-col grid + streak card)
+10. SectionHeader "20FIT PLUS"
+11. Plus card
+12. SectionHeader "PENGATURAN"
+13. Settings card
+14. Logout button
+15. App info
+
+---
+
+After all changes: npm run build — fix all errors.
