@@ -167,7 +167,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "8px 12px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
-        <p key={i} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 700, color: p.color || "#fff" }}>
+        <p key={i} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 400, color: p.color || "#fff" }}>
           {p.value}{p.name ? ` ${p.name}` : ""}
         </p>
       ))}
@@ -182,7 +182,7 @@ const SleepTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
-      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 4 }}>{hours}j</p>
+      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "#fff", marginBottom: 4 }}>{hours}j</p>
       <span style={{ background: q.color + "25", color: q.color, fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99 }}>{q.label}</span>
     </div>
   );
@@ -195,7 +195,7 @@ const WaterTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
-      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
+      <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
       <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{pct}% dari target</p>
     </div>
   );
@@ -215,7 +215,7 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
         <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, letterSpacing: "2.5px", color: "var(--muted)" }}>{title}</p>
         {latestVal != null && (
-          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+          <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 400, color: "var(--text)" }}>
             {String(latestVal)}{unit}
           </span>
         )}
@@ -287,7 +287,7 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
     }}>
       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, letterSpacing: "2px", color: "var(--muted)", marginBottom: 6 }}>{label}</p>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 3, marginBottom: 4 }}>
-        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 900, lineHeight: 1, color: "var(--text)" }}>
+        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 400, lineHeight: 1, color: "var(--text)" }}>
           {value ?? "—"}
         </span>
         {unit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>{unit}</span>}
@@ -298,7 +298,7 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
             ? <TrendingUp size={12} style={{ color: "#C41101" }} />
             : <TrendingDown size={12} style={{ color: "#16A34A" }} />}
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: change > 0 ? "#C41101" : "#16A34A" }}>
-            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>{changeUnit}</span>}
+            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400 }}>{changeUnit}</span>}
           </span>
         </div>
       )}
@@ -613,7 +613,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                           <div>
                             <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 1.5, color: "var(--muted)" }}>{item.label}</div>
                             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{item.value}</span>
+                              <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 400, color: "var(--text)" }}>{item.value}</span>
                               <TrendBadge trend={item.trend} positiveIsGood={item.positiveIsGood} />
                             </div>
                           </div>
@@ -706,7 +706,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>KUALITAS TIDUR</p>
                     {sleepData.length > 0 && (
-                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 400, color: "var(--text)" }}>
                         {sleepData[sleepData.length - 1].hours}j
                       </span>
                     )}
@@ -755,7 +755,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ASUPAN AIR HARIAN</p>
                     {waterData.length > 0 && (
-                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 700, color: "#06B6D4" }}>
+                      <span style={{ fontFamily: "'JetBrains Mono'", fontSize: 14, fontWeight: 400, color: "#06B6D4" }}>
                         {waterData[waterData.length - 1].liters}L
                       </span>
                     )}
@@ -860,7 +860,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                                   {fmtDate(w.date)}{w.note ? ` · ${w.note}` : ""}
                                 </p>
                               </div>
-                              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 700, color: "var(--text)" }}>
+                              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 400, color: "var(--text)" }}>
                                 {w.duration}<span style={{ fontSize: 10, color: "var(--muted)", fontFamily: "'Barlow Condensed', sans-serif" }}> min</span>
                               </span>
                             </div>

@@ -132,7 +132,7 @@ export default function SportsEvents() {
               marginBottom: 8,
             }}>{event.date}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 700, color: "#C41101" }}>{event.days}</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 12, fontWeight: 400, color: "#C41101" }}>{event.days}</span>
               <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 9, letterSpacing: 1, color: "rgba(255,255,255,.3)" }}>d</span>
             </div>
           </div>

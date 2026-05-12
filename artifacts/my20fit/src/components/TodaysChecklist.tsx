@@ -205,7 +205,7 @@ export default function TodaysChecklist() {
             </p>
           </div>
           <div className="text-right">
-            <p className="leading-none" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "22px", fontWeight: 700, color: "#fff" }}>
+            <p className="leading-none" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "22px", fontWeight: 400, color: "#fff" }}>
               {doneCount}/{tasks.length}
             </p>
             <p className="mt-1" style={{ fontFamily: allDone ? "'Anton', sans-serif" : "'Barlow Condensed', sans-serif", fontWeight: allDone ? 400 : 900, fontSize: "10px", letterSpacing: "1.5px", color: "rgba(255,255,255,0.55)" }}>
@@ -267,7 +267,7 @@ export default function TodaysChecklist() {
               {task.desc && (
                 <p
                   className="truncate"
-                  style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
+                  style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
                 >
                   {task.desc}
                 </p>

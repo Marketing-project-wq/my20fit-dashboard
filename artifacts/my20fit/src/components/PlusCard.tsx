@@ -89,7 +89,7 @@ export default function PlusCard() {
               PRICE
             </p>
             <p
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '18px', fontWeight: 700 }}
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '18px', fontWeight: 400 }}
             >
               Rp 49.000<span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', fontFamily: "'Barlow Condensed', sans-serif" }}>/mo</span>
             </p>

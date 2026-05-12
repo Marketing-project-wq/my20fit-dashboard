@@ -1,0 +1,162 @@
+CRITICAL FONT FIX — The app looks cluttered because 
+everything is bold. Fix font weights to create proper 
+visual hierarchy.
+
+---
+
+## THE CORE PROBLEM
+
+fontWeight: 900 is used everywhere — labels, body text, 
+values, descriptions — making everything fight for attention.
+Nothing feels elegant because there's no contrast.
+
+---
+
+## NEW FONT WEIGHT SYSTEM
+
+Apply these rules globally across ALL components:
+
+### Anton — display/headlines only
+fontFamily: "'Anton', sans-serif"
+(Anton has no weight variants — never set fontWeight on Anton)
+Use for: page titles, section titles, card headlines, 
+button text, nav labels, modal titles, grade letters
+
+### Barlow Condensed 900 — SHORT labels only  
+fontFamily: "'Barlow Condensed', sans-serif"
+fontWeight: 900
+letterSpacing: '1.5px' minimum
+Use ONLY for: 2-3 word uppercase labels like 
+"HUMIDITY", "TODAY", "COMPLETE", "HIGH", "UV INDEX"
+NEVER use for sentences or descriptive text
+
+### Barlow Condensed 400 — body/descriptions
+fontFamily: "'Barlow Condensed', sans-serif"
+fontWeight: 400  ← THIS IS THE KEY CHANGE
+fontStyle: 'normal' OR 'italic'
+Use for: all descriptions, subtitles, sentences, 
+explanatory text, row values, food names, reasons,
+anything more than 3 words that isn't a title
+
+### JetBrains Mono 400 — numbers only
+fontFamily: "'JetBrains Mono', monospace"
+fontWeight: 400
+Use for: ALL numbers
+
+---
+
+## FIX EVERY COMPONENT — specific changes:
+
+### Profile page (Image 1):
+
+"INFORMASI PERSONAL" section header:
+→ Barlow 900, 9px, letterSpacing 3px ✓ (keep)
+
+Row label "Nama Lengkap", "Email", "Nomor HP":
+→ Barlow 400 italic, 11px, color muted
+(currently: bold and looks same weight as value)
+
+Row value "ZIDNI", "zidni@20fit.id", "+62 812-3456-7890":
+→ Barlow 400 normal, 15px, color text
+(currently: same bold as label — no hierarchy)
+
+"Jenis Kelamin" label → Barlow 400 italic 11px muted
+"Laki-laki" value → Barlow 400 normal 15px
+
+"Tinggi Badan" label → Barlow 400 italic 11px muted  
+"171 cm" value:
+→ "171" JetBrains Mono 400 15px + "cm" Barlow 400 italic 12px
+
+"STATUS MCU" → Barlow 900 9px tracked (keep)
+"Belum ada MCU" → Anton 16px (headline)
+"Upload untuk program personal" → Barlow 400 italic 12px muted
+
+"20FIT PLUS AKTIF" badge → Barlow 900 9px tracked
+"MEMBER AKTIF" → Anton 22px
+"Berlaku hingga: 31 Des 2026" → Barlow 400 italic 12px
+Perk pills "10% Arena" etc → Barlow 900 9px tracked
+
+### Nutrition page (Image 2):
+
+"GOAL NUTRISI HARI INI" label → Barlow 900 9px tracked 2.5px
+Goal sentence "Mendukung pemulihan otot..." → Barlow 400 italic 14px
+(currently: Bold 900 italic — TOO HEAVY, hard to read)
+
+Macro labels "KALORI" "PROTEIN" "KARBO" "LEMAK":
+→ Barlow 900 8px tracked 2px
+
+Macro values "2200" "110g" "275g" "73g":
+→ JetBrains Mono 400 for number, Barlow 400 for unit
+
+Insight text "Dengan kombinasi strength training...":
+→ Barlow 400 italic 12px  
+(currently: Bold 900 — makes this wall of text unreadable)
+
+"HIDRASI HARI INI" → Barlow 900 9px tracked
+"0L / 2.5L" → JetBrains Mono 400
+
+Hydration description "Kamu belum minum hari ini!...":
+→ Barlow 400 italic 13px
+(currently: Bold 900 — creates heavy unreadable block)
+
+"REKOMENDASI MAKAN" → Barlow 900 9px tracked 2.5px
+
+Meal title "Sarapan" → Anton 18px
+Time range "06:00 - 09:00" → JetBrains Mono 400 11px
+
+Food name "Oatmeal dengan pisang dan madu":
+→ Barlow 400 normal 14px (NOT bold)
+
+Portion "1 mangkuk (250g oatmeal + 1 pisang)":
+→ Barlow 400 italic 11px muted
+
+Tags "Karbohidrat Kompleks" "Energi Tahan Lama":
+→ Barlow 900 9px tracked 0.5px
+(keep bold but tracked — these are labels not sentences)
+
+Calorie "380" "220" "120":
+→ JetBrains Mono 400 13px
+
+---
+
+## GLOBAL RULES — apply to ALL other pages:
+
+1. Any text that is a SENTENCE (5+ words) → Barlow 400
+2. Any text that is a SHORT LABEL (1-3 words, uppercase) → Barlow 900 tracked
+3. Any NUMBER → JetBrains Mono 400
+4. Any TITLE/HEADLINE → Anton
+5. fontWeight: 900 ONLY on 2-3 word uppercase tracked labels
+6. NEVER fontWeight 900 on sentences or paragraphs
+
+---
+
+## ALSO UPDATE GOOGLE FONTS IMPORT
+
+Make sure Barlow Condensed 400 is imported.
+In index.css, update @import:
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,400;0,900;1,400;1,900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+This imports all 4 needed variants:
+- Barlow Condensed 400 normal
+- Barlow Condensed 400 italic  
+- Barlow Condensed 900 normal
+- Barlow Condensed 900 italic
+
+---
+
+## VISUAL RESULT EXPECTED
+
+Before: everything same weight → cluttered, hard to read
+After: 
+- Labels: small, tracked, 900 (punchy)
+- Body text: 400 weight (readable, breathable)
+- Headlines: Anton (dominant)
+- Numbers: JetBrains Mono (technical, precise)
+
+This creates 4 distinct visual layers so the eye can 
+navigate the page naturally.
+
+---
+
+npm run build — fix all errors before finishing.

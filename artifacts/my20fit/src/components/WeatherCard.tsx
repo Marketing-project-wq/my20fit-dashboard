@@ -328,10 +328,10 @@ export default function WeatherCard() {
             <Shimmer w={140} h={56} style={{ marginBottom: "6px" }} />
           ) : (
             <div style={{ display: "flex", alignItems: "flex-start", lineHeight: 1, marginBottom: "4px" }}>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "56px", fontWeight: 900, letterSpacing: "-2px", ...text }}>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "56px", fontWeight: 400, letterSpacing: "-2px", ...text }}>
                 {error ? "—" : weather?.temp}
               </span>
-              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 700, marginTop: "8px", ...muted }}>°</span>
+              <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 400, marginTop: "8px", ...muted }}>°</span>
             </div>
           )}
 
@@ -339,7 +339,7 @@ export default function WeatherCard() {
           {loading ? (
             <Shimmer w={90} h={13} style={{ marginBottom: "4px" }} />
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "14px", fontWeight: 900, fontStyle: "italic", ...muted, marginBottom: "2px" }}>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "14px", fontWeight: 400, fontStyle: "italic", ...muted, marginBottom: "2px" }}>
               {error ? "—" : `${weatherIcon(weather?.conditionCode ?? 1000, weather?.isDay ?? true)} ${weather?.condition}`}
             </p>
           )}
@@ -348,7 +348,7 @@ export default function WeatherCard() {
           {loading ? (
             <Shimmer w={70} h={11} />
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "12px", color: "rgba(255,255,255,.25)" }}>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "12px", color: "rgba(255,255,255,.25)" }}>
               {error ? "" : `Feels like ${weather?.feels}°`}
             </p>
           )}
@@ -373,7 +373,7 @@ export default function WeatherCard() {
             </>
           ) : (
             <>
-              <span style={{ display: "block", fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 900, color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), lineHeight: 1 }}>
+              <span style={{ display: "block", fontFamily: "'JetBrains Mono', monospace", fontSize: "28px", fontWeight: 400, color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), lineHeight: 1 }}>
                 {error ? "—" : weather?.aqi}
               </span>
               <span style={{ display: "block", fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: error ? "#666" : aqiNumColor(weather?.aqi ?? 0), marginTop: "6px", lineHeight: 1.2 }}>
@@ -405,7 +405,7 @@ export default function WeatherCard() {
             {loading ? (
               <Shimmer w={36} h={18} style={{ margin: "0 auto 3px" }} />
             ) : (
-              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "16px", fontWeight: 700, ...text, lineHeight: 1 }}>{s.val}</p>
+              <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "16px", fontWeight: 400, ...text, lineHeight: 1 }}>{s.val}</p>
             )}
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "11px", ...muted, marginTop: "2px" }}>{s.unit}</p>
           </div>
@@ -421,7 +421,7 @@ export default function WeatherCard() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", color: recTagColor, marginBottom: "2px" }}>{rec.tag}</p>
             <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: recTagColor, marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 900, fontStyle: "italic", color: "rgba(255,255,255,.45)", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 400, fontStyle: "italic", color: "rgba(255,255,255,.45)", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
               {rec.pills.map(pill => (
                 <span key={pill} style={{ backgroundColor: recPillBg, color: recTagColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "1px", borderRadius: "99px", padding: "3px 8px" }}>{pill}</span>
@@ -465,7 +465,7 @@ export default function WeatherCard() {
                     {isNow ? "NOW" : h.time}
                   </p>
                   <p style={{ fontSize: "18px", marginBottom: "4px" }}>{h.icon}</p>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>{h.temp}°</p>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 400, color: "#fff", marginBottom: "4px" }}>{h.temp}°</p>
                   {h.aqi != null && cellAqiColor && cellAqiBg && (
                     <span style={{ backgroundColor: cellAqiBg, color: cellAqiColor, fontFamily: "'JetBrains Mono', monospace", fontSize: "9px", borderRadius: "4px", padding: "1px 5px" }}>
                       {h.aqi}
@@ -480,7 +480,7 @@ export default function WeatherCard() {
 
       {/* ── Section 5: Timestamp ── */}
       {!loading && !error && (
-        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontStyle: "italic", fontSize: "11px", ...muted, textAlign: "right", padding: "0 20px 14px" }}>
+        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "11px", ...muted, textAlign: "right", padding: "0 20px 14px" }}>
           Updated {minAgo < 1 ? "just now" : `${minAgo} min ago`} · Geolocation
         </p>
       )}
