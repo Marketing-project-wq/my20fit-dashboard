@@ -1,11 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/contexts/ToastContext";
 import {
   User, Mail, Phone, Ruler,
   ChevronRight, Bell, Moon, Sun,
   Globe, Shield, HelpCircle, Star,
-  LogOut, Pencil, Trash2, X,
+  LogOut, Pencil, Trash2, X, Camera,
 } from "lucide-react";
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
@@ -174,6 +174,13 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
   const { showToast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("my20fit_avatar");
+    if (saved) setAvatarSrc(saved);
+  }, []);
 
   const [editName, setEditName] = useState(mockUser.name);
   const [editPhone, setEditPhone] = useState(mockUser.phone);
@@ -256,6 +263,41 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
     a.click();
   }
 
+  function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const allowed = ["image/jpeg", "image/png", "image/webp"];
+    if (!allowed.includes(file.type)) {
+      showToast("Format tidak didukung. Gunakan JPG, PNG, atau WEBP.", "error");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      showToast("Ukuran foto maksimal 5MB.", "error");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
+      setAvatarSrc(base64);
+      localStorage.setItem("my20fit_avatar", base64);
+      window.dispatchEvent(new Event("my20fit_avatar_updated"));
+      showToast("Foto profil berhasil diperbarui ✓");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  }
+
+  function handleAvatarClick() {
+    avatarInputRef.current?.click();
+  }
+
+  function handleRemoveAvatar() {
+    setAvatarSrc(null);
+    localStorage.removeItem("my20fit_avatar");
+    window.dispatchEvent(new Event("my20fit_avatar_updated"));
+    showToast("Foto profil dihapus");
+  }
+
   const settings = [
     { icon: <Bell size={16} />, label: "Notifikasi", sublabel: "Reminder checklist, event, MCU", type: "toggle" as const, key: "notifications" },
     { icon: theme === "dark" ? <Sun size={16} /> : <Moon size={16} />, label: "Dark Mode", sublabel: theme === "dark" ? "Aktif" : "Nonaktif", type: "toggle" as const, key: "theme" },
@@ -303,28 +345,45 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
                 <div style={{ position: "relative" }}>
                   <div
-                    onClick={() => setShowEditModal(true)}
+                    onClick={handleAvatarClick}
                     style={{
                       width: 72, height: 72, borderRadius: "50%",
-                      background: "linear-gradient(135deg, #C41101, #8B0000)",
+                      background: avatarSrc ? "transparent" : "linear-gradient(135deg, #C41101, #8B0000)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       fontFamily: "'Anton', sans-serif", fontSize: 26, color: "#fff",
                       border: "2px solid rgba(255,255,255,.12)", cursor: "pointer",
+                      overflow: "hidden", position: "relative",
                     }}
                   >
-                    {getInitials(displayName)}
+                    {avatarSrc ? (
+                      <img src={avatarSrc} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+                    ) : (
+                      getInitials(displayName)
+                    )}
+                    <div
+                      style={{
+                        position: "absolute", inset: 0,
+                        background: "rgba(0,0,0,.4)", borderRadius: "50%",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        opacity: 0, transition: "opacity .2s",
+                      }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = "1"; }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = "0"; }}
+                    >
+                      <Camera size={20} color="#fff" />
+                    </div>
                   </div>
                   <div
-                    onClick={() => setShowEditModal(true)}
+                    onClick={handleAvatarClick}
                     style={{
                       position: "absolute", bottom: 0, right: 0,
-                      width: 22, height: 22, borderRadius: "50%",
-                      background: "#1A1710", border: "1.5px solid rgba(255,255,255,.15)",
+                      width: 24, height: 24, borderRadius: "50%",
+                      background: "#1A1710", border: "1.5px solid rgba(255,255,255,.2)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       cursor: "pointer", zIndex: 1,
                     }}
                   >
-                    <Pencil size={10} color="rgba(255,255,255,.6)" />
+                    <Camera size={11} color="rgba(255,255,255,.7)" />
                   </div>
                 </div>
 
@@ -785,6 +844,15 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
 
       <BottomNav />
 
+      {/* Hidden file input for avatar upload */}
+      <input
+        ref={avatarInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleAvatarChange}
+        style={{ display: "none" }}
+      />
+
       {/* ── EDIT PROFILE MODAL ── */}
       {showEditModal && (
         <div
@@ -850,6 +918,19 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   </div>
                 )}
               </div>
+              {avatarSrc && (
+                <button
+                  onClick={handleRemoveAvatar}
+                  style={{
+                    background: "none", border: "none",
+                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontWeight: 400, fontStyle: "italic",
+                    fontSize: 12, color: "#EF4444",
+                    cursor: "pointer", textDecoration: "underline",
+                    padding: 0,
+                  }}
+                >Hapus foto profil</button>
+              )}
               <button
                 onClick={handleSaveEdit}
                 style={{

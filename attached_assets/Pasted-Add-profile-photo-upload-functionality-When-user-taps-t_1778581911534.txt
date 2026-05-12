@@ -1,0 +1,213 @@
+Add profile photo upload functionality.
+When user taps the avatar, they can upload a photo.
+
+---
+
+## FEATURE: AVATAR PHOTO UPLOAD
+
+### How it works:
+1. User clicks avatar circle
+2. Hidden file input triggered
+3. User selects image (JPG/PNG/WEBP, max 5MB)
+4. Image previewed immediately (base64)
+5. Saved to localStorage 'my20fit_avatar'
+6. Avatar displays photo instead of initials
+
+---
+
+## IMPLEMENTATION IN Profile.jsx:
+
+### State:
+const [avatarSrc, setAvatarSrc] = useState(null)
+const avatarInputRef = useRef(null)
+
+### Load on mount:
+useEffect(() => {
+  const saved = localStorage.getItem('my20fit_avatar')
+  if (saved) setAvatarSrc(saved)
+}, [])
+
+### File handler:
+function handleAvatarChange(e) {
+  const file = e.target.files[0]
+  if (!file) return
+
+  // Validate type
+  const allowed = ['image/jpeg','image/png','image/webp']
+  if (!allowed.includes(file.type)) {
+    showToast('Format tidak didukung. Gunakan JPG, PNG, atau WEBP.', 'error')
+    return
+  }
+
+  // Validate size (5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('Ukuran foto maksimal 5MB.', 'error')
+    return
+  }
+
+  // Convert to base64 and save
+  const reader = new FileReader()
+  reader.onload = (ev) => {
+    const base64 = ev.target.result
+    setAvatarSrc(base64)
+    localStorage.setItem('my20fit_avatar', base64)
+    showToast('Foto profil berhasil diperbarui ✓')
+  }
+  reader.readAsDataURL(file)
+
+  // Reset input so same file can be re-selected
+  e.target.value = ''
+}
+
+function handleAvatarClick() {
+  avatarInputRef.current?.click()
+}
+
+### Hidden file input (place anywhere in JSX):
+<input
+  ref={avatarInputRef}
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  onChange={handleAvatarChange}
+  style={{ display: 'none' }}
+/>
+
+### Avatar display (update existing avatar circle):
+<div
+  onClick={handleAvatarClick}
+  style={{
+    width: 72, height: 72, borderRadius: '50%',
+    background: avatarSrc
+      ? 'transparent'
+      : 'linear-gradient(135deg, #C41101, #8B0000)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    fontFamily: "'Anton', sans-serif", fontSize: 26, color: '#fff',
+    border: '2px solid rgba(255,255,255,.12)',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    position: 'relative',
+  }}
+>
+  {avatarSrc ? (
+    <img
+      src={avatarSrc}
+      alt="Profile"
+      style={{
+        width: '100%', height: '100%',
+        objectFit: 'cover', borderRadius: '50%'
+      }}
+    />
+  ) : (
+    getInitials(displayName)
+  )}
+
+  {/* Hover overlay with camera icon */}
+  <div style={{
+    position: 'absolute', inset: 0,
+    background: 'rgba(0,0,0,.4)',
+    borderRadius: '50%',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    opacity: 0,
+    transition: 'opacity .2s',
+  }}
+    onMouseEnter={e => e.currentTarget.style.opacity = '1'}
+    onMouseLeave={e => e.currentTarget.style.opacity = '0'}
+  >
+    <Camera size={20} color="#fff"/>
+  </div>
+</div>
+
+### Edit pencil button (below avatar):
+<div
+  onClick={handleAvatarClick}
+  style={{
+    position: 'absolute', bottom: 0, right: 0,
+    width: 24, height: 24, borderRadius: '50%',
+    background: '#1A1710',
+    border: '1.5px solid rgba(255,255,255,.2)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    cursor: 'pointer', zIndex: 1
+  }}
+>
+  <Camera size={11} color="rgba(255,255,255,.7)"/>
+</div>
+
+### Also update Sidebar.jsx:
+Load avatar from localStorage on mount:
+const [avatarSrc, setAvatarSrc] = useState(null)
+
+useEffect(() => {
+  const saved = localStorage.getItem('my20fit_avatar')
+  if (saved) setAvatarSrc(saved)
+
+  // Listen for storage changes (when profile updates avatar)
+  const handleStorage = () => {
+    const updated = localStorage.getItem('my20fit_avatar')
+    setAvatarSrc(updated)
+  }
+  window.addEventListener('storage', handleStorage)
+  return () => window.removeEventListener('storage', handleStorage)
+}, [])
+
+// Also listen via custom event for same-tab updates:
+useEffect(() => {
+  const handleAvatarUpdate = () => {
+    const saved = localStorage.getItem('my20fit_avatar')
+    setAvatarSrc(saved)
+  }
+  window.addEventListener('my20fit_avatar_updated', handleAvatarUpdate)
+  return () => window.removeEventListener('my20fit_avatar_updated', handleAvatarUpdate)
+}, [])
+
+In Profile.jsx, after saving avatar, dispatch event:
+reader.onload = (ev) => {
+  const base64 = ev.target.result
+  setAvatarSrc(base64)
+  localStorage.setItem('my20fit_avatar', base64)
+  window.dispatchEvent(new Event('my20fit_avatar_updated'))
+  showToast('Foto profil berhasil diperbarui ✓')
+}
+
+Sidebar avatar display:
+{avatarSrc ? (
+  <img
+    src={avatarSrc}
+    alt="Avatar"
+    style={{
+      width: '100%', height: '100%',
+      objectFit: 'cover', borderRadius: '50%'
+    }}
+  />
+) : (
+  <span>{getInitials(displayName)}</span>
+)}
+
+### Add remove photo option in Edit Profile modal:
+If avatarSrc exists, show:
+<button
+  onClick={() => {
+    setAvatarSrc(null)
+    localStorage.removeItem('my20fit_avatar')
+    window.dispatchEvent(new Event('my20fit_avatar_updated'))
+    showToast('Foto profil dihapus')
+  }}
+  style={{
+    background: 'none', border: 'none',
+    fontFamily: "'Barlow Condensed', sans-serif",
+    fontWeight: 400, fontStyle: 'italic',
+    fontSize: 12, color: '#EF4444',
+    cursor: 'pointer', marginTop: 8,
+    textDecoration: 'underline'
+  }}
+>Hapus foto profil</button>
+
+---
+
+## IMPORTS NEEDED
+
+Add Camera to lucide-react imports in Profile.jsx and Sidebar.jsx:
+import { ..., Camera } from 'lucide-react'
+
+---
+
+After changes: npm run build — fix all errors.

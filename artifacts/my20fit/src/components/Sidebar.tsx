@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Home, Target, Calendar, Camera, User, Sun, Moon, UtensilsCrossed } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +15,19 @@ const navItems = [
 export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   const [location] = useLocation();
   const { user, profile, photoProfile } = useAuth();
+  const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("my20fit_avatar");
+    if (saved) setAvatarSrc(saved);
+    const handleStorage = () => setAvatarSrc(localStorage.getItem("my20fit_avatar"));
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("my20fit_avatar_updated", handleStorage);
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("my20fit_avatar_updated", handleStorage);
+    };
+  }, []);
 
   const displayName =
     profile?.full_name ||
@@ -71,10 +85,14 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
       <div className="mt-auto px-6 pb-6 flex flex-col gap-3">
         <div className="flex items-center gap-3 pt-4 border-t border-white/10">
           <div
-            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm"
-            style={{ backgroundColor: "#C41101", fontFamily: "'Anton', sans-serif", fontWeight: 400 }}
+            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm overflow-hidden"
+            style={{ backgroundColor: avatarSrc ? "transparent" : "#C41101", fontFamily: "'Anton', sans-serif", fontWeight: 400 }}
           >
-            {initials}
+            {avatarSrc ? (
+              <img src={avatarSrc} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+            ) : (
+              initials
+            )}
           </div>
           <div className="flex flex-col overflow-hidden">
             <span className="text-white text-sm truncate" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: "0.5px" }}>
