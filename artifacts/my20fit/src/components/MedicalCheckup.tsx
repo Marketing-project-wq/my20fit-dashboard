@@ -219,6 +219,7 @@ export default function MedicalCheckup() {
     <div className="mb-8" data-testid="section-mcu">
       <div className="section-header">
         <h2>MEDICAL CHECKUP</h2>
+        <div className="section-header-line" />
         {state === "success" && (
           <button
             onClick={handleClear}

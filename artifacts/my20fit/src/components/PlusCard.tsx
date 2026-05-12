@@ -97,13 +97,15 @@ export default function PlusCard() {
           <button
             className="py-2.5 px-5 transition-opacity hover:opacity-90"
             style={{
-              backgroundColor: '#D4A800',
-              color: '#0A0A05',
-              borderRadius: '6px',
+              background: 'linear-gradient(135deg, #D4A800, #FFD700)',
+              color: '#0A0908',
+              borderRadius: '10px',
               fontFamily: "'Anton', sans-serif",
               fontWeight: 400,
               fontSize: '13px',
               letterSpacing: '1px',
+              boxShadow: '0 4px 20px rgba(212,168,0,.35)',
+              transition: 'all .2s ease',
             }}
             data-testid="button-upgrade-plus"
           >

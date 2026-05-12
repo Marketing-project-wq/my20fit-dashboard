@@ -270,11 +270,12 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
 
 // ─── Metric Card ──────────────────────────────────────────────────────────────
 
-function MetricCard({ label, value, unit, status, change, changeUnit, trend, positiveIsGood = true }:
+function MetricCard({ label, value, unit, status, change, changeUnit, trend, positiveIsGood = true, accent }:
   {
     label: string; value?: number | string; unit?: string;
     status?: { label: string; color: string }; change?: number; changeUnit?: string;
     trend?: import("@/utils/checkinData").TrendResult | null; positiveIsGood?: boolean;
+    accent?: string;
   }
 ) {
   return (
@@ -282,6 +283,7 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
       background: "linear-gradient(180deg, #FFFFFF 0%, #FBFBFB 100%)",
       borderRadius: 14, padding: "14px 16px", minWidth: 130,
       border: "1px solid rgba(0,0,0,0.04)", boxShadow: "0 4px 16px rgba(0,0,0,0.05)", flexShrink: 0,
+      borderTop: `3px solid ${accent ?? "var(--red)"}`,
     }}>
       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, letterSpacing: "2px", color: "var(--muted)", marginBottom: 6 }}>{label}</p>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 3, marginBottom: 4 }}>
@@ -626,45 +628,48 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               {/* Section 2: Summary metric cards */}
               {(latest || sleepData.length > 0 || waterData.length > 0 || wellnessData.length > 0) && (
                 <div>
-                  <p className="section-header">METRIK TERKINI</p>
+                  <div className="section-header" style={{ marginBottom: 10 }}>
+                    <h2>METRIK TERKINI</h2>
+                    <div className="section-header-line" />
+                  </div>
                   <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 4, scrollbarWidth: "none" }}>
                     {latest?.weight != null && (
-                      <MetricCard label="BERAT BADAN" value={latest.weight} unit="kg"
+                      <MetricCard label="BERAT BADAN" value={latest.weight} unit="kg" accent="#C41101"
                         change={prev?.weight != null ? latest.weight - prev.weight : undefined} changeUnit=" kg"
                         trend={weightTrend} positiveIsGood={false} />
                     )}
                     {latest?.bmi != null && (
-                      <MetricCard label="BMI" value={latest.bmi?.toFixed(1)} status={bmiStatus(latest.bmi)}
+                      <MetricCard label="BMI" value={latest.bmi?.toFixed(1)} status={bmiStatus(latest.bmi)} accent="#3B82F6"
                         change={prev?.bmi != null && latest.bmi != null ? latest.bmi - prev.bmi : undefined} changeUnit=""
                         trend={bmiTrend} positiveIsGood={false} />
                     )}
                     {latest?.bodyFat != null && (
-                      <MetricCard label="BODY FAT" value={latest.bodyFat} unit="%" status={bfStatus(latest.bodyFat)}
+                      <MetricCard label="BODY FAT" value={latest.bodyFat} unit="%" status={bfStatus(latest.bodyFat)} accent="#F97316"
                         trend={bfTrend} positiveIsGood={false} />
                     )}
                     {latest?.restingHr != null && (
-                      <MetricCard label="RESTING HR" value={latest.restingHr} unit="bpm" status={hrStatus(latest.restingHr)}
+                      <MetricCard label="RESTING HR" value={latest.restingHr} unit="bpm" status={hrStatus(latest.restingHr)} accent="#EF4444"
                         trend={hrTrend} positiveIsGood={false} />
                     )}
                     {latest?.waist != null && (
-                      <MetricCard label="PINGGANG" value={latest.waist} unit="cm" status={waistStatus(latest.waist)}
+                      <MetricCard label="PINGGANG" value={latest.waist} unit="cm" status={waistStatus(latest.waist)} accent="#A855F7"
                         trend={waistTrend} positiveIsGood={false} />
                     )}
                     {latest?.bloodPressureSys != null && (
                       <MetricCard label="BLOOD PRESSURE" value={`${latest.bloodPressureSys}/${latest.bloodPressureDia}`}
-                        status={bpStatus(latest.bloodPressureSys, latest.bloodPressureDia)} />
+                        status={bpStatus(latest.bloodPressureSys, latest.bloodPressureDia)} accent="#06B6D4" />
                     )}
                     {/* Checkin-based metric cards */}
                     {avgSleep > 0 && (
-                      <MetricCard label="RATA-RATA TIDUR" value={avgSleep} unit="j"
+                      <MetricCard label="RATA-RATA TIDUR" value={avgSleep} unit="j" accent="#A855F7"
                         status={sleepQuality(avgSleep)} trend={sleepTrend} positiveIsGood={true} />
                     )}
                     {avgWaterPct > 0 && (
-                      <MetricCard label="HIDRASI HARIAN" value={`${avgWaterPct}%`}
+                      <MetricCard label="HIDRASI HARIAN" value={`${avgWaterPct}%`} accent="#06B6D4"
                         status={waterStatus(avgWaterPct)} trend={waterTrend} positiveIsGood={true} />
                     )}
                     {avgEnergy > 0 && (
-                      <MetricCard label="LEVEL ENERGI" value={avgEnergy} unit="/10"
+                      <MetricCard label="LEVEL ENERGI" value={avgEnergy} unit="/10" accent="#22C55E"
                         status={energyStatus(avgEnergy)} trend={energyTrend} positiveIsGood={true} />
                     )}
                   </div>
@@ -674,7 +679,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               {/* Section 3: Health Charts */}
               {(entries.length > 0) && (
                 <div>
-                  <p className="section-header">TREN KESEHATAN</p>
+                  <div className="section-header" style={{ marginBottom: 12 }}>
+                    <h2>TREN KESEHATAN</h2>
+                    <div className="section-header-line" />
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ChartCard title="BERAT BADAN" data={filteredEntries} dataKey="weight" unit=" kg" trendKey="weight" />
                     <ChartCard title="BMI" data={filteredEntries} dataKey="bmi"
@@ -691,7 +699,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
               {/* Section 4: Sleep Chart */}
               <div>
-                <p className="section-header">KUALITAS TIDUR</p>
+                <div className="section-header" style={{ marginBottom: 12 }}>
+                  <h2>KUALITAS TIDUR</h2>
+                  <div className="section-header-line" />
+                </div>
                 <div className="app-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>KUALITAS TIDUR</p>
@@ -737,7 +748,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
               {/* Section 5: Water Chart */}
               <div>
-                <p className="section-header">ASUPAN AIR HARIAN</p>
+                <div className="section-header" style={{ marginBottom: 12 }}>
+                  <h2>ASUPAN AIR HARIAN</h2>
+                  <div className="section-header-line" />
+                </div>
                 <div className="app-card">
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                     <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ASUPAN AIR HARIAN</p>
@@ -784,7 +798,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               {/* Section 6: Energy & Mood Chart */}
               {wellnessChartData.length > 0 && (
                 <div>
-                  <p className="section-header">ENERGI & MOOD</p>
+                  <div className="section-header" style={{ marginBottom: 12 }}>
+                    <h2>ENERGI &amp; MOOD</h2>
+                    <div className="section-header-line" />
+                  </div>
                   <div className="app-card">
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                       <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ENERGI & MOOD</p>
@@ -813,7 +830,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
               {/* Section 7: Workout history */}
               <div>
-                <p className="section-header">RIWAYAT LATIHAN</p>
+                <div className="section-header" style={{ marginBottom: 12 }}>
+                  <h2>RIWAYAT LATIHAN</h2>
+                  <div className="section-header-line" />
+                </div>
                 {workoutGroups.length === 0 ? (
                   <div className="app-card" style={{ textAlign: "center", padding: "28px 20px" }}>
                     <Dumbbell size={28} style={{ color: "var(--border-subtle)", margin: "0 auto 8px" }} />
@@ -856,7 +876,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
               {/* Section 8: MCU Recommendations */}
               {mcuResult?.recommendations && mcuResult.recommendations.length > 0 && (
                 <div>
-                  <p className="section-header">REKOMENDASI MCU</p>
+                  <div className="section-header" style={{ marginBottom: 12 }}>
+                    <h2>REKOMENDASI MCU</h2>
+                    <div className="section-header-line" />
+                  </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {mcuResult.recommendations.map((rec, i) => {
                       const isPositive = !rec.toLowerCase().includes("hindari") && !rec.toLowerCase().includes("kurangi") && !rec.toLowerCase().includes("waspadai");

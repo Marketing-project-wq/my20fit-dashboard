@@ -1,0 +1,573 @@
+Redesign the entire app with a premium, rich visual language.
+Keep all existing functionality — only change visual styling.
+
+---
+
+## DESIGN DIRECTION
+
+The app should feel like a premium fitness/health app — 
+dark cards on warm canvas, depth through gradients and glows,
+not flat and corporate.
+
+---
+
+## STEP 1: UPDATE index.css — GLOBAL DESIGN TOKENS
+
+:root {
+  /* Canvas */
+  --bg: #EDE8DF;
+  --bg-secondary: #E4DDD2;
+
+  /* Cards */
+  --card: #FFFFFF;
+  --card-dark: #0A0908;
+  --card-navy: #0D1B35;
+
+  /* Text */
+  --text: #0A0908;
+  --text-soft: #36322D;
+  --muted: #9E8E7A;
+  --muted-light: #B0A090;
+
+  /* Brand */
+  --red: #C41101;
+  --red-glow: rgba(196,17,1,0.25);
+  --gold: #D4A800;
+  --gold-glow: rgba(212,168,0,0.12);
+
+  /* Borders */
+  --border: rgba(20,17,12,0.06);
+  --border-warm: #DDD5C8;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 4px rgba(20,17,12,.06), 0 0 0 0.5px rgba(20,17,12,.04);
+  --shadow-md: 0 4px 16px rgba(20,17,12,.08), 0 0 0 0.5px rgba(20,17,12,.04);
+  --shadow-lg: 0 8px 32px rgba(20,17,12,.12), 0 0 0 0.5px rgba(20,17,12,.04);
+
+  /* Fonts */
+  --font-display: 'Anton', sans-serif;
+  --font-body: 'Barlow Condensed', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0A0908;
+  --bg-secondary: #111009;
+  --card: #131310;
+  --card-dark: #1A1915;
+  --card-navy: #0D1B35;
+  --text: #F0EDE6;
+  --text-soft: #C8C0B4;
+  --muted: #6E665C;
+  --muted-light: #5A5248;
+  --border: rgba(255,255,255,0.06);
+  --border-warm: rgba(255,255,255,0.08);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+}
+
+/* Global */
+body {
+  background: var(--bg);
+  font-family: var(--font-body);
+  font-weight: 900;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Grain texture overlay on body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+---
+
+## STEP 2: MAIN LAYOUT
+
+Main content area background: var(--bg)
+Sidebar stays dark (#0A0908) always — no change needed.
+
+Main content max-width: 680px
+Padding: 28px 24px 80px
+Gap between sections: 16px
+
+---
+
+## STEP 3: GREETING CARD
+
+Replace current greeting with this design:
+
+<div style={{
+  background: 'linear-gradient(135deg, #0A0908 0%, #1C1810 60%, #241A0A 100%)',
+  borderRadius: 22,
+  padding: '22px 20px',
+  position: 'relative',
+  overflow: 'hidden',
+}}>
+  {/* Red glow top-right */}
+  <div style={{
+    position:'absolute', top:-50, right:-40,
+    width:160, height:160,
+    background:'radial-gradient(circle, rgba(196,17,1,.3) 0%, transparent 70%)',
+    pointerEvents:'none'
+  }}/>
+  {/* Gold glow bottom-left */}
+  <div style={{
+    position:'absolute', bottom:-30, left:-20,
+    width:120, height:120,
+    background:'radial-gradient(circle, rgba(212,168,0,.1) 0%, transparent 70%)',
+    pointerEvents:'none'
+  }}/>
+
+  {/* Time-based greeting tag */}
+  <div style={{
+    fontFamily:"'Barlow Condensed', sans-serif", fontWeight:900,
+    fontSize:9, letterSpacing:3,
+    color:'rgba(255,255,255,.3)', marginBottom:2,
+    position:'relative'
+  }}>
+    {greeting.toUpperCase()} · {dayName} {date}
+  </div>
+
+  {/* Name */}
+  <div style={{
+    fontFamily:"'Anton', sans-serif",
+    fontSize:48, color:'#fff',
+    lineHeight:.9, letterSpacing:-1,
+    position:'relative'
+  }}>
+    {userName}
+  </div>
+
+  {/* Motivational sub */}
+  <div style={{
+    fontFamily:"'Barlow Condensed', sans-serif", fontWeight:900,
+    fontSize:11, fontStyle:'italic',
+    color:'rgba(255,255,255,.35)',
+    marginTop:8, lineHeight:1.4,
+    position:'relative'
+  }}>
+    {motivationalText}
+  </div>
+
+  {/* Stats chips */}
+  <div style={{
+    display:'flex', gap:6, marginTop:14,
+    position:'relative', flexWrap:'wrap'
+  }}>
+    {[
+      { label: streak > 0 ? `🔥 ${streak} HARI STREAK` : 'MULAI STREAK', red: streak > 0 },
+      { label: `GRADE ${mcuGrade || '—'}` },
+      { label: `${checklistDone}/${checklistTotal} HARI INI` },
+    ].map((chip, i) => (
+      <div key={i} style={{
+        background: chip.red
+          ? 'rgba(196,17,1,.15)'
+          : 'rgba(255,255,255,.06)',
+        border: `0.5px solid ${chip.red
+          ? 'rgba(196,17,1,.35)'
+          : 'rgba(255,255,255,.1)'}`,
+        borderRadius: 99,
+        padding: '5px 12px',
+        fontSize: 9, letterSpacing: 1.5,
+        color: chip.red ? 'rgba(255,100,100,.8)' : 'rgba(255,255,255,.4)',
+        fontFamily:"'Barlow Condensed', sans-serif",
+        fontWeight: 900
+      }}>{chip.label}</div>
+    ))}
+  </div>
+</div>
+
+Compute motivationalText based on checklist completion:
+- 0/5: "Mulai hari ini dengan satu langkah kecil."
+- 1-2/5: "Sudah ada yang selesai — lanjutkan!"
+- 3-4/5: "Hampir selesai — jangan berhenti sekarang."
+- 5/5: "Semua selesai hari ini. Luar biasa! 🎉"
+
+---
+
+## STEP 4: SECTION HEADERS
+
+Replace all section headers with this minimal divider style:
+
+function SectionHeader({ title, right }) {
+  return (
+    <div style={{
+      display:'flex', alignItems:'center',
+      gap:10, padding:'0 2px',
+    }}>
+      <div style={{
+        fontFamily:"'Barlow Condensed', sans-serif", fontWeight:900,
+        fontSize:9, letterSpacing:3,
+        color:'var(--muted)', whiteSpace:'nowrap'
+      }}>{title}</div>
+      <div style={{
+        flex:1, height:'0.5px',
+        background:'linear-gradient(90deg, var(--border-warm), transparent)'
+      }}/>
+      {right && (
+        <div style={{
+          fontFamily:"'JetBrains Mono', monospace",
+          fontSize:9, color:'var(--muted-light)'
+        }}>{right}</div>
+      )}
+    </div>
+  )
+}
+
+---
+
+## STEP 5: WEATHER CARD
+
+Full redesign — navy dark card:
+
+Outer card:
+background: linear-gradient(145deg, #0D1B35 0%, #0A1428 100%)
+borderRadius: 20px
+padding: 18px
+overflow: hidden
+position: relative
+
+Blue glow:
+position absolute, top -40px, right -30px
+width 130px height 130px
+radial-gradient(circle, rgba(59,130,246,.2), transparent 70%)
+
+Location row:
+- Red pulsing dot (5px circle, #C41101, box-shadow 0 0 8px rgba(196,17,1,.8))
+- "CITYNAME · SEKARANG" Barlow 8px tracked rgba(255,255,255,.35)
+
+Main row (flex space-between):
+Left:
+- Temperature: JetBrains Mono 52px weight 700 #fff
+  letterSpacing -2px, degree superscript 20px
+- Condition: Barlow italic 10px rgba(255,255,255,.35)
+
+Right — AQI box:
+background: rgba(0,0,0,.5)
+border: 0.5px solid rgba(255,107,53,.25)
+borderRadius: 12px, padding: 10px 12px, textAlign: center
+backdropFilter: blur(4px)
+- "AQI" label: 7px tracked rgba(255,255,255,.25)
+- Number: JetBrains Mono 22px weight 700
+  Color: ≤50 #22C55E, ≤100 #EAB308, ≤150 #F97316, >150 #FF6B35
+- Status: 7px tracked same color
+
+Stats grid (4 cols):
+borderTop: 0.5px solid rgba(255,255,255,.07)
+marginTop 12px, paddingTop 10px
+Each stat: text center, borderRight 0.5px rgba(255,255,255,.07) on non-last
+- Value: JetBrains Mono 14px weight 700 #fff
+- Label: Barlow 7px tracked rgba(255,255,255,.25)
+
+Recommendation banner:
+background: rgba(185,28,28,.12)
+border: 0.5px solid rgba(185,28,28,.25)
+borderRadius: 10px, padding: 9px 12px
+display flex, gap 10px
+- Icon: Lucide (Dumbbell/CloudRain/etc) color #FCA5A5
+- Title: Anton 13px #FCA5A5
+- Sub: Barlow italic 9px rgba(252,165,165,.5)
+
+---
+
+## STEP 6: CHECKLIST HEADER CARD
+
+background: linear-gradient(135deg, #0A0908 0%, #161410 100%)
+borderRadius: 16px, padding: 14px 18px
+position relative, overflow hidden
+display flex, justify-content space-between, align-items center
+
+Bottom accent line:
+position absolute, bottom 0, left 0, right 0, height 2.5px
+background: linear-gradient(90deg, #C41101 60%, transparent)
+
+Left:
+- "TODAY" label: Barlow 7px tracked rgba(255,255,255,.3)
+- Date: Anton 17px #fff
+
+Right:
+- Progress "3/5": JetBrains Mono 24px weight 700 #fff
+- "COMPLETE": Barlow 7px tracked rgba(255,255,255,.25)
+
+---
+
+## STEP 7: CHECKLIST ITEMS
+
+Each item is a floating white card:
+
+background: var(--card)
+borderRadius: 13px, padding: 10px 14px
+display flex, align-items center, gap 10px
+boxShadow: var(--shadow-sm)
+position relative, overflow hidden
+
+Left accent bar (::before via className):
+Use a div absolutely positioned:
+position absolute, left 0, top 0, bottom 0, width 3px, borderRadius 99px 0 0 99px
+Done: background #22C55E
+Todo: background linear-gradient(180deg, var(--border-warm), transparent)
+
+Done item: opacity 0.65
+
+Circle (left):
+Done: background #22C55E, boxShadow 0 2px 8px rgba(34,197,94,.3)
+  size 20px circle, white checkmark ✓ centered, fontSize 11px
+Todo: border 1.5px solid var(--border-warm), 20px circle empty
+
+Emoji (14px, flex-shrink 0)
+
+Body:
+- Name: Barlow 12px var(--text), done → strikethrough + color var(--muted-light)
+- Sub: Barlow italic 9px var(--muted), margin-top 1px
+- Tags: flex row gap 3px, margin-top 3px
+  Each tag: Barlow 7px, padding 2px 6px, borderRadius 99px
+  border 0.5px solid var(--border-warm), color var(--muted)
+  HIGH tag: color #C41101, border rgba(196,17,1,.2), bg rgba(196,17,1,.04)
+
+---
+
+## STEP 8: QUICK CHECK-IN TILES
+
+2x2 grid, gap 8px
+
+Each tile: borderRadius 16px, padding 14px 12px
+position relative, overflow hidden
+cursor pointer
+
+Tile backgrounds (always dark even in light mode):
+Cycle:    linear-gradient(135deg, #1E0918, #2A1022)
+Wellness: linear-gradient(135deg, #091E11, #0D2617)
+Sleep:    linear-gradient(135deg, #0E0918, #17102A)
+Water:    linear-gradient(135deg, #04121E, #071825)
+
+Glow blob (position absolute, top -20px, right -20px, 60px circle, opacity .3):
+Cycle:    radial-gradient(circle, #EC4899, transparent)
+Wellness: radial-gradient(circle, #22C55E, transparent)
+Sleep:    radial-gradient(circle, #A855F7, transparent)
+Water:    radial-gradient(circle, #06B6D4, transparent)
+
+Accent dot (position absolute, bottom 10px, right 10px, 5px circle):
+Cycle:    #EC4899, boxShadow 0 0 8px rgba(236,72,153,.6)
+Wellness: #22C55E, boxShadow 0 0 8px rgba(34,197,94,.6)
+Sleep:    #A855F7, boxShadow 0 0 8px rgba(168,85,247,.6)
+Water:    #06B6D4, boxShadow 0 0 8px rgba(6,182,212,.6)
+
+Content (position relative, z-index 1):
+- Icon: 18px emoji, marginBottom 6px
+- Title: Anton 12px #fff, letterSpacing .3px
+- Value: Barlow italic 8px, marginTop 4px
+  Cycle color:    rgba(236,72,153,.55)
+  Wellness color: rgba(34,197,94,.55)
+  Sleep color:    rgba(168,85,247,.55)
+  Water color:    rgba(6,182,212,.55)
+
+Hover effect:
+transform: translateY(-2px)
+filter: brightness(1.1)
+transition: all .2s
+
+---
+
+## STEP 9: MCU CARD (empty state)
+
+background: var(--card)
+borderRadius: 20px, padding: 24px 20px
+boxShadow: var(--shadow-md)
+textAlign: center
+
+Large icon container:
+width 72px, height 72px, borderRadius 50%
+background: rgba(196,17,1,.06)
+border: 1px solid rgba(196,17,1,.1)
+display flex, center center
+margin: 0 auto 16px
+
+Bandage/medical icon: Lucide Activity, size 32, color rgba(196,17,1,.5)
+
+Title: Anton 20px var(--text)
+Description: Barlow italic 13px var(--muted) maxWidth 280px margin auto
+
+Feature tiles (2x2):
+Each: background var(--bg), borderRadius 10px, padding 10px 12px
+border: 0.5px solid var(--border-warm)
+Icon + title side by side
+
+Buttons:
+Primary (Upload): background #C41101, color #fff, Anton 14px tracked
+  borderRadius 12px, padding 13px, fullWidth
+  hover: opacity .88, transform translateY(-1px)
+Secondary: transparent, border 1.5px solid var(--border-warm)
+  color var(--muted), Anton 14px
+
+---
+
+## STEP 10: SPORTS EVENTS SECTION
+
+Featured event card:
+background: linear-gradient(135deg, #0A0908, #1A1408)
+borderRadius: 20px, padding: 20px
+position relative, overflow hidden
+
+Gold glow top-right:
+radial-gradient(circle, rgba(212,168,0,.15), transparent 60%)
+
+Content:
+- Flag emoji + event type (Barlow 9px tracked rgba(255,255,255,.35))
+- Event name: Anton 22px #fff
+- Date + location: Barlow 11px rgba(255,255,255,.45)
+- Countdown: JetBrains Mono 14px #fff + Barlow "HARI LAGI" rgba(255,255,255,.35)
+- "DAFTAR →" button: 
+  background #C41101, color #fff, Anton 13px tracked
+  borderRadius 10px, padding 9px 18px
+  boxShadow: 0 4px 16px rgba(196,17,1,.3)
+
+Mini event cards (horizontal scroll):
+background: rgba(255,255,255,.05)
+border: 0.5px solid rgba(255,255,255,.1)
+borderRadius: 12px, padding 12px 14px
+width 120px, flex-shrink 0
+
+---
+
+## STEP 11: 20FIT PLUS CARD
+
+Keep existing dark gradient.
+Upgrade button:
+background: linear-gradient(135deg, #D4A800, #FFD700)
+color: #0A0908, Anton 15px tracked
+boxShadow: 0 4px 20px rgba(212,168,0,.35)
+hover: translateY(-2px), shadow increase
+
+---
+
+## STEP 12: PAGE TRANSITIONS
+
+Add smooth fade+slide transition between routes:
+
+In App.jsx or Layout.jsx, wrap page content:
+
+import { useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+
+function PageWrapper({ children }) {
+  const location = useLocation()
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    setVisible(false)
+    const t = setTimeout(() => setVisible(true), 50)
+    return () => clearTimeout(t)
+  }, [location.pathname])
+
+  return (
+    <div style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? 'translateY(0)' : 'translateY(8px)',
+      transition: 'opacity .3s ease, transform .3s ease',
+    }}>
+      {children}
+    </div>
+  )
+}
+
+Wrap all Route elements with PageWrapper.
+
+---
+
+## STEP 13: SECTION ENTRANCE ANIMATIONS
+
+Add stagger animation when sections enter viewport.
+Use Intersection Observer:
+
+function useReveal() {
+  const ref = useRef(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
+      { threshold: 0.1 }
+    )
+    if (ref.current) obs.observe(ref.current)
+    return () => obs.disconnect()
+  }, [])
+
+  return { ref, visible }
+}
+
+Apply to each section wrapper:
+const { ref, visible } = useReveal()
+
+<div ref={ref} style={{
+  opacity: visible ? 1 : 0,
+  transform: visible ? 'translateY(0)' : 'translateY(16px)',
+  transition: 'opacity .5s ease, transform .5s ease',
+}}>
+  {/* section content */}
+</div>
+
+---
+
+## STEP 14: HOVER + ACTIVE STATES
+
+Add to all interactive cards:
+
+onMouseEnter: e.currentTarget.style.transform = 'translateY(-2px)'
+onMouseLeave: e.currentTarget.style.transform = 'translateY(0)'
+onMouseDown: e.currentTarget.style.transform = 'scale(0.98)'
+onMouseUp: e.currentTarget.style.transform = 'translateY(-2px)'
+
+All transitions: 'all .2s cubic-bezier(.22,1,.36,1)'
+
+---
+
+## STEP 15: PROGRESS PAGE CARDS
+
+Metric cards:
+background: var(--card)
+borderRadius: 14px
+padding: 16px
+boxShadow: var(--shadow-sm)
+
+Add colored top border per metric:
+Weight: borderTop 2.5px solid #C41101
+BMI: borderTop 2.5px solid #3B82F6
+Body Fat: borderTop 2.5px solid #F97316
+Resting HR: borderTop 2.5px solid #EF4444
+Waist: borderTop 2.5px solid #A855F7
+Sleep: borderTop 2.5px solid #8B5CF6
+Water: borderTop 2.5px solid #06B6D4
+Energy: borderTop 2.5px solid #22C55E
+
+---
+
+## STEP 16: NUTRITION PAGE
+
+Daily goal card (dark):
+background: linear-gradient(135deg, #0A0908 0%, #1A1810 100%)
+Add gold glow: radial-gradient(circle, rgba(212,168,0,.12), transparent 60%)
+
+Meal cards: white cards with left border accent
+color per meal time:
+Sarapan: borderLeft 3px solid #F97316
+Makan Siang: borderLeft 3px solid #EAB308
+Snack: borderLeft 3px solid #22C55E
+Makan Malam: borderLeft 3px solid #3B82F6
+
+---
+
+## IMPORTANT
+
+- Do NOT change any functionality — only visual styles
+- All modals (bottom sheets) keep same structure, update background to var(--card) with warm border
+- Bottom nav on mobile: background #0A0908 always dark, active tab red
+- Sidebar: no change (already dark)
+- After all changes: npm run build — fix all errors
+- Make sure dark mode still works — all CSS variables must have [data-theme="dark"] overrides

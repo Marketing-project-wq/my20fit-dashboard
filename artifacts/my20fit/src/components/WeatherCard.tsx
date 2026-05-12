@@ -250,33 +250,33 @@ export default function WeatherCard() {
   }, [retryKey]);
 
   const card: React.CSSProperties = {
-    backgroundColor: "var(--card)",
-    borderRadius: "16px",
-    boxShadow: "0 1px 8px rgba(0,0,0,0.06)",
+    background: "linear-gradient(145deg, #0D1B35 0%, #0A1428 100%)",
+    borderRadius: "20px",
     overflow: "hidden",
     marginBottom: "24px",
+    position: "relative",
   };
 
   const divider: React.CSSProperties = {
-    borderTop: "1px solid var(--border-subtle)",
+    borderTop: "0.5px solid rgba(255,255,255,.07)",
   };
 
-  const muted = { color: "var(--muted)" } as const;
-  const text = { color: "var(--text)" } as const;
+  const muted = { color: "rgba(255,255,255,.35)" } as const;
+  const text = { color: "#ffffff" } as const;
 
   const rec = weather ? getRecommendation(weather.aqi, weather.conditionCode, weather.feels) : null;
   const isIndoor = rec?.type === "indoor";
 
-  const recBg = isIndoor ? "#FEF2F2" : "#F0FDF4";
-  const recBorder = isIndoor ? "#FECACA" : "#BBF7D0";
-  const recIconBg = isIndoor ? "#FEE2E2" : "#DCFCE7";
-  const recTagColor = isIndoor ? "#B91C1C" : "#15803D";
-  const recPillBg = isIndoor ? "#FEE2E2" : "#DCFCE7";
+  const recBg = isIndoor ? "rgba(185,28,28,.12)" : "rgba(34,197,94,.08)";
+  const recBorder = isIndoor ? "rgba(185,28,28,.25)" : "rgba(34,197,94,.2)";
+  const recIconBg = isIndoor ? "rgba(185,28,28,.15)" : "rgba(34,197,94,.12)";
+  const recTagColor = isIndoor ? "#FCA5A5" : "#86EFAC";
+  const recPillBg = isIndoor ? "rgba(252,165,165,.1)" : "rgba(134,239,172,.1)";
 
   const minAgo = weather ? Math.floor((Date.now() - weather.fetchedAt) / 60000) : 0;
 
   if (loading) return (
-    <div style={{ background: "var(--card)", borderRadius: 16, padding: 20, boxShadow: "0 1px 8px rgba(0,0,0,0.06)", marginBottom: 24 }}>
+    <div style={{ background: "linear-gradient(145deg, #0D1B35 0%, #0A1428 100%)", borderRadius: 20, padding: 20, marginBottom: 24 }}>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           <SkeletonBlock height={10} width={120} />
@@ -348,7 +348,7 @@ export default function WeatherCard() {
           {loading ? (
             <Shimmer w={70} h={11} />
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", color: "var(--muted)", opacity: 0.7 }}>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", color: "rgba(255,255,255,.25)" }}>
               {error ? "" : `Feels like ${weather?.feels}°`}
             </p>
           )}
@@ -356,10 +356,11 @@ export default function WeatherCard() {
 
         {/* AQI Box */}
         <div style={{
-          background: "linear-gradient(180deg, #111111 0%, #000000 100%)",
-          boxShadow: "inset 0 0 20px rgba(196,17,1,0.2), 0 10px 30px rgba(0,0,0,0.25)",
+          background: "rgba(0,0,0,.5)",
+          border: "0.5px solid rgba(255,107,53,.25)",
+          backdropFilter: "blur(4px)",
           borderRadius: "12px",
-          padding: "14px 16px",
+          padding: "10px 12px",
           textAlign: "center",
           minWidth: "80px",
           flexShrink: 0,
@@ -397,7 +398,7 @@ export default function WeatherCard() {
             style={{
               padding: "12px 0",
               textAlign: "center",
-              borderRight: i < arr.length - 1 ? "1px solid var(--border-subtle)" : "none",
+              borderRight: i < arr.length - 1 ? "0.5px solid rgba(255,255,255,.07)" : "none",
             }}
           >
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", ...muted, marginBottom: "4px" }}>{s.label}</p>
@@ -419,8 +420,8 @@ export default function WeatherCard() {
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", color: recTagColor, marginBottom: "2px" }}>{rec.tag}</p>
-            <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: "#0A0908", marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 500, color: "#6B7280", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
+            <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: recTagColor, marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 500, color: "rgba(255,255,255,.45)", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
               {rec.pills.map(pill => (
                 <span key={pill} style={{ backgroundColor: recPillBg, color: recTagColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "1px", borderRadius: "99px", padding: "3px 8px" }}>{pill}</span>
@@ -456,15 +457,15 @@ export default function WeatherCard() {
                     borderRadius: "10px",
                     padding: "10px 6px",
                     textAlign: "center",
-                    backgroundColor: isNow ? "#0A0908" : "var(--card2)",
-                    border: `0.5px solid ${isNow ? "#0A0908" : "var(--border-subtle)"}`,
+                    backgroundColor: isNow ? "rgba(196,17,1,.85)" : "rgba(255,255,255,.06)",
+                    border: `0.5px solid ${isNow ? "rgba(196,17,1,.5)" : "rgba(255,255,255,.08)"}`,
                   }}
                 >
-                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: isNow ? "rgba(255,255,255,.5)" : "var(--muted)", marginBottom: "5px" }}>
+                  <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "10px", letterSpacing: "1.5px", color: isNow ? "rgba(255,255,255,.8)" : "rgba(255,255,255,.3)", marginBottom: "5px" }}>
                     {isNow ? "NOW" : h.time}
                   </p>
                   <p style={{ fontSize: "18px", marginBottom: "4px" }}>{h.icon}</p>
-                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 700, color: isNow ? "#fff" : "var(--text)", marginBottom: "4px" }}>{h.temp}°</p>
+                  <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px", fontWeight: 700, color: "#fff", marginBottom: "4px" }}>{h.temp}°</p>
                   {h.aqi != null && cellAqiColor && cellAqiBg && (
                     <span style={{ backgroundColor: cellAqiBg, color: cellAqiColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", borderRadius: "4px", padding: "1px 5px", letterSpacing: "0.5px" }}>
                       {h.aqi}

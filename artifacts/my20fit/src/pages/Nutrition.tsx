@@ -332,7 +332,10 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
               {/* Section 3: Meal cards */}
               <div>
-                <p className="section-header">REKOMENDASI MAKAN</p>
+                <div className="section-header" style={{ marginBottom: 12 }}>
+                  <h2>REKOMENDASI MAKAN</h2>
+                  <div className="section-header-line" />
+                </div>
                 {recommendation.meals.map((meal, index) => {
                   const isCurrent = index === currentMealIndex;
                   const isExpanded = expandedMeal === index;
@@ -342,7 +345,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                       style={{
                         background: "var(--card)",
                         borderRadius: 14,
-                        border: isCurrent ? "2px solid #C41101" : "1px solid transparent",
+                        borderLeft: isCurrent ? "3px solid #C41101" : "3px solid var(--border-warm)",
                         boxShadow: isCurrent ? "0 0 0 4px rgba(196,17,1,.06)" : "var(--shadow, 0 2px 8px rgba(0,0,0,0.05))",
                         marginBottom: 12, overflow: "hidden", transition: "all .2s",
                       }}

@@ -306,6 +306,7 @@ export default function QuickCheckin() {
     <div className="mb-8" data-testid="section-quick-checkin">
       <div className="section-header">
         <h2>QUICK CHECK-IN</h2>
+        <div className="section-header-line" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
@@ -313,12 +314,13 @@ export default function QuickCheckin() {
         {/* ---- TILE 1: Menstrual Cycle ---- */}
         <div
           onClick={handleCycleTileClick}
-          style={tileStyle(hoverCycle)}
+          style={{...tileStyle(hoverCycle), background: "linear-gradient(135deg, #1E0918, #2A1022)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
           onMouseEnter={() => setHoverCycle(true)}
           onMouseLeave={() => setHoverCycle(false)}
           data-testid="checkin-menstrual"
         >
-          <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#EC4899" }} />
+          <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,.3), transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#EC4899", boxShadow: "0 0 8px rgba(236,72,153,.6)" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Heart size={18} style={{ color: "#EC4899" }} />
             <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>SIKLUS</span>
@@ -356,12 +358,13 @@ export default function QuickCheckin() {
         {/* ---- TILE 2: Daily Wellness ---- */}
         <div
           onClick={openWellness}
-          style={tileStyle(hoverWellness)}
+          style={{...tileStyle(hoverWellness), background: "linear-gradient(135deg, #091E11, #0D2617)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
           onMouseEnter={() => setHoverWellness(true)}
           onMouseLeave={() => setHoverWellness(false)}
           data-testid="checkin-wellness"
         >
-          <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#22C55E" }} />
+          <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(34,197,94,.25), transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 8px rgba(34,197,94,.5)" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Smile size={18} style={{ color: "#22C55E" }} />
             <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>WELLNESS</span>
@@ -381,12 +384,13 @@ export default function QuickCheckin() {
         {/* ---- TILE 3: Sleep Quality ---- */}
         <div
           onClick={openSleep}
-          style={tileStyle(hoverSleep)}
+          style={{...tileStyle(hoverSleep), background: "linear-gradient(135deg, #0E0918, #17102A)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
           onMouseEnter={() => setHoverSleep(true)}
           onMouseLeave={() => setHoverSleep(false)}
           data-testid="checkin-sleep"
         >
-          <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#A855F7" }} />
+          <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,.25), transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#A855F7", boxShadow: "0 0 8px rgba(168,85,247,.5)" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Moon size={18} style={{ color: "#A855F7" }} />
             <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>TIDUR</span>
@@ -410,12 +414,13 @@ export default function QuickCheckin() {
         {/* ---- TILE 4: Water Intake ---- */}
         <div
           onClick={() => setShowWaterModal(true)}
-          style={tileStyle(hoverWater)}
+          style={{...tileStyle(hoverWater), background: "linear-gradient(135deg, #04121E, #071825)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
           onMouseEnter={() => setHoverWater(true)}
           onMouseLeave={() => setHoverWater(false)}
           data-testid="checkin-water"
         >
-          <div style={{ position: "absolute", top: 12, right: 12, width: 8, height: 8, borderRadius: "50%", background: "#06B6D4" }} />
+          <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(6,182,212,.25), transparent 70%)", pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#06B6D4", boxShadow: "0 0 8px rgba(6,182,212,.5)" }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
             <Droplets size={18} style={{ color: "#06B6D4" }} />
             <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>AIR</span>
@@ -423,7 +428,7 @@ export default function QuickCheckin() {
           <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 700, color: "var(--text)" }}>
             {totalCups}<span style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", margin: "0 2px" }}>/</span>{targetCups}
           </div>
-          <div style={{ height: 4, background: "var(--bg, #f5f5f5)", borderRadius: 99, marginTop: 6, overflow: "hidden" }}>
+          <div style={{ height: 4, background: "rgba(255,255,255,.1)", borderRadius: 99, marginTop: 6, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${waterPct}%`, background: "#06B6D4", borderRadius: 99, transition: "width .4s ease" }} />
           </div>
           <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 10, color: "var(--muted)", marginTop: 3 }}>gelas hari ini</div>

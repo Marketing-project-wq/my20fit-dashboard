@@ -17,20 +17,43 @@ function RedirectHome() {
   return null;
 }
 
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  const [location] = useLocation();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    setVisible(false);
+    const t = setTimeout(() => setVisible(true), 30);
+    return () => clearTimeout(t);
+  }, [location]);
+
+  return (
+    <div style={{
+      opacity: visible ? 1 : 0,
+      transform: visible ? "none" : "translateY(6px)",
+      transition: "opacity .25s ease, transform .25s ease",
+    }}>
+      {children}
+    </div>
+  );
+}
+
 const queryClient = new QueryClient();
 
 function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   useScrollRestore();
   return (
-    <Switch>
-      <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
-      <Route path="/progress" component={() => <Progress theme={theme} toggleTheme={toggleTheme} />} />
-      <Route path="/nutrition" component={() => <Nutrition theme={theme} toggleTheme={toggleTheme} />} />
-      <Route path="/events" component={() => <ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} />} />
-      <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
-      <Route path="/profile" component={() => <Profile theme={theme} toggleTheme={toggleTheme} />} />
-      <Route component={RedirectHome} />
-    </Switch>
+    <PageWrapper>
+      <Switch>
+        <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/progress" component={() => <Progress theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/nutrition" component={() => <Nutrition theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/events" component={() => <ComingSoon title="EVENTS" theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
+        <Route path="/profile" component={() => <Profile theme={theme} toggleTheme={toggleTheme} />} />
+        <Route component={RedirectHome} />
+      </Switch>
+    </PageWrapper>
   );
 }
 

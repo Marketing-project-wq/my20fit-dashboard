@@ -179,75 +179,49 @@ export default function TodaysChecklist() {
             </span>
           )}
         </div>
-        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "11px", color: "var(--muted)" }}>{dateStr}</span>
+        <div className="section-header-line" />
+        <span className="section-header-right">{dateStr}</span>
       </div>
 
       {/* Header card */}
-      <motion.div
-        className="app-card !p-0 mb-3 overflow-hidden"
-        animate={{ backgroundColor: allDone ? "#16a34a" : "var(--card)" }}
-        transition={{ duration: 0.5 }}
+      <div
+        className="!p-0 mb-3 overflow-hidden"
+        style={{
+          borderRadius: 16,
+          position: "relative",
+          background: allDone
+            ? "linear-gradient(135deg, #14532D, #166534)"
+            : "linear-gradient(135deg, #0A0908 0%, #161410 100%)",
+          transition: "background 0.5s ease",
+        }}
       >
         <div className="p-4 flex justify-between items-center">
           <div>
-            <p
-              style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: 900,
-                fontSize: "10px",
-                letterSpacing: "1.5px",
-                color: allDone ? "rgba(255,255,255,0.7)" : "var(--muted)",
-              }}
-            >
+            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: "10px", letterSpacing: "1.5px", color: "rgba(255,255,255,0.45)" }}>
               TODAY
             </p>
-            <p
-              style={{
-                fontFamily: "'Anton', sans-serif",
-                fontWeight: 400,
-                fontSize: "15px",
-                color: allDone ? "#fff" : "var(--text)",
-              }}
-            >
+            <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: "#fff" }}>
               {dateStr}
             </p>
           </div>
           <div className="text-right">
-            <p
-              className="leading-none"
-              style={{
-                fontFamily: "'JetBrains Mono', monospace",
-                fontSize: "22px",
-                fontWeight: 700,
-                color: allDone ? "#fff" : "var(--text)",
-              }}
-            >
+            <p className="leading-none" style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "22px", fontWeight: 700, color: "#fff" }}>
               {doneCount}/{tasks.length}
             </p>
-            <p
-              className="mt-1"
-              style={{
-                fontFamily: allDone ? "'Anton', sans-serif" : "'Barlow Condensed', sans-serif",
-                fontWeight: allDone ? 400 : 900,
-                fontSize: "10px",
-                letterSpacing: allDone ? "1px" : "1.5px",
-                color: allDone ? "rgba(255,255,255,0.85)" : "var(--muted)",
-              }}
-            >
+            <p className="mt-1" style={{ fontFamily: allDone ? "'Anton', sans-serif" : "'Barlow Condensed', sans-serif", fontWeight: allDone ? 400 : 900, fontSize: "10px", letterSpacing: "1.5px", color: "rgba(255,255,255,0.55)" }}>
               {allDone ? "ALL DONE TODAY!" : "COMPLETE"}
             </p>
           </div>
         </div>
-        <div className="h-1.5 w-full" style={{ backgroundColor: "var(--card2)" }}>
+        <div style={{ height: 3, width: "100%", background: "rgba(255,255,255,.08)" }}>
           <motion.div
-            className="h-full"
-            style={{ backgroundColor: allDone ? "rgba(255,255,255,0.35)" : "#22C55E" }}
+            style={{ height: "100%", backgroundColor: allDone ? "rgba(255,255,255,0.5)" : "#C41101" }}
             initial={{ width: 0 }}
             animate={{ width: `${tasks.length ? (doneCount / tasks.length) * 100 : 0}%` }}
             transition={{ duration: 0.5, ease: "easeInOut" }}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Task items */}
       <div className="flex flex-col gap-2">
@@ -257,7 +231,7 @@ export default function TodaysChecklist() {
             layout
             onClick={() => toggleTask(task.id)}
             className="app-card !p-3 flex items-center gap-3 cursor-pointer"
-            style={{ opacity: task.done ? 0.58 : 1 }}
+            style={{ opacity: task.done ? 0.58 : 1, borderLeft: `3px solid ${task.done ? "#22C55E" : "var(--red)"}` }}
             data-testid={`task-${task.id}`}
             whileTap={{ scale: 0.98 }}
           >
