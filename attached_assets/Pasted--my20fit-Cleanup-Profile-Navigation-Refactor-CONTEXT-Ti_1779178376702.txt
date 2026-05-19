@@ -1,0 +1,298 @@
+# my20fit — Cleanup & Profile Navigation Refactor
+
+## CONTEXT
+
+Tiga cleanup dalam satu eksekusi:
+
+**Task A:** Hapus menu "Events" dari sidebar — halaman placeholder tidak digunakan.
+
+**Task B:** Hapus section "UPCOMING SPORTS EVENTS" dari Home page — section dengan hardcoded data.
+
+**Task C:** Hapus menu "Profile" dari sidebar utama, ganti dengan **user card di bottom-left jadi clickable** yang navigate ke `/profile` (embedded access pattern).
+
+**Tujuan akhir:**
+- Sidebar: **4 menu** utama (HOME, NUTRITION, PROGRESS, MOMENTS)
+- Profile access: via user card di bottom-left sidebar (yang sudah ada — tinggal di-make clickable)
+- Home page: tanpa section Sports Events
+
+---
+
+## SCOPE
+
+### Files to MODIFY:
+1. `src/components/Sidebar.jsx` (atau equivalent) — Remove Events & Profile dari menu items + make user card clickable
+2. `src/App.jsx` / router config — Remove route `/events`, keep route `/profile`
+3. `src/pages/Home.jsx` — Remove `<SportsEvents />` usage
+4. Mobile bottom nav (kalau ada file terpisah) — adjust menu items
+
+### Files to DELETE:
+1. `src/pages/Events.jsx` (atau equivalent)
+2. `src/components/SportsEvents.tsx`
+
+### ❌ JANGAN UBAH:
+- `src/pages/Profile.jsx` — page Profile tetap ada, route `/profile` tetap functional
+- Komponen Profile content (hero card, personal info, health snapshot, activity stats, 20FIT Plus, settings)
+- Section lain di Home (Greeting Card, Weather Card, Today's Checklist, Quick Check-in, My Moments, 20FIT Plus)
+- Menu lain (HOME, NUTRITION, PROGRESS, MOMENTS) tetap berfungsi
+- Brand identity, fonts, colors
+
+---
+
+## TASK A — REMOVE EVENTS MENU
+
+### Step A1 — Sidebar Menu Items
+
+Di `Sidebar.jsx`, cari array menu items. Pattern umum:
+
+```javascript
+const menuItems = [
+  { id: 'home', label: 'HOME', icon: Home, path: '/' },
+  { id: 'nutrition', label: 'NUTRITION', icon: Utensils, path: '/nutrition' },
+  { id: 'progress', label: 'PROGRESS', icon: TrendingUp, path: '/progress' },
+  { id: 'events', label: 'EVENTS', icon: Calendar, path: '/events' },     // ← REMOVE
+  { id: 'moments', label: 'MOMENTS', icon: Camera, path: '/moments' },
+  { id: 'profile', label: 'PROFILE', icon: User, path: '/profile' },      // ← REMOVE (Task C)
+];
+```
+
+Hapus entry Events. (Profile akan dihapus di Task C, biar consolidated dalam 1 edit.)
+
+### Step A2 — Remove Route /events
+
+Di router file:
+```jsx
+<Route path="/events" element={<Events />} />        // ← REMOVE
+import Events from './pages/Events';                  // ← REMOVE import
+```
+
+### Step A3 — Delete Events Page
+
+Hapus `src/pages/Events.jsx`. Kalau Replit Agent tidak bisa delete, kosongkan isi file dengan komentar:
+```jsx
+// File deprecated — safe to delete manually
+```
+
+---
+
+## TASK B — REMOVE SPORTS EVENTS SECTION
+
+### Step B1 — Remove dari Home.jsx
+
+```jsx
+import SportsEvents from '../components/SportsEvents';  // ← REMOVE
+<SportsEvents />                                         // ← REMOVE dari JSX
+```
+
+### Step B2 — Delete SportsEvents Component
+
+Hapus `src/components/SportsEvents.tsx`. Kalau tidak bisa delete, kosongkan dengan komentar.
+
+### Step B3 — Cek Unused Dependencies
+
+Setelah hapus SportsEvents:
+- Cek `Calendar` icon import — apakah masih dipakai komponen lain?
+- Cek hardcoded event data array yang mungkin hanya untuk SportsEvents
+- Cek CSS classes specific untuk SportsEvents
+
+Hapus yang sudah tidak terpakai. **Tapi hati-hati:** kalau `Calendar` icon masih dipakai di komponen lain (misal Weather, Date picker), JANGAN hapus.
+
+### Step B4 — Verify Home Layout
+
+Pastikan section sebelum dan sesudahnya tetap rapi. Adjust margin/gap kalau perlu supaya tidak ada gap kosong.
+
+---
+
+## TASK C — PROFILE ACCESS VIA USER CARD (EMBEDDED)
+
+Ini bagian utama yang baru — pattern Discord/Slack/Spotify style.
+
+### Step C1 — Remove Profile dari Main Menu
+
+Di sidebar menu items array, hapus entry Profile:
+```javascript
+{ id: 'profile', label: 'PROFILE', icon: User, path: '/profile' },  // ← REMOVE
+```
+
+**Hasilnya:** Main menu sidebar tinggal 4 items:
+- HOME
+- NUTRITION
+- PROGRESS
+- MOMENTS
+
+### Step C2 — Make User Card di Bottom-Left Clickable
+
+Di `Sidebar.jsx`, cari section user card di bottom-left yang menampilkan:
+- Avatar initials (lingkaran merah dengan "ZI")
+- Nama "ZIDNI"
+- Email "zidni@20fit.id"
+- Badge "PLUS MEMBER"
+
+Saat ini kemungkinan struktur-nya:
+```jsx
+<div className="user-card">
+  <div className="avatar">ZI</div>
+  <div className="user-info">
+    <p className="name">ZIDNI</p>
+    <p className="email">zidni@20fit.id</p>
+    <span className="badge">⭐ PLUS MEMBER</span>
+  </div>
+</div>
+```
+
+**Transform jadi:**
+```jsx
+import { useNavigate, useLocation } from 'react-router-dom';
+
+// inside component:
+const navigate = useNavigate();
+const location = useLocation();
+const isProfileActive = location.pathname === '/profile';
+
+<button
+  type="button"
+  onClick={() => navigate('/profile')}
+  className={`user-card-button ${isProfileActive ? 'active' : ''}`}
+  aria-label="Buka Profile"
+>
+  <div className="avatar">ZI</div>
+  <div className="user-info">
+    <p className="name">ZIDNI</p>
+    <p className="email">zidni@20fit.id</p>
+    <span className="badge">⭐ PLUS MEMBER</span>
+  </div>
+</button>
+```
+
+### Step C3 — Add Visual Feedback (Hover + Active State)
+
+User card button perlu visual cue supaya jelas clickable:
+
+**Styling guidelines (pakai Tailwind atau inline style sesuai existing pattern):**
+
+```jsx
+// Base state — looks like existing card, but clearly tappable
+style={{
+  background: 'transparent', // atau existing bg
+  border: 'none',
+  width: '100%',
+  textAlign: 'left',
+  padding: '12px 16px',
+  cursor: 'pointer',
+  borderRadius: '12px',
+  transition: 'all 0.2s ease',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+}}
+
+// Hover state
+':hover': {
+  background: 'rgba(255, 255, 255, 0.05)',
+}
+
+// Active state (when /profile route is active)
+isProfileActive && {
+  background: 'rgba(192, 57, 43, 0.15)', // subtle red tint
+  borderLeft: '3px solid #C0392B',       // red accent bar (consistent dengan active menu style)
+}
+```
+
+**Penting:** Active state styling-nya **konsisten dengan menu items lain** yang aktif. Kalau menu HOME aktif pakai red bar di kiri + bg tint, user card juga harus pakai pattern sama.
+
+### Step C4 — Add Subtle Chevron / Arrow Icon (Optional tapi recommended)
+
+Tambah icon kecil di kanan user card untuk indicate clickable + drill-down:
+
+```jsx
+import { ChevronRight } from 'lucide-react';
+
+// Di akhir user-info, tambah:
+<ChevronRight size={16} className="text-white/30 ml-auto" />
+```
+
+Ini ngasih affordance visual yang jelas: "klik untuk masuk".
+
+### Step C5 — Keep Route /profile Active
+
+⚠️ **JANGAN hapus route `/profile` di router!** Route harus tetap ada supaya navigate works:
+
+```jsx
+<Route path="/profile" element={<Profile />} />  // ← KEEP THIS
+```
+
+Hanya **menu entry** di sidebar yang dihapus, route tetap valid.
+
+### Step C6 — Mobile Bottom Nav (kalau ada)
+
+Kalau ada `BottomNav.jsx` untuk mobile, apply pattern yang sama:
+- Hapus Profile dari main tabs (jadi 4 tabs: Home, Nutrition, Progress, Moments)
+- Profile access via avatar/header di top-right (atau via slide-in menu)
+
+Kalau tidak yakin pattern mobile-nya, lakukan minimal change: hapus Profile dari tabs, biarkan user akses Profile via swipe sidebar atau hamburger menu existing.
+
+### Step C7 — Logout Button (jika ada di sidebar)
+
+Kalau button logout saat ini di sidebar (terpisah dari user card), **biarkan saja**. Logout di Profile page sudah cukup, tapi kalau sudah ada di sidebar dan working, no need to remove.
+
+---
+
+## TESTING CHECKLIST
+
+Setelah build selesai:
+
+### Task A — Events Menu
+- [ ] Sidebar **TIDAK** menampilkan menu EVENTS
+- [ ] Akses URL `/events` manual → 404 atau redirect (bukan render placeholder)
+- [ ] Menu lain tetap berfungsi
+
+### Task B — Sports Events Section
+- [ ] Section "UPCOMING SPORTS EVENTS" **TIDAK** muncul di Home
+- [ ] Section sebelum & sesudahnya tetap normal — tidak ada gap aneh
+- [ ] Mobile view tetap rapi
+
+### Task C — Profile via User Card
+- [ ] Sidebar main menu hanya **4 items** (HOME, NUTRITION, PROGRESS, MOMENTS)
+- [ ] User card di bottom-left visible dengan: avatar, nama "ZIDNI", email, badge PLUS MEMBER
+- [ ] Hover user card → ada visual feedback (background tint atau cursor pointer)
+- [ ] Klik user card → navigate ke `/profile`
+- [ ] Saat berada di `/profile`, user card menampilkan **active state** (red accent bar atau bg tint, konsisten dengan active menu lain)
+- [ ] Profile page tetap render normal (semua section: hero card, personal info, health snapshot, activity stats, 20FIT Plus, settings)
+- [ ] Klik logout di Profile → navigation works (saat ini masih mock auth, jadi mungkin no actual logout, tapi tidak boleh ada error)
+- [ ] Klik menu HOME → user card kembali ke normal state (no active)
+- [ ] Tab keyboard navigation works (Tab focus ke user card → Enter trigger navigation)
+- [ ] Aria-label "Buka Profile" terbaca screen reader (accessibility)
+
+### General
+- [ ] No console errors
+- [ ] Layout sidebar tetap balanced — main menu di atas, user card di bawah
+- [ ] Dark mode toggle (kalau ada) tetap berfungsi
+- [ ] Responsive: desktop sidebar fixed 220px, mobile sidebar behavior tetap sama
+
+---
+
+## NOTES UNTUK REPLIT AGENT
+
+1. **Eksekusi berurutan** — Task A → B → C. Tapi commit boleh digabung, atau pisah 3 commits sesuai task.
+
+2. **Pattern konsistensi** — Active state user card HARUS konsisten dengan active state menu items lain. Cek dulu styling existing active menu (red bar? bg tint?) lalu apply pattern yang sama.
+
+3. **Aksesibilitas** — User card sekarang fungsi sebagai button, WAJIB pakai `<button>` element (bukan `<div>` dengan onClick), supaya:
+   - Keyboard navigation works (Tab + Enter)
+   - Screen reader announce-nya tepat
+   - Right-click context menu standard
+
+4. **JANGAN hapus** Profile page logic — page-nya tetap utuh, hanya entry point yang berubah.
+
+5. **JANGAN tambah** fitur baru di Profile page — scope ini hanya navigation refactor.
+
+6. **Test edge cases:**
+   - Klik user card berkali-kali → tidak boleh error
+   - Browser back button dari Profile → kembali ke previous page works
+   - Direct URL `/profile` → tetap accessible (penting untuk bookmark/share)
+
+7. **Report back:**
+   - Files modified
+   - Files deleted
+   - Active state styling yang dipakai (red bar? tint? both?)
+   - Confirmation testing checklist passed
+   - Catatan kalau ada pattern existing yang tidak match dengan rencana di atas (e.g. sidebar pakai struktur berbeda dari pattern menuItems array)

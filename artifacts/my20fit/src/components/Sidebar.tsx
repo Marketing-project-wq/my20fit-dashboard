@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, Target, Camera, User, Sun, Moon, UtensilsCrossed } from "lucide-react";
+import { Home, Target, Camera, Sun, Moon, UtensilsCrossed, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -8,7 +8,6 @@ const navItems = [
   { icon: UtensilsCrossed, label: "NUTRITION", key: "nutrition", href: "/nutrition" },
   { icon: Target, label: "PROGRESS", key: "progress", href: "/progress" },
   { icon: Camera, label: "MOMENTS", key: "moments", href: "/moments" },
-  { icon: User, label: "PROFILE", key: "profile", href: "/profile" },
 ];
 
 export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
@@ -36,6 +35,7 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
 
   const initials = displayName.slice(0, 2).toUpperCase();
   const isPlusMember = profile?.is_plus_member ?? false;
+  const isProfileActive = location === "/profile";
 
   return (
     <aside
@@ -81,32 +81,50 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
         })}
       </nav>
 
-      <div className="mt-auto px-6 pb-6 flex flex-col gap-3">
-        <div className="flex items-center gap-3 pt-4 border-t border-white/10">
-          <div
-            className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm overflow-hidden"
-            style={{ backgroundColor: avatarSrc ? "transparent" : "#C41101", fontFamily: "'Anton', sans-serif", fontWeight: 400 }}
+      <div className="mt-auto px-4 pb-6 flex flex-col gap-3">
+        <Link href="/profile">
+          <button
+            type="button"
+            className="w-full flex items-center gap-3 transition-all duration-200"
+            style={{
+              padding: "10px 12px",
+              borderRadius: "10px",
+              cursor: "pointer",
+              backgroundColor: isProfileActive ? "rgba(196, 17, 1, 0.18)" : "transparent",
+              borderLeft: isProfileActive ? "3px solid #C41101" : "3px solid transparent",
+            }}
+            aria-label="Buka Profile"
+            data-testid="sidebar-profile-card"
           >
-            {avatarSrc ? (
-              <img src={avatarSrc} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
-            ) : (
-              initials
-            )}
-          </div>
-          <div className="flex flex-col overflow-hidden">
-            <span className="text-white text-sm truncate" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: "0.5px" }}>
-              {displayName}
-            </span>
-            <span className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>
-              {user?.email}
-            </span>
-            {isPlusMember && (
-              <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: "1px" }}>
-                ⭐ PLUS MEMBER
+            <div
+              className="h-9 w-9 rounded-full flex items-center justify-center shrink-0 text-white text-sm overflow-hidden"
+              style={{ backgroundColor: avatarSrc ? "transparent" : "#C41101", fontFamily: "'Anton', sans-serif", fontWeight: 400 }}
+            >
+              {avatarSrc ? (
+                <img src={avatarSrc} alt="Avatar" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} />
+              ) : (
+                initials
+              )}
+            </div>
+            <div className="flex flex-col overflow-hidden flex-1 text-left">
+              <span className="text-white text-sm truncate" style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: "0.5px" }}>
+                {displayName}
               </span>
-            )}
-          </div>
-        </div>
+              <span className="text-[10px] truncate" style={{ color: "rgba(255,255,255,0.35)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900 }}>
+                {user?.email}
+              </span>
+              {isPlusMember && (
+                <span className="text-[10px]" style={{ color: "#D4A800", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, letterSpacing: "1px" }}>
+                  ⭐ PLUS MEMBER
+                </span>
+              )}
+            </div>
+            <ChevronRight
+              size={14}
+              style={{ color: isProfileActive ? "rgba(196,17,1,0.8)" : "rgba(255,255,255,0.2)", flexShrink: 0 }}
+            />
+          </button>
+        </Link>
 
         <button
           onClick={toggleTheme}
