@@ -1,0 +1,171 @@
+# my20fit — Remove Events Menu & Sports Events Section
+
+## CONTEXT
+
+Dua cleanup dalam satu prompt:
+
+**Task A:** Hapus menu "Events" dari sidebar — halaman placeholder yang tidak digunakan.
+
+**Task B:** Hapus section "UPCOMING SPORTS EVENTS" dari Home page — section yang menampilkan featured events (SportFest Vol.3, HYROX Jakarta 2026, dll) dengan hardcoded data.
+
+**Tujuan akhir:**
+- Sidebar: 5 menu (HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE)
+- Home page: tanpa section Sports Events
+
+---
+
+## SCOPE
+
+### Files to modify:
+1. `src/components/Sidebar.jsx` (atau equivalent) — Remove Events menu item
+2. `src/App.jsx` / `src/main.jsx` / router config — Remove route `/events`
+3. `src/pages/Home.jsx` — Remove `<SportsEvents />` component usage
+4. Adjust mobile bottom nav (kalau Events juga muncul di sana)
+
+### Files to DELETE:
+1. `src/pages/Events.jsx` (atau equivalent) — placeholder page
+2. `src/components/SportsEvents.tsx` — Home page section component
+
+### ❌ JANGAN UBAH:
+- Menu lain di sidebar (HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE)
+- Section lain di Home page (Greeting Card, Weather Card, Today's Checklist, Quick Check-in tiles, My Moments, 20FIT Plus)
+- Komponen non-related (BottomSheet, Skeleton, Toast, dll)
+- Brand identity, fonts, colors
+- Logic auth atau routing lain
+
+---
+
+## TASK A — REMOVE EVENTS MENU
+
+### Step A1 — Sidebar Menu
+
+Cari di `Sidebar.jsx` (atau `Navigation.jsx` / `BottomNav.jsx`) array yang mendefinisikan menu items. Pattern biasanya:
+
+```javascript
+const menuItems = [
+  { id: 'home', label: 'HOME', icon: Home, path: '/' },
+  { id: 'nutrition', label: 'NUTRITION', icon: Utensils, path: '/nutrition' },
+  { id: 'progress', label: 'PROGRESS', icon: TrendingUp, path: '/progress' },
+  { id: 'events', label: 'EVENTS', icon: Calendar, path: '/events' },  // ← REMOVE
+  { id: 'moments', label: 'MOMENTS', icon: Camera, path: '/moments' },
+  { id: 'profile', label: 'PROFILE', icon: User, path: '/profile' },
+];
+```
+
+**Hapus** baris yang berisi `events` / `EVENTS` / `/events`.
+
+Kalau ada `import { Calendar } from 'lucide-react'` yang **hanya dipakai untuk Events**, hapus juga. Tapi kalau Calendar masih dipakai di komponen lain (misal weather), **jangan hapus import-nya**.
+
+### Step A2 — Remove Route
+
+Di router (biasanya `App.jsx` atau `main.jsx`):
+
+```jsx
+<Route path="/events" element={<Events />} />        // ← REMOVE
+import Events from './pages/Events';                  // ← REMOVE import
+```
+
+### Step A3 — Delete Events Page File
+
+Hapus file `src/pages/Events.jsx`.
+
+Kalau Replit Agent tidak bisa delete langsung, kosongkan isi file dengan komentar:
+```jsx
+// File deprecated — Events menu removed from app
+// Safe to delete this file manually
+```
+
+### Step A4 — Cek Mobile Bottom Nav
+
+Kalau ada file terpisah untuk bottom navigation di mobile (`BottomNav.jsx`), check juga — kemungkinan ada array menu yang sama. Pastikan mobile bottom nav menampilkan 5 tabs.
+
+---
+
+## TASK B — REMOVE SPORTS EVENTS SECTION
+
+### Step B1 — Remove SportsEvents Component dari Home
+
+File: `src/pages/Home.jsx`
+
+Cari import dan usage `SportsEvents`:
+
+```jsx
+import SportsEvents from '../components/SportsEvents';  // ← REMOVE import
+
+// Dalam JSX, cari penggunaan ini:
+<SportsEvents />  // ← REMOVE entire line
+```
+
+### Step B2 — Delete SportsEvents Component File
+
+Hapus file `src/components/SportsEvents.tsx`.
+
+Kalau tidak bisa delete, kosongkan dengan komentar:
+```tsx
+// Component deprecated — Sports Events section removed from Home page
+// Safe to delete this file manually
+```
+
+### Step B3 — Cek Dependencies yang Tidak Dipakai Lagi
+
+Setelah hapus SportsEvents, check apakah ada:
+- Import unused di Home.jsx
+- Hardcoded events data di other files yang hanya untuk SportsEvents
+- CSS classes yang spesifik untuk SportsEvents (misal `.section-events`, `.featured-event`)
+- Type definitions atau interfaces untuk Event yang tidak dipakai lagi
+
+Hapus yang relevan.
+
+### Step B4 — Verify Layout Home Page
+
+Setelah SportsEvents dihapus, pastikan section di bawahnya (20FIT Plus card) tetap rapi tanpa gap aneh. Sesuaikan `margin-top` atau `gap` di parent container Home page kalau perlu.
+
+---
+
+## TESTING CHECKLIST
+
+Setelah build selesai:
+
+### Sidebar (Task A)
+- [ ] Sidebar desktop menampilkan **5 menu** (HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE) — tidak ada EVENTS
+- [ ] Bottom nav mobile (kalau ada) juga 5 tabs
+- [ ] Akses URL `/events` manual → 404 atau redirect (bukan render placeholder)
+- [ ] Menu lain tetap berfungsi: HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE
+- [ ] Active state highlighting tetap berfungsi
+- [ ] Spacing/layout sidebar tetap rapi
+
+### Home Page (Task B)
+- [ ] Section "UPCOMING SPORTS EVENTS" **tidak muncul** lagi di Home
+- [ ] Section sebelum dan sesudahnya tetap normal:
+  - Greeting Card → Weather Card → Today's Checklist → Quick Check-in tiles → My Moments → 20FIT Plus
+- [ ] Tidak ada gap kosong atau spacing aneh setelah hapus section
+- [ ] Mobile view juga clean — tidak ada horizontal scroll empty atau layout shift
+
+### General
+- [ ] No console errors related ke "Events" atau "SportsEvents"
+- [ ] No 404 di network tab (kalau ada fetch ke `/api/events` atau similar, hapus juga)
+- [ ] App tetap render normal end-to-end
+
+---
+
+## NOTES UNTUK REPLIT AGENT
+
+1. **Search-and-destroy approach** — Search global untuk:
+   - `Events` (case-sensitive untuk component name)
+   - `/events` (route path)
+   - `SportsEvents` (component name)
+   - `UPCOMING SPORTS EVENTS` (text content)
+   
+   Tapi **hati-hati**: jangan hapus kata "event" generic yang kebetulan ada di konteks lain (misalnya event handlers `onClick`, `addEventListener`, event analytics, dll).
+
+2. **Two tasks, one PR** — Eksekusi keduanya, tapi commit message bisa terpisah supaya history clean:
+   - Commit 1: "Remove Events menu from sidebar"
+   - Commit 2: "Remove Sports Events section from Home page"
+
+3. **Quick task** — Total scope kecil, eksekusi cepat.
+
+4. **Report back:**
+   - List file yang dimodifikasi
+   - List file yang di-delete
+   - Confirmation semua testing checklist passed
+   - Screenshot atau description final state (sidebar + home page tanpa 2 section yang dihapus)

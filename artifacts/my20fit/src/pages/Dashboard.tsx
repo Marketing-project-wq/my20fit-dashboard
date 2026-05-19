@@ -6,7 +6,6 @@ import MedicalCheckup from "@/components/MedicalCheckup";
 import TodaysChecklist from "@/components/TodaysChecklist";
 import QuickCheckin from "@/components/QuickCheckin";
 import MyMoments from "@/components/MyMoments";
-import SportsEvents from "@/components/SportsEvents";
 import PlusCard from "@/components/PlusCard";
 import BottomNav from "@/components/BottomNav";
 import Sidebar from "@/components/Sidebar";
@@ -53,7 +52,6 @@ export default function Dashboard({ theme, toggleTheme }: { theme: string; toggl
             <motion.div variants={item} className="mb-5"><TodaysChecklist /></motion.div>
             <motion.div variants={item} className="mb-5"><QuickCheckin /></motion.div>
             <motion.div variants={item} className="mb-5"><MyMoments /></motion.div>
-            <motion.div variants={item} className="mb-5"><SportsEvents /></motion.div>
             <motion.div variants={item} className="mb-5"><PlusCard /></motion.div>
           </motion.div>
         </div>
