@@ -1,10 +1,9 @@
-import { Home, UtensilsCrossed, Calendar, Camera, User } from "lucide-react";
+import { Home, UtensilsCrossed, Camera, User } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 const tabs = [
   { icon: Home, label: "HOME", key: "home", href: "/" },
   { icon: UtensilsCrossed, label: "NUTRITION", key: "nutrition", href: "/nutrition" },
-  { icon: Calendar, label: "EVENTS", key: "events", href: "/events" },
   { icon: Camera, label: "MOMENTS", key: "moments", href: "/moments" },
   { icon: User, label: "PROFILE", key: "profile", href: "/profile" },
 ];

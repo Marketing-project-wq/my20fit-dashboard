@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Home, Target, Calendar, Camera, User, Sun, Moon, UtensilsCrossed } from "lucide-react";
+import { Home, Target, Camera, User, Sun, Moon, UtensilsCrossed } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -7,7 +7,6 @@ const navItems = [
   { icon: Home, label: "HOME", key: "home", href: "/" },
   { icon: UtensilsCrossed, label: "NUTRITION", key: "nutrition", href: "/nutrition" },
   { icon: Target, label: "PROGRESS", key: "progress", href: "/progress" },
-  { icon: Calendar, label: "EVENTS", key: "events", href: "/events" },
   { icon: Camera, label: "MOMENTS", key: "moments", href: "/moments" },
   { icon: User, label: "PROFILE", key: "profile", href: "/profile" },
 ];

@@ -1,0 +1,116 @@
+# my20fit — Remove Events Menu from Sidebar
+
+## CONTEXT
+
+Menu "Events" di sidebar my20fit perlu dihapus. Halaman saat ini cuma placeholder "Halaman ini sedang dalam pengembangan" — tidak digunakan, harus di-takeout.
+
+**Tujuan akhir:** Sidebar kembali ke 5 menu: HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE.
+
+---
+
+## SCOPE — APA YANG DIUBAH
+
+### Files to modify:
+1. `src/components/Sidebar.jsx` (atau equivalent) — Remove Events menu item
+2. `src/App.jsx` / `src/main.jsx` / router config — Remove route `/events`
+3. **DELETE** file `src/pages/Events.jsx` (atau filename yang sesuai) — kalau ada
+4. Adjust mobile bottom nav (kalau Events juga muncul di sana)
+
+### ❌ JANGAN UBAH:
+- Menu lain (HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE) — biarkan tetap berfungsi
+- Sidebar styling, brand, atau layout selain menu Events
+- Logic auth atau routing lain
+- Halaman lain yang sudah ada
+
+---
+
+## STEP-BY-STEP INSTRUCTIONS
+
+### Step 1 — Locate the Sidebar Menu Definition
+
+Cari di `Sidebar.jsx` (atau `Navigation.jsx` / `BottomNav.jsx` / similar) array yang mendefinisikan menu items. Biasanya pattern-nya seperti ini:
+
+```javascript
+const menuItems = [
+  { id: 'home', label: 'HOME', icon: Home, path: '/' },
+  { id: 'nutrition', label: 'NUTRITION', icon: Utensils, path: '/nutrition' },
+  { id: 'progress', label: 'PROGRESS', icon: TrendingUp, path: '/progress' },
+  { id: 'events', label: 'EVENTS', icon: Calendar, path: '/events' },  // ← REMOVE THIS
+  { id: 'moments', label: 'MOMENTS', icon: Camera, path: '/moments' },
+  { id: 'profile', label: 'PROFILE', icon: User, path: '/profile' },
+];
+```
+
+**Hapus** baris yang berisi `events` / `EVENTS` / `/events`.
+
+Kalau ada `import { Calendar } from 'lucide-react'` yang **hanya dipakai untuk Events**, hapus juga import-nya. Tapi kalau Calendar masih dipakai di komponen lain (misalnya di Home page untuk weather), **jangan hapus import-nya**.
+
+### Step 2 — Remove Route Definition
+
+Cari di file router (biasanya `App.jsx` atau `main.jsx`) baris yang define route `/events`:
+
+```jsx
+<Route path="/events" element={<Events />} />        // ← REMOVE
+{/* atau dengan ProtectedRoute: */}
+<Route path="/events" element={<ProtectedRoute><Events /></ProtectedRoute>} />  // ← REMOVE
+```
+
+Hapus baris tersebut. Juga hapus import:
+
+```jsx
+import Events from './pages/Events';  // ← REMOVE
+```
+
+### Step 3 — Delete Events Page File
+
+Hapus file `src/pages/Events.jsx` (atau apapun nama file Events page-nya). 
+
+Kalau Replit Agent tidak bisa delete file langsung, **kosongkan isi file** dan tambahkan komentar:
+```jsx
+// File deprecated — Events menu removed from app
+// Safe to delete this file manually
+```
+
+### Step 4 — Cek Mobile Bottom Nav
+
+Kalau ada file terpisah untuk bottom navigation di mobile (misal `BottomNav.jsx`), check juga di sana — kemungkinan ada array menu yang sama dan perlu di-remove Events-nya.
+
+Pastikan bottom nav di mobile menampilkan 5 tabs, bukan 6.
+
+### Step 5 — Verify No Broken Links
+
+Search di seluruh codebase untuk references ke `/events`:
+- `navigate('/events')` → ganti atau hapus
+- `<Link to="/events">` → ganti atau hapus
+- `useNavigate()` calls yang menuju events
+
+Kalau ada di Home page atau halaman lain ("Lihat Events" button, dll), hapus juga atau redirect ke halaman lain yang relevan.
+
+---
+
+## TESTING CHECKLIST
+
+Setelah build selesai, verify:
+
+- [ ] Sidebar desktop menampilkan **5 menu** (HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE) — tidak ada EVENTS
+- [ ] Bottom nav mobile (kalau ada) juga 5 tabs, bukan 6
+- [ ] Akses URL `/events` secara manual → harus 404 atau redirect ke home (bukan render halaman placeholder lagi)
+- [ ] Tidak ada console error/warning related ke "Events" component
+- [ ] Menu lain tetap berfungsi normal (klik HOME, NUTRITION, PROGRESS, MOMENTS, PROFILE → navigasi works)
+- [ ] Active state highlighting di sidebar tetap berfungsi
+- [ ] Spacing/layout sidebar tetap rapi (tidak ada gap kosong dari menu yang dihapus)
+
+---
+
+## NOTES UNTUK REPLIT AGENT
+
+1. **Search-and-destroy approach** — Cari semua occurrence kata "events" / "Events" / "/events" di codebase, tapi hati-hati untuk **case-sensitive**. Jangan hapus kata "events" yang relevan untuk konteks lain (misal HYROX events, Sportfest, dll kalau ada).
+
+2. **Confirm setiap deletion** sebelum eksekusi — saya tidak mau Replit Agent over-delete dan break menu lain.
+
+3. **Quick task** — Ini bukan refactor besar, scope-nya kecil. Eksekusi cepat, no need extensive planning.
+
+4. **Report back:**
+   - File yang dimodifikasi (Sidebar, Router)
+   - File yang di-delete
+   - Confirmation testing checklist semua passed
