@@ -1,0 +1,67 @@
+Update penting buat lu:
+
+Investigation di Supabase lu menemukan ada 2 trigger di auth.users — gue 
+gak tau ini sebelumnya:
+
+1. on_auth_user_created (punya kita, ada exception handler) — TIDAK PERLU DI-DROP
+2. trg_my20fit_on_auth_user_created (legacy dari project lama, nyari kolom 
+   "name" yang gak ada, execute function handle_new_user_my20fit()) — 
+   INI yang penyebab "Database error creating new user"
+
+Gue udah drop trigger #2 manual via Dashboard:
+DROP TRIGGER IF EXISTS trg_my20fit_on_auth_user_created ON auth.users;
+
+Trigger #1 (kita punya) TETEP ADA dan harus ada — fungsinya bikin row 
+my20fit_profile otomatis. Plus belt-and-suspenders upsert di auth.ts 
+sebagai fallback.
+
+Sekarang lakuin:
+
+1. JANGAN run SQL drop on_auth_user_created. Itu trigger yang harus 
+   tetap exist. Hapus file db-migrations/03_drop_trigger_and_function.sql 
+   atau modify isinya jadi cuma drop trg_my20fit_on_auth_user_created 
+   untuk dokumentasi.
+
+2. Lakuin E2E test register sekarang dari Replit shell:
+
+   curl -v -X POST http://localhost:8080/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{
+       "fullName":"Test After Drop Real",
+       "email":"after-drop-real-20260520@example.com",
+       "phone":"+6285999333444",
+       "password":"PostDrop123"
+     }'
+
+   Expected: HTTP 200 dengan { ok: true }
+
+3. Verify profile row created:
+   
+   curl "$SUPABASE_URL/rest/v1/my20fit_profile?email=eq.after-drop-real-20260520@example.com" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+
+4. Verify auth.users row created:
+   
+   curl "$SUPABASE_URL/auth/v1/admin/users?email=after-drop-real-20260520@example.com" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+
+5. Verify email_verification_tokens row created (token buat link verifikasi):
+   
+   curl "$SUPABASE_URL/rest/v1/email_verification_tokens?email=eq.after-drop-real-20260520@example.com&order=created_at.desc&limit=1" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+
+6. Verify Mailtrap beneran kirim email — cek API server log entry waktu 
+   request register tadi jalan. Cari log seperti:
+   - "mailtrap_send_success"
+   - "verification_email_sent"
+   - Atau error apapun dari Mailtrap
+
+7. Kasih gue full output 5 hal:
+   - Step 2 (register HTTP response)
+   - Step 3 (profile row)
+   - Step 4 (auth.users row)
+   - Step 5 (verification token row)
+   - Step 6 (Mailtrap log entry)
