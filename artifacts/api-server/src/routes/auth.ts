@@ -27,7 +27,7 @@ function normalizePhone(raw: string): string {
 }
 
 // ── POST /api/auth/register ───────────────────────────────────────────────
-router.post("/api/auth/register", async (req, res) => {
+router.post("/auth/register", async (req, res) => {
   const { fullName, email, phone, password } = req.body ?? {};
 
   // Validation
@@ -90,7 +90,7 @@ router.post("/api/auth/register", async (req, res) => {
 });
 
 // ── POST /api/auth/resend-verification ────────────────────────────────────
-router.post("/api/auth/resend-verification", async (req, res) => {
+router.post("/auth/resend-verification", async (req, res) => {
   const { email } = req.body ?? {};
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -145,7 +145,7 @@ router.post("/api/auth/resend-verification", async (req, res) => {
 });
 
 // ── GET /api/auth/verify?token=... ────────────────────────────────────────
-router.get("/api/auth/verify", async (req, res) => {
+router.get("/auth/verify", async (req, res) => {
   const { token } = req.query;
 
   if (!token || typeof token !== "string") {
@@ -182,7 +182,7 @@ router.get("/api/auth/verify", async (req, res) => {
 });
 
 // ── POST /api/auth/magic-link/request ────────────────────────────────────
-router.post("/api/auth/magic-link/request", async (req, res) => {
+router.post("/auth/magic-link/request", async (req, res) => {
   const { email } = req.body ?? {};
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -242,7 +242,7 @@ router.post("/api/auth/magic-link/request", async (req, res) => {
 });
 
 // ── GET /api/auth/magic-link/verify?token=... ─────────────────────────────
-router.get("/api/auth/magic-link/verify", async (req, res) => {
+router.get("/auth/magic-link/verify", async (req, res) => {
   const { token } = req.query;
 
   if (!token || typeof token !== "string") {
