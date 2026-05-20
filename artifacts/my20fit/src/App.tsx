@@ -3,12 +3,25 @@ import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+
 import Dashboard from "@/pages/Dashboard";
 import Progress from "@/pages/Progress";
 import Nutrition from "@/pages/Nutrition";
 import Profile from "@/pages/Profile";
 import ComingSoon from "@/pages/ComingSoon";
-import { AuthProvider } from "@/contexts/AuthContext";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import VerifyEmail from "@/pages/VerifyEmail";
+import VerifyEmailPending from "@/pages/VerifyEmailPending";
+import MagicLink from "@/pages/MagicLink";
+import MagicLinkSent from "@/pages/MagicLinkSent";
+import MagicLinkConsume from "@/pages/MagicLinkConsume";
+import AuthCallback from "@/pages/AuthCallback";
+import ResetPassword from "@/pages/ResetPassword";
+
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 
 function RedirectHome() {
@@ -42,16 +55,67 @@ const queryClient = new QueryClient();
 
 function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   useScrollRestore();
+  const { user, profile } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  useEffect(() => {
+    if (!user || !profile || profile.onboarding_completed || profile.onboarding_skipped_at) {
+      setShowOnboarding(false);
+      return;
+    }
+    const t = setTimeout(() => setShowOnboarding(true), 800);
+    return () => clearTimeout(t);
+  }, [user, profile?.onboarding_completed, profile?.onboarding_skipped_at]);
+
   return (
     <PageWrapper>
       <Switch>
-        <Route path="/" component={() => <Dashboard theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/progress" component={() => <Progress theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/nutrition" component={() => <Nutrition theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/moments" component={() => <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />} />
-        <Route path="/profile" component={() => <Profile theme={theme} toggleTheme={toggleTheme} />} />
+        {/* ── Public auth routes ── */}
+        <Route path="/login" component={Login} />
+        <Route path="/register" component={Register} />
+        <Route path="/verify" component={VerifyEmail} />
+        <Route path="/verify-pending" component={VerifyEmailPending} />
+        <Route path="/magic-link" component={MagicLink} />
+        <Route path="/magic-link-sent" component={MagicLinkSent} />
+        <Route path="/auth/magic" component={MagicLinkConsume} />
+        <Route path="/auth/callback" component={AuthCallback} />
+        <Route path="/reset-password" component={ResetPassword} />
+
+        {/* ── Protected app routes ── */}
+        <Route path="/" component={() =>
+          <ProtectedRoute>
+            <Dashboard theme={theme} toggleTheme={toggleTheme} />
+          </ProtectedRoute>
+        } />
+        <Route path="/progress" component={() =>
+          <ProtectedRoute>
+            <Progress theme={theme} toggleTheme={toggleTheme} />
+          </ProtectedRoute>
+        } />
+        <Route path="/nutrition" component={() =>
+          <ProtectedRoute>
+            <Nutrition theme={theme} toggleTheme={toggleTheme} />
+          </ProtectedRoute>
+        } />
+        <Route path="/moments" component={() =>
+          <ProtectedRoute>
+            <ComingSoon title="MOMENTS" theme={theme} toggleTheme={toggleTheme} />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" component={() =>
+          <ProtectedRoute>
+            <Profile theme={theme} toggleTheme={toggleTheme} />
+          </ProtectedRoute>
+        } />
+
         <Route component={RedirectHome} />
       </Switch>
+
+      {/* Auto-trigger onboarding modal after first verified login */}
+      <OnboardingModal
+        open={showOnboarding}
+        onClose={() => setShowOnboarding(false)}
+      />
     </PageWrapper>
   );
 }

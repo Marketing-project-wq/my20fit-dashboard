@@ -10,6 +10,8 @@ import {
 import Sidebar from "@/components/Sidebar";
 import BottomNav from "@/components/BottomNav";
 import Header from "@/components/Header";
+import { useAuth } from "@/contexts/AuthContext";
+import OnboardingModal from "@/components/onboarding/OnboardingModal";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -174,6 +176,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
   const { showToast } = useToast();
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const { profile, signOut: authSignOut } = useAuth();
   const [avatarSrc, setAvatarSrc] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
@@ -198,10 +202,10 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
   const { mcu, latestEntry, gender, height } = data;
 
   // ── Derived values ──────────────────────────────────────────────────────
-  const displayName = editName || mockUser.name;
-  const userEmail = mockUser.email;
-  const joinDate = formatJoinDate(mockUser.joinDate);
-  const isPlusMember = mockUser.isPlusMember;
+  const displayName = editName || profile?.full_name || mockUser.name;
+  const userEmail = profile?.email || mockUser.email;
+  const joinDate = profile?.created_at ? formatJoinDate(profile.created_at) : formatJoinDate(mockUser.joinDate);
+  const isPlusMember = profile?.is_plus_member ?? mockUser.isPlusMember;
 
   const mcuGrade = mcu?.grade || "—";
   const latestWeight = latestEntry?.weight
@@ -461,6 +465,60 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
               }} />
             </div>
           </div>
+
+          {/* ── ONBOARDING CTA ── */}
+          {profile && !profile.onboarding_completed && !profile.onboarding_skipped_at && (
+            <div
+              onClick={() => setShowOnboarding(true)}
+              style={{
+                background: "linear-gradient(135deg, #FEF9EC 0%, #FEF3C7 100%)",
+                border: "1.5px solid #FCD34D",
+                borderRadius: 14,
+                padding: "16px 18px",
+                marginBottom: 16,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                transition: "transform 0.15s, box-shadow 0.15s",
+              }}
+              onMouseEnter={e => {
+                (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)";
+              }}
+              onMouseLeave={e => {
+                (e.currentTarget as HTMLElement).style.transform = "none";
+                (e.currentTarget as HTMLElement).style.boxShadow = "none";
+              }}
+            >
+              <div style={{
+                width: 40, height: 40, borderRadius: 10,
+                background: "rgba(196,17,1,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                <span style={{ fontSize: 20 }}>🏋️</span>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  fontFamily: "'Anton', sans-serif", fontSize: 14, color: "#0A0908", letterSpacing: "0.3px",
+                }}>
+                  Complete your profile
+                </div>
+                <div style={{
+                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic",
+                  fontSize: 12, color: "#6E665C", marginTop: 2,
+                }}>
+                  Get personalized workout & nutrition targets
+                </div>
+              </div>
+              <div style={{
+                fontFamily: "'Anton', sans-serif", fontSize: 11, letterSpacing: "1px",
+                color: "#C41101", flexShrink: 0,
+              }}>
+                START →
+              </div>
+            </div>
+          )}
 
           {/* ── SECTION 2: PERSONAL INFO ── */}
           <SectionHeader title="INFORMASI PERSONAL" />
@@ -1042,6 +1100,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
         </div>
       )}
 
+      <OnboardingModal open={showOnboarding} onClose={() => setShowOnboarding(false)} />
     </div>
   );
 }
