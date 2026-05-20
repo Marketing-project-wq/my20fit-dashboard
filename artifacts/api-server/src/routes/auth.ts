@@ -76,7 +76,7 @@ router.post("/api/auth/register", async (req, res) => {
   });
 
   const appUrl = process.env.APP_URL ?? "";
-  const verifyUrl = `${appUrl}/verify?token=${token}`;
+  const verifyUrl = `${appUrl}/verify-email?token=${token}`;
   const { html, text, subject } = verificationEmailHtml({ fullName: fullName.trim(), verifyUrl });
 
   try {
@@ -131,7 +131,7 @@ router.post("/api/auth/resend-verification", async (req, res) => {
   });
 
   const appUrl = process.env.APP_URL ?? "";
-  const verifyUrl = `${appUrl}/verify?token=${token}`;
+  const verifyUrl = `${appUrl}/verify-email?token=${token}`;
   const nameHint = email.split("@")[0];
   const { html, text, subject } = verificationEmailHtml({ fullName: nameHint, verifyUrl });
 
@@ -227,7 +227,7 @@ router.post("/api/auth/magic-link/request", async (req, res) => {
   });
 
   const appUrl = process.env.APP_URL ?? "";
-  const loginUrl = `${appUrl}/auth/magic?token=${token}`;
+  const loginUrl = `${appUrl}/magic-link/consume?token=${token}`;
   const { html, text, subject } = magicLinkEmailHtml({ email, loginUrl, ipAddress: ip, userAgent });
 
   try {

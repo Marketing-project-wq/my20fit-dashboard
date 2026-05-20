@@ -73,11 +73,11 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
         {/* ── Public auth routes ── */}
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
-        <Route path="/verify" component={VerifyEmail} />
-        <Route path="/verify-pending" component={VerifyEmailPending} />
+        <Route path="/verify-email" component={VerifyEmail} />
+        <Route path="/verify-email-pending" component={VerifyEmailPending} />
         <Route path="/magic-link" component={MagicLink} />
-        <Route path="/magic-link-sent" component={MagicLinkSent} />
-        <Route path="/auth/magic" component={MagicLinkConsume} />
+        <Route path="/magic-link/sent" component={MagicLinkSent} />
+        <Route path="/magic-link/consume" component={MagicLinkConsume} />
         <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/reset-password" component={ResetPassword} />
 

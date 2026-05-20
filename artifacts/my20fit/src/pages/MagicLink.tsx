@@ -40,7 +40,7 @@ export default function MagicLink() {
         return;
       }
 
-      setLocation(`/magic-link-sent?email=${encodeURIComponent(email)}`);
+      setLocation(`/magic-link/sent?email=${encodeURIComponent(email)}`);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

@@ -102,7 +102,7 @@ export default function Register() {
         return;
       }
 
-      setLocation(`/verify-pending?email=${encodeURIComponent(email)}`);
+      setLocation(`/verify-email-pending?email=${encodeURIComponent(email)}`);
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
