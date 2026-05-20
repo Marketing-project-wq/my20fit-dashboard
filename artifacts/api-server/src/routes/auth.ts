@@ -57,11 +57,31 @@ router.post("/auth/register", async (req, res) => {
 
   if (error) {
     const msg = error.message.toLowerCase();
-    if (msg.includes("already registered") || msg.includes("already exists") || msg.includes("unique")) {
+    if (
+      msg.includes("already registered") ||
+      msg.includes("already exists") ||
+      msg.includes("unique") ||
+      msg.includes("duplicate")
+    ) {
       return res.status(409).json({ ok: false, code: "EMAIL_TAKEN" });
     }
     req.log.error({ event: "register_error", err: error.message });
     return res.status(500).json({ ok: false, message: "Registration failed. Please try again." });
+  }
+
+  // Belt-and-suspenders: explicitly upsert the profile row so it always
+  // exists even if the DB trigger (handle_new_auth_user) failed silently.
+  const { error: profileErr } = await supabaseAdmin.from("my20fit_profile").upsert(
+    {
+      auth_user_id: data.user.id,
+      email,
+      full_name: fullName.trim(),
+      phone: normalizedPhone || null,
+    },
+    { onConflict: "auth_user_id" }
+  );
+  if (profileErr) {
+    req.log.warn({ event: "register_profile_upsert_warn", err: profileErr.message });
   }
 
   // Generate verification token (24h expiry)
