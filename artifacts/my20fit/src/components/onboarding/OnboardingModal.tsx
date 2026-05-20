@@ -57,7 +57,7 @@ export default function OnboardingModal({ open, onClose }: OnboardingModalProps)
   const [gymExperience, setGymExperience] = useState("");
   const [dailySchedule, setDailySchedule] = useState("");
 
-  const { saving, updateProfile } = useProfile();
+  const { saving, saveError, updateProfile } = useProfile();
 
   const handleSkip = async () => {
     try {
@@ -257,6 +257,22 @@ export default function OnboardingModal({ open, onClose }: OnboardingModalProps)
 
               {/* Actions */}
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {saveError && (
+                  <div
+                    style={{
+                      background: "#FEF2F2",
+                      border: "1px solid #FCA5A5",
+                      color: "#991B1B",
+                      padding: "10px 12px",
+                      borderRadius: 8,
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontSize: 14,
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {saveError}
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleNext}

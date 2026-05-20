@@ -13,14 +13,22 @@ export function useProfile() {
       setSaving(true);
       setSaveError(null);
       try {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("my20fit_profile")
           .update(updates)
-          .eq("auth_user_id", user.id);
+          .eq("auth_user_id", user.id)
+          .select("id");
         if (error) throw error;
+        if (!data || data.length === 0) {
+          throw new Error(
+            "Update affected 0 rows — likely session/RLS issue. Try signing out and back in."
+          );
+        }
         await refreshProfile();
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to save";
+        // eslint-disable-next-line no-console
+        console.error("[useProfile.updateProfile] failed:", err);
         setSaveError(msg);
         throw err;
       } finally {
