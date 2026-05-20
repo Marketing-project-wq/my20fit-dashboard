@@ -1,0 +1,61 @@
+Approved. Apply the fix with these 4 requirements:
+
+1. Drop BOTH trigger dan function-nya (clean state):
+   DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+   DROP FUNCTION IF EXISTS public.handle_new_auth_user() CASCADE;
+   
+   Print SQL exactly yang lu run + result-nya.
+
+2. Verify backend code di auth.ts udah explicit upsert ke my20fit_profile 
+   setelah createUser sukses. Print snippet kode-nya (setelah line ~75) 
+   biar gue konfirm visually. Kalau belum ada, tambahin:
+   
+   await supabaseAdmin.from("my20fit_profile").upsert({
+     auth_user_id: data.user.id,
+     email,
+     full_name: fullName.trim(),
+     phone: normalizedPhone,
+   }, { onConflict: "auth_user_id" });
+
+3. Update AuthCallback.tsx (untuk Google OAuth flow) supaya bikin profile 
+   row manually setelah session detected. Sample code:
+   
+   const { data: existing } = await supabase
+     .from("my20fit_profile")
+     .select("id")
+     .eq("auth_user_id", session.user.id)
+     .maybeSingle();
+   
+   if (!existing) {
+     await supabase.from("my20fit_profile").insert({
+       auth_user_id: session.user.id,
+       email: session.user.email,
+       full_name: session.user.user_metadata?.full_name 
+                  || session.user.user_metadata?.name 
+                  || "",
+       phone: session.user.user_metadata?.phone || "",
+       email_verified_at: new Date().toISOString(),
+     });
+   }
+
+4. After apply, run end-to-end test:
+
+   curl -v -X POST http://localhost:8080/api/auth/register \
+     -H "Content-Type: application/json" \
+     -d '{
+       "fullName":"Test After Fix",
+       "email":"test-after-fix-20260520@example.com",
+       "phone":"+6285999111222",
+       "password":"PostFix123"
+     }'
+   
+   Expected: HTTP 200 dengan { ok: true }
+   
+   Then verify rows exist:
+   curl "$SUPABASE_URL/rest/v1/my20fit_profile?email=eq.test-after-fix-20260520@example.com" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+
+5. Report full output dari 4 step di atas.
+
+Jangan kasih summary doang. Gue mau lihat exact output tiap langkah.
