@@ -1,0 +1,63 @@
+BUG REPORT: Pas user login dari https://profile.20fit.id (atau dev URL Replit), 
+setelah berhasil login mereka di-redirect ke https://photo.20fit.id padahal 
+seharusnya tetap di profile.20fit.id (atau redirect ke dashboard "/").
+
+Tolong investigate dan fix. Lakuin step ini:
+
+STEP 1 — Grep seluruh codebase untuk hardcoded photo.20fit.id
+
+Run di root project:
+  grep -rn "photo.20fit" --include="*.ts" --include="*.tsx" --include="*.js" .
+  grep -rn "photo\\.20fit" --include="*.ts" --include="*.tsx" --include="*.js" .
+
+List SEMUA file dan line yang ada string "photo.20fit". Untuk setiap match, 
+jelasin context-nya:
+- File path
+- Line number
+- Apakah itu redirect, link, image src, atau just data fetching
+- Apakah dia ke-trigger saat login flow
+
+STEP 2 — Trace post-login redirect path
+
+Cek file-file ini berurutan:
+- artifacts/my20fit/src/pages/AuthCallback.tsx (Google OAuth landing)
+- artifacts/my20fit/src/pages/Login.tsx (post-password-login redirect)
+- artifacts/my20fit/src/pages/MagicLinkConsume.tsx (post-magic-link redirect)
+- artifacts/my20fit/src/contexts/AuthContext.tsx (any redirect side-effect on session change)
+- artifacts/my20fit/src/components/auth/ProtectedRoute.tsx
+
+Cari semua setLocation(), window.location.href =, window.location.replace(), 
+window.location.assign(), atau redirect lain. List semua target redirect-nya.
+
+STEP 3 — Cek Supabase URL Configuration mismatch
+
+Confirm Supabase Dashboard → Authentication → URL Configuration → Site URL = 
+"https://profile.20fit.id". Kalau user salah set ke photo.20fit.id, itu sumber 
+masalah utama.
+
+STEP 4 — Fix
+
+Setelah ketemu penyebab pastinya, fix dengan:
+- Kalau ada hardcoded "photo.20fit.id" di redirect logic → ganti ke "/" (relative 
+  path supaya domain-agnostic), atau ke process.env.VITE_APP_URL
+- Kalau ada legacy code yang redirect ke photo.20fit.id setelah login (mungkin 
+  dari iterasi awal yang nge-bridge sama 20FIT Photo platform), comment out atau 
+  hapus — itu out of scope untuk auth flow ini
+- JANGAN hapus reference ke "photo.20fit.id" yang fungsinya:
+  - Fetch data dari photo platform API (data integration, bukan redirect)
+  - Display foto profile pic user
+  - Background image atau asset URL
+
+Cuma hapus yang ngebikin redirect/navigation ke domain photo.20fit.id.
+
+STEP 5 — Report
+
+Kasih gue:
+1. Semua match dari grep step 1 (file:line + context)
+2. List semua redirect target dari step 2
+3. Konfirmasi root cause-nya
+4. List file yang lu modified untuk fix-nya
+5. Reasoning kenapa lu yakin fix ini gak break feature lain
+
+JANGAN refactor lebih dari yang perlu. Cuma fix redirect bug. Photo integration 
+data (kalau ada) tetep biarin.

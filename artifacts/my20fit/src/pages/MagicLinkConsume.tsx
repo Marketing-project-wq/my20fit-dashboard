@@ -22,7 +22,7 @@ export default function MagicLinkConsume() {
         if (!data.ok) { setState("error"); return; }
 
         if (data.access_token && data.refresh_token) {
-          // Direct session injection
+          // Direct session injection — primary path
           const { error: sessErr } = await supabase.auth.setSession({
             access_token: data.access_token,
             refresh_token: data.refresh_token,
@@ -31,8 +31,11 @@ export default function MagicLinkConsume() {
           setState("success");
           setTimeout(() => setLocation("/"), 1200);
         } else if (data.action_link) {
-          // Fallback: redirect to Supabase action link
-          window.location.href = data.action_link;
+          // Fallback: server-side token extraction failed. Rewrite redirect_to in the
+          // Supabase action_link to point at our own /auth/callback — never photo.20fit.id
+          // or whatever Supabase's Site URL is set to.
+          window.location.href = data.action_link
+            .replace(/redirect_to=[^&]*/i, `redirect_to=${encodeURIComponent(window.location.origin + "/auth/callback")}`);
         } else {
           setState("error");
         }
