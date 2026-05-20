@@ -2,6 +2,25 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
+// Background prefetch of lazy-loaded protected pages. Called as soon as we
+// detect an authenticated session so that the JS chunks are already cached
+// (and parsed) by the time the user clicks through.
+let _prefetched = false;
+function prefetchProtectedRoutes() {
+  if (_prefetched) return;
+  _prefetched = true;
+  const idle = (cb: () => void) =>
+    (typeof window !== "undefined" && "requestIdleCallback" in window)
+      ? (window as unknown as { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(cb)
+      : setTimeout(cb, 200);
+  idle(() => {
+    void import("@/pages/Dashboard");
+    void import("@/pages/Progress");
+    void import("@/pages/Nutrition");
+    void import("@/pages/Profile");
+  });
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────
 
 export interface My20fitProfile {
@@ -123,6 +142,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
+        // Warm up protected-route chunks in the background so first navigation
+        // after auth feels instant. Fire-and-forget; failures are harmless.
+        prefetchProtectedRoutes();
         fetchProfile(u).finally(() => {
           if (mounted) setLoading(false);
         });
@@ -137,6 +159,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const u = session?.user ?? null;
       setUser(u);
       if (u) {
+        prefetchProtectedRoutes();
         await fetchProfile(u);
       } else {
         setProfile(null);

@@ -1,28 +1,32 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import Dashboard from "@/pages/Dashboard";
-import Progress from "@/pages/Progress";
-import Nutrition from "@/pages/Nutrition";
-import Profile from "@/pages/Profile";
-import ComingSoon from "@/pages/ComingSoon";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import VerifyEmail from "@/pages/VerifyEmail";
-import VerifyEmailPending from "@/pages/VerifyEmailPending";
-import MagicLink from "@/pages/MagicLink";
-import MagicLinkSent from "@/pages/MagicLinkSent";
-import MagicLinkConsume from "@/pages/MagicLinkConsume";
-import AuthCallback from "@/pages/AuthCallback";
-import ResetPassword from "@/pages/ResetPassword";
-
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import OnboardingModal from "@/components/onboarding/OnboardingModal";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
+
+// ── Lazy routes ─────────────────────────────────────────────────────────────
+// Each page is fetched on first visit. Initial JS bundle drops dramatically
+// because heavy pages (Dashboard/Progress/Nutrition/Profile, ~150KB combined)
+// are no longer required for /login, /register, /verify-email, etc.
+const Dashboard            = lazy(() => import("@/pages/Dashboard"));
+const Progress             = lazy(() => import("@/pages/Progress"));
+const Nutrition            = lazy(() => import("@/pages/Nutrition"));
+const Profile              = lazy(() => import("@/pages/Profile"));
+const ComingSoon           = lazy(() => import("@/pages/ComingSoon"));
+const Login                = lazy(() => import("@/pages/Login"));
+const Register             = lazy(() => import("@/pages/Register"));
+const VerifyEmail          = lazy(() => import("@/pages/VerifyEmail"));
+const VerifyEmailPending   = lazy(() => import("@/pages/VerifyEmailPending"));
+const MagicLink            = lazy(() => import("@/pages/MagicLink"));
+const MagicLinkSent        = lazy(() => import("@/pages/MagicLinkSent"));
+const MagicLinkConsume     = lazy(() => import("@/pages/MagicLinkConsume"));
+const AuthCallback         = lazy(() => import("@/pages/AuthCallback"));
+const ResetPassword        = lazy(() => import("@/pages/ResetPassword"));
+const OnboardingModal      = lazy(() => import("@/components/onboarding/OnboardingModal"));
 
 function RedirectHome() {
   const [, setLocation] = useLocation();
@@ -30,28 +34,43 @@ function RedirectHome() {
   return null;
 }
 
-function PageWrapper({ children }: { children: React.ReactNode }) {
-  const [location] = useLocation();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setVisible(false);
-    const t = setTimeout(() => setVisible(true), 30);
-    return () => clearTimeout(t);
-  }, [location]);
-
+function RouteFallback() {
+  // Minimal, no-flash placeholder while a lazy chunk loads. Matches the app
+  // background so users don't see a white flash between navigations.
   return (
-    <div style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "none" : "translateY(6px)",
-      transition: "opacity .25s ease, transform .25s ease",
-    }}>
-      {children}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#F4F2EE",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      <div
+        style={{
+          width: 28,
+          height: 28,
+          border: "3px solid rgba(196,17,1,0.18)",
+          borderTopColor: "#C41101",
+          borderRadius: "50%",
+          animation: "appspin 0.7s linear infinite",
+        }}
+      />
+      <style>{`@keyframes appspin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60_000,        // 1 min — avoid refetching on every nav
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
 
 function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void }) {
   useScrollRestore();
@@ -68,7 +87,7 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
   }, [user, profile?.onboarding_completed, profile?.onboarding_skipped_at]);
 
   return (
-    <PageWrapper>
+    <Suspense fallback={<RouteFallback />}>
       <Switch>
         {/* ── Public auth routes ── */}
         <Route path="/login" component={Login} />
@@ -111,12 +130,18 @@ function Router({ theme, toggleTheme }: { theme: string; toggleTheme: () => void
         <Route component={RedirectHome} />
       </Switch>
 
-      {/* Auto-trigger onboarding modal after first verified login */}
-      <OnboardingModal
-        open={showOnboarding}
-        onClose={() => setShowOnboarding(false)}
-      />
-    </PageWrapper>
+      {/* Auto-trigger onboarding modal after first verified login.
+          Nested Suspense with null fallback prevents the whole app from
+          showing the route-level spinner while this modal chunk loads. */}
+      {showOnboarding && (
+        <Suspense fallback={null}>
+          <OnboardingModal
+            open={showOnboarding}
+            onClose={() => setShowOnboarding(false)}
+          />
+        </Suspense>
+      )}
+    </Suspense>
   );
 }
 

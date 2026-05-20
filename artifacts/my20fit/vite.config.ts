@@ -57,6 +57,28 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    target: "es2020",
+    cssCodeSplit: true,
+    sourcemap: false,
+    minify: "esbuild",
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        // Split only heavy, route-specific vendor libs into their own chunks.
+        // We deliberately keep React + everything else in the default vendor
+        // bundle: splitting React separately created circular chunk graphs
+        // (vendor → react-vendor → vendor) because every other lib depends
+        // on React. Let Rollup handle the shared base; we only carve out the
+        // big libs that aren't needed on auth pages.
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (id.includes("/recharts/") || id.includes("/d3-")) return "charts";
+          if (id.includes("/framer-motion/")) return "motion";
+          if (id.includes("/@supabase/")) return "supabase";
+          if (id.includes("/embla-carousel")) return "carousel";
+        },
+      },
+    },
   },
   server: {
     port,
