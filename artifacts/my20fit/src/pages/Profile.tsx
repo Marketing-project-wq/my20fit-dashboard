@@ -242,7 +242,10 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
   }, [toggleTheme]);
 
   function handleSaveEdit() {
-    if (editGender) localStorage.setItem("my20fit_gender", editGender);
+    if (editGender) {
+      localStorage.setItem("my20fit_gender", editGender);
+      window.dispatchEvent(new CustomEvent("my20fit_gender_updated"));
+    }
     if (editHeight) localStorage.setItem("my20fit_height", editHeight);
     setData(getProfileData());
     setShowEditModal(false);

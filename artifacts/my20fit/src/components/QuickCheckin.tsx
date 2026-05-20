@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Heart, Smile, Moon, Droplets } from "lucide-react";
 import BottomSheet from "./BottomSheet";
 import { useToast } from "@/contexts/ToastContext";
+import GenderSelectionCard from "./checkin/GenderSelectionCard";
+import MuscleFatigueWidget from "./checkin/MuscleFatigueWidget";
 
 // ---- Types ----
 interface CycleData { lastPeriod: string; cycleLength: number; }
@@ -136,12 +138,10 @@ export default function QuickCheckin() {
   const { showToast } = useToast();
 
   // Modal visibility
-  const [showGenderModal, setShowGenderModal] = useState(false);
   const [showCycleModal, setShowCycleModal] = useState(false);
   const [showWellnessModal, setShowWellnessModal] = useState(false);
   const [showSleepModal, setShowSleepModal] = useState(false);
   const [showWaterModal, setShowWaterModal] = useState(false);
-  const [showMaleTip, setShowMaleTip] = useState(false);
 
   // Tile hover states
   const [hoverCycle, setHoverCycle] = useState(false);
@@ -149,9 +149,20 @@ export default function QuickCheckin() {
   const [hoverSleep, setHoverSleep] = useState(false);
   const [hoverWater, setHoverWater] = useState(false);
 
-  // --- Tile 1: Cycle ---
+  // --- Gender (determines which tile 1 shows) ---
   const [gender, setGender] = useState<string | null>(() => localStorage.getItem("my20fit_gender"));
-  const [selectedGender, setSelectedGender] = useState("");
+
+  useEffect(() => {
+    const sync = () => setGender(localStorage.getItem("my20fit_gender"));
+    window.addEventListener("my20fit_gender_updated", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("my20fit_gender_updated", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+
+  // --- Tile 1 (female): Cycle ---
   const [cycleData, setCycleData] = useState<CycleData | null>(() => {
     try {
       const s = localStorage.getItem("my20fit_cycle");
@@ -199,7 +210,6 @@ export default function QuickCheckin() {
 
   // ESC key handler
   const closeAll = useCallback(() => {
-    setShowGenderModal(false);
     setShowCycleModal(false);
     setShowWellnessModal(false);
     setShowSleepModal(false);
@@ -212,14 +222,8 @@ export default function QuickCheckin() {
     return () => window.removeEventListener("keydown", handler);
   }, [closeAll]);
 
-  // ---- Tile 1 handlers ----
+  // ---- Tile 1 handler (female only) ----
   const handleCycleTileClick = () => {
-    if (!gender) { setSelectedGender(""); setShowGenderModal(true); return; }
-    if (gender === "male") {
-      setShowMaleTip(true);
-      setTimeout(() => setShowMaleTip(false), 2500);
-      return;
-    }
     setLastPeriod(cycleData?.lastPeriod ?? "");
     setCycleLength(cycleData?.cycleLength ?? 28);
     setShowCycleModal(true);
@@ -302,6 +306,15 @@ export default function QuickCheckin() {
   const weekSleep = getLast7Days();
   const maxSleepH = Math.max(...weekSleep.map(d => d.hours), 8);
 
+  // ---- Gender gate: show selection card if no gender set ----
+  if (!gender) {
+    return (
+      <GenderSelectionCard
+        onConfirmed={(g) => setGender(g)}
+      />
+    );
+  }
+
   return (
     <div className="mb-8" data-testid="section-quick-checkin">
       <div className="section-header">
@@ -311,49 +324,41 @@ export default function QuickCheckin() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
 
-        {/* ---- TILE 1: Menstrual Cycle ---- */}
-        <div
-          onClick={handleCycleTileClick}
-          style={{...tileStyle(hoverCycle), background: "linear-gradient(135deg, #1E0918, #2A1022)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
-          onMouseEnter={() => setHoverCycle(true)}
-          onMouseLeave={() => setHoverCycle(false)}
-          data-testid="checkin-menstrual"
-        >
-          <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,.3), transparent 70%)", pointerEvents: "none" }} />
-          <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#EC4899", boxShadow: "0 0 8px rgba(236,72,153,.6)" }} />
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-            <Heart size={18} style={{ color: "#EC4899" }} />
-            <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>SIKLUS</span>
-          </div>
-          {gender === "male" ? (
-            <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", opacity: 0.5 }}>
-              Tidak tersedia
+        {/* ---- TILE 1: Muscle Fatigue (male) / Menstrual Cycle (female) ---- */}
+        {gender === "male" ? (
+          <MuscleFatigueWidget />
+        ) : (
+          <div
+            onClick={handleCycleTileClick}
+            style={{...tileStyle(hoverCycle), background: "linear-gradient(135deg, #1E0918, #2A1022)", "--text": "#fff", "--muted": "rgba(255,255,255,.35)", "--bg": "rgba(255,255,255,.08)"} as React.CSSProperties}
+            onMouseEnter={() => setHoverCycle(true)}
+            onMouseLeave={() => setHoverCycle(false)}
+            data-testid="checkin-menstrual"
+          >
+            <div style={{ position: "absolute", top: -20, right: -20, width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, rgba(236,72,153,.3), transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: 10, right: 10, width: 5, height: 5, borderRadius: "50%", background: "#EC4899", boxShadow: "0 0 8px rgba(236,72,153,.6)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+              <Heart size={18} style={{ color: "#EC4899" }} />
+              <span style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 13, letterSpacing: 0.5, color: "var(--text)" }}>SIKLUS</span>
             </div>
-          ) : cycleInfo ? (
-            <>
-              <span style={{
-                display: "inline-block", background: cycleInfo.phaseColor + "22",
-                color: cycleInfo.phaseColor, fontFamily: "'Barlow Condensed'",
-                fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99,
-              }}>{cycleInfo.phase}</span>
-              <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "var(--text)", marginTop: 4 }}>
-                {cycleInfo.cycleDay}<span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginLeft: 3 }}>hari</span>
+            {cycleInfo ? (
+              <>
+                <span style={{
+                  display: "inline-block", background: cycleInfo.phaseColor + "22",
+                  color: cycleInfo.phaseColor, fontFamily: "'Barlow Condensed'",
+                  fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99,
+                }}>{cycleInfo.phase}</span>
+                <div style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "var(--text)", marginTop: 4 }}>
+                  {cycleInfo.cycleDay}<span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginLeft: 3 }}>hari</span>
+                </div>
+              </>
+            ) : (
+              <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
+                Belum diisi
               </div>
-            </>
-          ) : (
-            <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
-              {!gender ? "Atur jenis kelamin" : "Belum diisi"}
-            </div>
-          )}
-          {showMaleTip && (
-            <div style={{
-              position: "absolute", bottom: "100%", left: 0, right: 0,
-              background: "rgba(0,0,0,0.85)", color: "#fff", borderRadius: 8,
-              padding: "8px 12px", fontFamily: "'Barlow Condensed'", fontSize: 12,
-              zIndex: 10, marginBottom: 4, textAlign: "center",
-            }}>Fitur ini untuk pengguna perempuan</div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
 
         {/* ---- TILE 2: Daily Wellness ---- */}
         <div
@@ -436,49 +441,6 @@ export default function QuickCheckin() {
           <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 10, color: "var(--muted)", marginTop: 3 }}>hari ini</div>
         </div>
       </div>
-
-      {/* ========== MODAL: GENDER ========== */}
-      <BottomSheet isOpen={showGenderModal} onClose={() => setShowGenderModal(false)} title="Pilih Jenis Kelamin">
-        <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: "var(--muted)", marginBottom: 16 }}>
-          Untuk menampilkan fitur yang relevan
-        </p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, margin: "8px 0 20px" }}>
-          {(["male", "female"] as const).map(g => (
-            <div
-              key={g}
-              onClick={() => setSelectedGender(g)}
-              style={{
-                border: `2px solid ${selectedGender === g ? "#C41101" : "var(--border-subtle, #E5E1D8)"}`,
-                background: selectedGender === g ? "rgba(196,17,1,.05)" : "var(--card)",
-                borderRadius: 12, padding: "20px 16px",
-                textAlign: "center", cursor: "pointer", transition: "all .2s",
-              }}
-            >
-              <div style={{ fontSize: 32, marginBottom: 8 }}>{g === "male" ? "♂️" : "♀️"}</div>
-              <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 16, letterSpacing: 1, color: selectedGender === g ? "#C41101" : "var(--text)" }}>
-                {g === "male" ? "LAKI-LAKI" : "PEREMPUAN"}
-              </div>
-            </div>
-          ))}
-        </div>
-        <button
-          onClick={() => {
-            if (!selectedGender) return;
-            localStorage.setItem("my20fit_gender", selectedGender);
-            setGender(selectedGender);
-            setShowGenderModal(false);
-            if (selectedGender === "female") { setLastPeriod(""); setCycleLength(28); setShowCycleModal(true); }
-          }}
-          disabled={!selectedGender}
-          style={{
-            width: "100%", padding: 14,
-            background: selectedGender ? "#C41101" : "#ccc",
-            color: "#fff", border: "none",
-            borderRadius: 12, cursor: selectedGender ? "pointer" : "not-allowed",
-            fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, letterSpacing: 1,
-          }}
-        >SIMPAN</button>
-      </BottomSheet>
 
       {/* ========== MODAL: CYCLE ========== */}
       <BottomSheet isOpen={showCycleModal} onClose={() => setShowCycleModal(false)} title="Siklus Menstruasi">
@@ -590,7 +552,6 @@ export default function QuickCheckin() {
           <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginTop: 8, lineHeight: 1.4 }}>{currentSleepInfo.tip}</div>
         </div>
 
-        {/* Weekly chart */}
         <div style={{ marginBottom: 20 }}>
           <label style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)", display: "block", marginBottom: 10 }}>7 HARI TERAKHIR</label>
           <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 60 }}>

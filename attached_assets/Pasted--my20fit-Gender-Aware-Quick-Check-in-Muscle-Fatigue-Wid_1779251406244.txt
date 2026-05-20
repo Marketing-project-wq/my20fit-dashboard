@@ -1,0 +1,1208 @@
+# my20fit — Gender-Aware Quick Check-in + Muscle Fatigue Widget
+
+## CONTEXT
+
+Quick Check-in section di Home page saat ini menampilkan 4 widget statis: SIKLUS, WELLNESS, TIDUR, AIR. Widget SIKLUS (menstrual cycle) hanya relevan untuk perempuan, sehingga laki-laki melihat widget yang tidak relevan.
+
+**Tujuan iterasi:** Gender-aware Quick Check-in dengan inline gender selection flow untuk semua user.
+
+**Supabase project:** `cpvzwqptzcxnwzfzgrmt`
+
+**Prerequisites yang sudah selesai:**
+- ✅ SQL migration `07_SQL_Migration_Gender_Aware_Checkin.sql` sudah dijalankan
+- ✅ Kolom `gender_selected_at` di `my20fit_profile` sudah ada
+- ✅ Table `muscle_fatigue_log` sudah dibuat dengan RLS
+- ✅ RPC `confirm_gender(p_gender)` siap dipakai
+- ✅ RPC `upsert_muscle_fatigue(...)` siap dipakai
+- ✅ View `muscle_fatigue_today` siap di-query
+- ✅ Semua existing user-nya sudah di-reset `gender_selected_at = NULL` (force confirm flow)
+
+---
+
+## DESIGN DECISIONS (Sudah final)
+
+| Aspek | Keputusan |
+|-------|-----------|
+| Widget pengganti SIKLUS untuk laki-laki | **MUSCLE FATIGUE** (4 area: KAKI, PUNGGUNG, LENGAN, CORE) |
+| UX pattern gender selection | **Inline card di Home page**, mengganti area widget Quick Check-in sampai user pilih |
+| Bisa ubah gender setelahnya? | **Ya**, via Profile page (Personal Info → Jenis Kelamin row) |
+| Behavior existing user | **Force semua pilih ulang** via inline card (gender_selected_at sudah di-NULL-kan via SQL) |
+
+**Logic widget rendering:**
+
+| `gender` | `gender_selected_at` | Yang ditampilkan |
+|----------|---------------------|------------------|
+| NULL atau apapun | NULL | **Inline gender selection card** |
+| 'female' | NOT NULL | 4 widget: **SIKLUS**, WELLNESS, TIDUR, AIR |
+| 'male' | NOT NULL | 4 widget: **MUSCLE FATIGUE**, WELLNESS, TIDUR, AIR |
+
+---
+
+## SCOPE — APA YANG DIBANGUN
+
+### NEW FILES TO CREATE:
+
+1. `src/components/checkin/GenderSelectionCard.jsx` — Inline card untuk pilih gender
+2. `src/components/checkin/MuscleFatigueWidget.jsx` — Widget MUSCLE FATIGUE (replacement untuk SIKLUS)
+3. `src/components/checkin/MuscleFatigueBottomSheet.jsx` — Bottom sheet input untuk MUSCLE FATIGUE
+4. `src/utils/fatigueHelpers.js` — Helper functions (compute overall, level mapping, etc.)
+
+### EXISTING FILES TO MODIFY:
+
+1. `src/components/QuickCheckin.jsx` (atau wherever the 4 widgets are rendered in Home) — Add conditional rendering logic
+2. `src/pages/Profile.jsx` — Make "Jenis Kelamin" row editable (currently displays read-only "Perempuan")
+
+### ❌ JANGAN UBAH:
+- Widget existing yang masih dipakai: SIKLUS, WELLNESS, TIDUR, AIR — biarkan logic-nya
+- Section lain di Home (Greeting Card, Weather, Today's Checklist, My Moments, 20FIT Plus)
+- Sidebar, navigation, brand identity
+- Auth flow (masih mock user "ZIDNI" untuk sekarang)
+- Komponen non-related (BottomSheet base, Skeleton, Toast)
+
+---
+
+## FILE 1: Gender Selection Card
+
+**Path:** `src/components/checkin/GenderSelectionCard.jsx`
+
+### Visual Design
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  QUICK CHECK-IN                                          │
+│  ─────────────                                          │
+│                                                          │
+│  ┌───────────────────────────────────────────────────┐  │
+│  │                                                    │  │
+│  │             🎯 Personalisasi Widget                │  │
+│  │                                                    │  │
+│  │      Pilih jenis kelamin untuk mengaktifkan       │  │
+│  │      widget Quick Check-in yang sesuai dengan      │  │
+│  │      kebutuhan kamu                                │  │
+│  │                                                    │  │
+│  │   ┌──────────────────┐   ┌──────────────────┐    │  │
+│  │   │      ♀           │   │      ♂           │    │  │
+│  │   │   Perempuan      │   │   Laki-laki      │    │  │
+│  │   │   (with SIKLUS)  │   │ (with MUSCLE     │    │  │
+│  │   │                  │   │     FATIGUE)     │    │  │
+│  │   └──────────────────┘   └──────────────────┘    │  │
+│  │                                                    │  │
+│  │   ℹ️ Pilihan bisa diubah nanti di Profile         │  │
+│  │                                                    │  │
+│  └───────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Component Code
+
+```jsx
+import { useState } from 'react';
+import { supabase } from '../../lib/supabaseClient'; // adjust path
+// Atau kalau supabase belum di-setup, mock saja dulu — tapi ada RPC nya di Supabase
+
+export default function GenderSelectionCard({ onConfirmed, userId }) {
+  const [selected, setSelected] = useState(null); // 'female' | 'male' | null
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleConfirm = async () => {
+    if (!selected) return;
+    setSubmitting(true);
+    setError('');
+
+    try {
+      // Call RPC confirm_gender
+      const { data, error } = await supabase.rpc('confirm_gender', {
+        p_gender: selected,
+      });
+
+      if (error) throw error;
+
+      // Notify parent to refresh profile + show widgets
+      onConfirmed(data);
+    } catch (err) {
+      console.error('Gender confirm error:', err);
+      setError('Gagal menyimpan pilihan. Coba lagi.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="mb-8">
+      {/* Section header — same pattern as other Quick Check-in sections */}
+      <div className="section-header">
+        <h2>QUICK CHECK-IN</h2>
+        <div className="section-header-line"></div>
+      </div>
+
+      {/* Main card */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #0A0908 0%, #1a1410 100%)',
+          borderRadius: '20px',
+          padding: '32px 24px',
+          position: 'relative',
+          overflow: 'hidden',
+          textAlign: 'center',
+        }}
+      >
+        {/* Decorative glow */}
+        <div
+          style={{
+            position: 'absolute',
+            top: '-40px',
+            right: '-40px',
+            width: '180px',
+            height: '180px',
+            background: 'radial-gradient(circle, rgba(196, 17, 1, 0.2), transparent 60%)',
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Icon */}
+        <div style={{ fontSize: '40px', marginBottom: '12px' }}>🎯</div>
+
+        {/* Title */}
+        <div
+          style={{
+            fontFamily: 'Anton, sans-serif',
+            fontSize: '22px',
+            color: '#FFFFFF',
+            letterSpacing: '0.5px',
+            marginBottom: '8px',
+          }}
+        >
+          Personalisasi Widget
+        </div>
+
+        {/* Description */}
+        <div
+          style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.65)',
+            lineHeight: '1.5',
+            maxWidth: '420px',
+            margin: '0 auto 24px',
+          }}
+        >
+          Pilih jenis kelamin untuk mengaktifkan widget Quick Check-in yang sesuai
+        </div>
+
+        {/* Gender options */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: '12px',
+            maxWidth: '440px',
+            margin: '0 auto 16px',
+          }}
+        >
+          {/* Female option */}
+          <button
+            type="button"
+            onClick={() => setSelected('female')}
+            style={{
+              background: selected === 'female' ? 'rgba(196, 17, 1, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: selected === 'female' ? '2px solid #C0392B' : '2px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '14px',
+              padding: '20px 16px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              color: '#FFFFFF',
+            }}
+            aria-label="Pilih jenis kelamin Perempuan"
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>♀</div>
+            <div
+              style={{
+                fontFamily: 'Anton, sans-serif',
+                fontSize: '16px',
+                letterSpacing: '1px',
+                marginBottom: '4px',
+              }}
+            >
+              PEREMPUAN
+            </div>
+            <div
+              style={{
+                fontFamily: 'Barlow Condensed, sans-serif',
+                fontWeight: 700,
+                fontSize: '10px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                letterSpacing: '1.5px',
+              }}
+            >
+              + WIDGET SIKLUS
+            </div>
+          </button>
+
+          {/* Male option */}
+          <button
+            type="button"
+            onClick={() => setSelected('male')}
+            style={{
+              background: selected === 'male' ? 'rgba(196, 17, 1, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+              border: selected === 'male' ? '2px solid #C0392B' : '2px solid rgba(255, 255, 255, 0.1)',
+              borderRadius: '14px',
+              padding: '20px 16px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              color: '#FFFFFF',
+            }}
+            aria-label="Pilih jenis kelamin Laki-laki"
+          >
+            <div style={{ fontSize: '32px', marginBottom: '8px' }}>♂</div>
+            <div
+              style={{
+                fontFamily: 'Anton, sans-serif',
+                fontSize: '16px',
+                letterSpacing: '1px',
+                marginBottom: '4px',
+              }}
+            >
+              LAKI-LAKI
+            </div>
+            <div
+              style={{
+                fontFamily: 'Barlow Condensed, sans-serif',
+                fontWeight: 700,
+                fontSize: '10px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                letterSpacing: '1.5px',
+              }}
+            >
+              + MUSCLE FATIGUE
+            </div>
+          </button>
+        </div>
+
+        {/* Info text */}
+        <div
+          style={{
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: '12px',
+            color: 'rgba(255, 255, 255, 0.4)',
+            fontStyle: 'italic',
+            marginBottom: '20px',
+          }}
+        >
+          ℹ️ Pilihan bisa diubah nanti di Profile
+        </div>
+
+        {/* Error message */}
+        {error && (
+          <div
+            style={{
+              background: 'rgba(220, 38, 38, 0.15)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              color: '#fca5a5',
+              padding: '10px 16px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              marginBottom: '16px',
+              maxWidth: '440px',
+              margin: '0 auto 16px',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* Confirm button */}
+        <button
+          type="button"
+          onClick={handleConfirm}
+          disabled={!selected || submitting}
+          style={{
+            background: selected ? '#C0392B' : 'rgba(255, 255, 255, 0.1)',
+            color: '#FFFFFF',
+            fontFamily: 'Anton, sans-serif',
+            fontSize: '14px',
+            letterSpacing: '1.5px',
+            padding: '14px 32px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: selected ? 'pointer' : 'not-allowed',
+            transition: 'all 0.2s',
+            boxShadow: selected ? '0 4px 16px rgba(196, 17, 1, 0.3)' : 'none',
+            opacity: submitting ? 0.6 : 1,
+          }}
+        >
+          {submitting ? 'MENYIMPAN...' : 'KONFIRMASI →'}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
+---
+
+## FILE 2: Fatigue Helpers Utility
+
+**Path:** `src/utils/fatigueHelpers.js`
+
+```javascript
+/**
+ * Helper functions for muscle fatigue widget
+ */
+
+// Compute overall fatigue (simple average)
+export function computeOverallFatigue({ legs, back, arms, core }) {
+  return Math.round((legs + back + arms + core) / 4);
+}
+
+// Map 0-100 to level label
+export function getFatigueLevel(value) {
+  if (value >= 70) return 'high';
+  if (value >= 40) return 'medium';
+  return 'low';
+}
+
+// Map level to label text (Indonesian)
+export function getFatigueLabel(value) {
+  if (value >= 70) return 'Lelah';
+  if (value >= 40) return 'Sedang';
+  return 'Fresh';
+}
+
+// Map level to color
+export function getFatigueColor(value) {
+  if (value >= 70) return '#ff4444'; // red
+  if (value >= 40) return '#ffaa44'; // orange
+  return '#44ff88'; // green
+}
+
+// Preset configurations for quick input
+export const FATIGUE_PRESETS = [
+  {
+    id: 'fresh',
+    label: 'Fresh seharian',
+    emoji: '😎',
+    values: { legs: 10, back: 10, arms: 10, core: 10 },
+  },
+  {
+    id: 'leg_day',
+    label: 'Habis leg day',
+    emoji: '🦵',
+    values: { legs: 85, back: 30, arms: 20, core: 50 },
+  },
+  {
+    id: 'pull_day',
+    label: 'Habis pull day',
+    emoji: '💪',
+    values: { legs: 20, back: 85, arms: 75, core: 30 },
+  },
+  {
+    id: 'push_day',
+    label: 'Habis push day',
+    emoji: '🏋️',
+    values: { legs: 20, back: 35, arms: 80, core: 50 },
+  },
+  {
+    id: 'full_body',
+    label: 'Habis full body',
+    emoji: '🔥',
+    values: { legs: 70, back: 70, arms: 65, core: 70 },
+  },
+  {
+    id: 'rest_day',
+    label: 'Rest day',
+    emoji: '🧘',
+    values: { legs: 25, back: 20, arms: 20, core: 15 },
+  },
+];
+
+export const MUSCLE_AREAS = [
+  { id: 'legs', label: 'KAKI', emoji: '🦵' },
+  { id: 'back', label: 'PUNGGUNG', emoji: '💪' },
+  { id: 'arms', label: 'LENGAN', emoji: '🏋️' },
+  { id: 'core', label: 'CORE', emoji: '🔥' },
+];
+```
+
+---
+
+## FILE 3: Muscle Fatigue Widget (Display Card)
+
+**Path:** `src/components/checkin/MuscleFatigueWidget.jsx`
+
+Replace SIKLUS widget. Style harus konsisten dengan widget Quick Check-in lain (gradient card, dot indicator, dll).
+
+```jsx
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
+import MuscleFatigueBottomSheet from './MuscleFatigueBottomSheet';
+import {
+  computeOverallFatigue,
+  getFatigueLevel,
+  getFatigueLabel,
+  getFatigueColor,
+  MUSCLE_AREAS,
+} from '../../utils/fatigueHelpers';
+
+export default function MuscleFatigueWidget() {
+  const [todayData, setTodayData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  // Fetch today's fatigue data
+  const fetchToday = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('muscle_fatigue_today')
+      .select('*')
+      .single();
+
+    // Error code PGRST116 = no rows returned (user hasn't logged today)
+    if (error && error.code !== 'PGRST116') {
+      console.error('Fatigue fetch error:', error);
+    }
+
+    setTodayData(data || null);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchToday();
+  }, []);
+
+  const handleSaved = (newData) => {
+    setTodayData({
+      ...newData,
+      overall_fatigue: computeOverallFatigue({
+        legs: newData.fatigue_legs,
+        back: newData.fatigue_back,
+        arms: newData.fatigue_arms,
+        core: newData.fatigue_core,
+      }),
+    });
+    setSheetOpen(false);
+  };
+
+  const hasData = todayData !== null;
+  const overall = hasData ? todayData.overall_fatigue : 0;
+  const level = getFatigueLevel(overall);
+  const dotColor = getFatigueColor(overall);
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setSheetOpen(true)}
+        style={{
+          background: 'linear-gradient(135deg, #1a0a14 0%, #2d0a0a 100%)',
+          borderRadius: '16px',
+          padding: '18px',
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: '130px',
+          border: 'none',
+          cursor: 'pointer',
+          textAlign: 'left',
+          width: '100%',
+          color: 'white',
+          transition: 'transform 0.2s',
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.02)')}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        aria-label="Buka input Muscle Fatigue"
+      >
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+          <span style={{ fontSize: '18px' }}>🏋️</span>
+          <span
+            style={{
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 900,
+              fontSize: '13px',
+              letterSpacing: '2px',
+              color: 'rgba(255, 255, 255, 0.9)',
+            }}
+          >
+            MUSCLE FATIGUE
+          </span>
+        </div>
+
+        {!hasData ? (
+          // Empty state
+          <div>
+            <div
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '13px',
+                color: 'rgba(255, 255, 255, 0.5)',
+                lineHeight: '1.5',
+              }}
+            >
+              Belum diisi hari ini
+            </div>
+          </div>
+        ) : (
+          // Filled state
+          <>
+            <div
+              style={{
+                fontFamily: 'Anton, sans-serif',
+                fontSize: '28px',
+                color: 'white',
+                lineHeight: '1',
+                marginBottom: '4px',
+              }}
+            >
+              {overall}%
+            </div>
+            <div
+              style={{
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '11px',
+                color: 'rgba(255, 255, 255, 0.55)',
+                marginBottom: '12px',
+              }}
+            >
+              {getFatigueLabel(overall)} · keseluruhan
+            </div>
+
+            {/* Per-area mini bars */}
+            <div style={{ display: 'flex', gap: '4px' }}>
+              {MUSCLE_AREAS.map((area) => {
+                const value = todayData[`fatigue_${area.id}`];
+                return (
+                  <div
+                    key={area.id}
+                    style={{
+                      flex: 1,
+                      height: '28px',
+                      background: 'rgba(255, 255, 255, 0.08)',
+                      borderRadius: '4px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: `${value}%`,
+                        background: getFatigueColor(value),
+                        transition: 'height 0.3s',
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ display: 'flex', gap: '4px', marginTop: '4px' }}>
+              {MUSCLE_AREAS.map((area) => (
+                <div
+                  key={area.id}
+                  style={{
+                    flex: 1,
+                    textAlign: 'center',
+                    fontFamily: 'Barlow Condensed, sans-serif',
+                    fontWeight: 700,
+                    fontSize: '8px',
+                    color: 'rgba(255, 255, 255, 0.4)',
+                    letterSpacing: '0.5px',
+                  }}
+                >
+                  {area.label}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* Status dot */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '14px',
+            right: '14px',
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            background: hasData ? dotColor : '#ff4444',
+            boxShadow: `0 0 8px ${hasData ? dotColor : '#ff4444'}80`,
+          }}
+        />
+      </button>
+
+      {/* Bottom Sheet for input */}
+      {sheetOpen && (
+        <MuscleFatigueBottomSheet
+          initialData={todayData}
+          onClose={() => setSheetOpen(false)}
+          onSaved={handleSaved}
+        />
+      )}
+    </>
+  );
+}
+```
+
+---
+
+## FILE 4: Muscle Fatigue Bottom Sheet (Input)
+
+**Path:** `src/components/checkin/MuscleFatigueBottomSheet.jsx`
+
+```jsx
+import { useState } from 'react';
+import BottomSheet from '../BottomSheet'; // existing component
+import { supabase } from '../../lib/supabaseClient';
+import {
+  MUSCLE_AREAS,
+  FATIGUE_PRESETS,
+  getFatigueColor,
+  getFatigueLabel,
+  computeOverallFatigue,
+} from '../../utils/fatigueHelpers';
+
+export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved }) {
+  const [values, setValues] = useState({
+    legs: initialData?.fatigue_legs ?? 0,
+    back: initialData?.fatigue_back ?? 0,
+    arms: initialData?.fatigue_arms ?? 0,
+    core: initialData?.fatigue_core ?? 0,
+  });
+  const [notes, setNotes] = useState(initialData?.notes ?? '');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const overall = computeOverallFatigue(values);
+
+  const handlePreset = (preset) => {
+    setValues(preset.values);
+  };
+
+  const handleSliderChange = (areaId, value) => {
+    setValues((prev) => ({ ...prev, [areaId]: parseInt(value, 10) }));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+
+    try {
+      const { data, error } = await supabase.rpc('upsert_muscle_fatigue', {
+        p_fatigue_legs: values.legs,
+        p_fatigue_back: values.back,
+        p_fatigue_arms: values.arms,
+        p_fatigue_core: values.core,
+        p_notes: notes || null,
+      });
+
+      if (error) throw error;
+
+      onSaved(data);
+    } catch (err) {
+      console.error('Save fatigue error:', err);
+      setError('Gagal menyimpan. Coba lagi.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <BottomSheet isOpen onClose={onClose} title="Muscle Fatigue Hari Ini">
+      <div style={{ padding: '0 20px 20px' }}>
+        {/* Overall display */}
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '16px',
+            background: 'linear-gradient(135deg, #1a0a14 0%, #2d0a0a 100%)',
+            borderRadius: '12px',
+            marginBottom: '20px',
+            color: 'white',
+          }}
+        >
+          <div
+            style={{
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 900,
+              fontSize: '10px',
+              letterSpacing: '2px',
+              color: 'rgba(255, 255, 255, 0.5)',
+              marginBottom: '4px',
+            }}
+          >
+            FATIGUE OVERALL
+          </div>
+          <div style={{ fontFamily: 'Anton, sans-serif', fontSize: '48px', color: getFatigueColor(overall) }}>
+            {overall}%
+          </div>
+          <div
+            style={{
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '12px',
+              color: 'rgba(255, 255, 255, 0.6)',
+              marginTop: '4px',
+            }}
+          >
+            {getFatigueLabel(overall)}
+          </div>
+        </div>
+
+        {/* Quick presets */}
+        <div style={{ marginBottom: '20px' }}>
+          <div
+            style={{
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 900,
+              fontSize: '11px',
+              letterSpacing: '2px',
+              color: 'rgba(0, 0, 0, 0.5)',
+              marginBottom: '12px',
+            }}
+          >
+            QUICK PRESET
+          </div>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))',
+              gap: '8px',
+            }}
+          >
+            {FATIGUE_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => handlePreset(preset)}
+                style={{
+                  background: '#f5f5f0',
+                  border: '1px solid rgba(0, 0, 0, 0.08)',
+                  borderRadius: '10px',
+                  padding: '10px 8px',
+                  fontSize: '11px',
+                  cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif',
+                  textAlign: 'center',
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#e8e6dd';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = '#f5f5f0';
+                }}
+              >
+                <div style={{ fontSize: '18px', marginBottom: '4px' }}>{preset.emoji}</div>
+                <div>{preset.label}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Per-area sliders */}
+        <div style={{ marginBottom: '20px' }}>
+          <div
+            style={{
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 900,
+              fontSize: '11px',
+              letterSpacing: '2px',
+              color: 'rgba(0, 0, 0, 0.5)',
+              marginBottom: '16px',
+            }}
+          >
+            DETAIL PER AREA
+          </div>
+
+          {MUSCLE_AREAS.map((area) => {
+            const value = values[area.id];
+            return (
+              <div key={area.id} style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px' }}>{area.emoji}</span>
+                    <span
+                      style={{
+                        fontFamily: 'DM Sans, sans-serif',
+                        fontWeight: 600,
+                        fontSize: '14px',
+                      }}
+                    >
+                      {area.label}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span
+                      style={{
+                        fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: '14px',
+                        fontWeight: 700,
+                        color: getFatigueColor(value),
+                      }}
+                    >
+                      {value}%
+                    </span>
+                    <span
+                      style={{
+                        fontFamily: 'Barlow Condensed, sans-serif',
+                        fontWeight: 700,
+                        fontSize: '10px',
+                        letterSpacing: '1px',
+                        color: getFatigueColor(value),
+                      }}
+                    >
+                      {getFatigueLabel(value)}
+                    </span>
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="5"
+                  value={value}
+                  onChange={(e) => handleSliderChange(area.id, e.target.value)}
+                  style={{
+                    width: '100%',
+                    accentColor: getFatigueColor(value),
+                  }}
+                  aria-label={`Level fatigue ${area.label}`}
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Notes (optional) */}
+        <div style={{ marginBottom: '20px' }}>
+          <label
+            style={{
+              fontFamily: 'Barlow Condensed, sans-serif',
+              fontWeight: 900,
+              fontSize: '11px',
+              letterSpacing: '2px',
+              color: 'rgba(0, 0, 0, 0.5)',
+              display: 'block',
+              marginBottom: '8px',
+            }}
+          >
+            CATATAN (OPSIONAL)
+          </label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Misal: kemarin habis leg day, hari ini full DOMS"
+            style={{
+              width: '100%',
+              minHeight: '60px',
+              padding: '10px 12px',
+              border: '1px solid rgba(0, 0, 0, 0.1)',
+              borderRadius: '8px',
+              fontFamily: 'DM Sans, sans-serif',
+              fontSize: '13px',
+              resize: 'vertical',
+            }}
+            maxLength={200}
+          />
+        </div>
+
+        {error && (
+          <div
+            style={{
+              background: '#fee2e2',
+              border: '1px solid #fca5a5',
+              color: '#991b1b',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              fontSize: '13px',
+              marginBottom: '16px',
+            }}
+          >
+            {error}
+          </div>
+        )}
+
+        {/* Save button */}
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            width: '100%',
+            background: '#C0392B',
+            color: '#FFFFFF',
+            fontFamily: 'Anton, sans-serif',
+            fontSize: '15px',
+            letterSpacing: '1.5px',
+            padding: '14px',
+            borderRadius: '12px',
+            border: 'none',
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.6 : 1,
+            transition: 'all 0.2s',
+          }}
+        >
+          {saving ? 'MENYIMPAN...' : 'SIMPAN'}
+        </button>
+      </div>
+    </BottomSheet>
+  );
+}
+```
+
+---
+
+## FILE 5 (MODIFY): Quick Check-in Section Logic
+
+**Path:** `src/components/QuickCheckin.jsx` (atau wherever Quick Check-in dirender, kemungkinan di `Home.jsx`)
+
+Tambahkan conditional rendering logic:
+
+```jsx
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import GenderSelectionCard from './checkin/GenderSelectionCard';
+import MuscleFatigueWidget from './checkin/MuscleFatigueWidget';
+// Existing widgets:
+import SiklusWidget from './checkin/SiklusWidget';      // existing
+import WellnessWidget from './checkin/WellnessWidget';  // existing
+import TidurWidget from './checkin/TidurWidget';        // existing
+import AirWidget from './checkin/AirWidget';            // existing
+
+export default function QuickCheckin() {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('my20fit_profile')
+      .select('gender, gender_selected_at')
+      .single();
+
+    if (error) {
+      console.error('Profile fetch error:', error);
+      setLoading(false);
+      return;
+    }
+
+    setProfile(data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="mb-8">
+        <div className="section-header">
+          <h2>QUICK CHECK-IN</h2>
+          <div className="section-header-line"></div>
+        </div>
+        {/* Skeleton loading */}
+        <div style={{ height: '280px', background: 'rgba(0,0,0,0.05)', borderRadius: '16px' }} />
+      </div>
+    );
+  }
+
+  // No gender selected → show selection card
+  if (!profile?.gender_selected_at) {
+    return (
+      <GenderSelectionCard
+        onConfirmed={(updatedProfile) => {
+          setProfile(updatedProfile);
+        }}
+      />
+    );
+  }
+
+  // Gender confirmed → show 4 widgets based on gender
+  const isFemale = profile.gender === 'female';
+
+  return (
+    <div className="mb-8">
+      <div className="section-header">
+        <h2>QUICK CHECK-IN</h2>
+        <div className="section-header-line"></div>
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: '12px',
+        }}
+      >
+        {/* First widget: SIKLUS for female, MUSCLE FATIGUE for male */}
+        {isFemale ? <SiklusWidget /> : <MuscleFatigueWidget />}
+
+        {/* Other 3 widgets — same for everyone */}
+        <WellnessWidget />
+        <TidurWidget />
+        <AirWidget />
+      </div>
+    </div>
+  );
+}
+```
+
+⚠️ **PENTING:** Cek dulu existing code Quick Check-in di codebase — kemungkinan widget-widget sudah ada di file yang berbeda atau di-render langsung di `Home.jsx`. Adaptasi pattern di atas sesuai struktur existing.
+
+---
+
+## FILE 6 (MODIFY): Profile Page — Make Jenis Kelamin Editable
+
+**Path:** `src/pages/Profile.jsx`
+
+Saat ini "Jenis Kelamin" row menampilkan "Perempuan" sebagai read-only. Update jadi editable via modal.
+
+### Step 6.1 — Make row clickable
+
+Cari row "JENIS KELAMIN" di Personal Info section:
+
+```jsx
+<div
+  className="info-row"
+  onClick={() => setShowGenderEdit(true)}  // ← ADD
+  style={{ cursor: 'pointer' }}
+>
+  <div className="info-icon">...</div>
+  <div className="info-content">
+    <span className="label">JENIS KELAMIN</span>
+    <span className="value">{profile?.gender === 'female' ? 'Perempuan' : profile?.gender === 'male' ? 'Laki-laki' : '-'}</span>
+  </div>
+  <ChevronRight size={18} className="info-chevron" />  {/* Optional indicator */}
+</div>
+```
+
+### Step 6.2 — Add edit modal/sheet
+
+```jsx
+{showGenderEdit && (
+  <BottomSheet isOpen onClose={() => setShowGenderEdit(false)} title="Edit Jenis Kelamin">
+    <div style={{ padding: '20px' }}>
+      <p style={{ fontSize: '13px', color: '#666', marginBottom: '20px' }}>
+        Perubahan akan mengupdate widget Quick Check-in di Home page.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+        {/* Same option cards as GenderSelectionCard but in modal context */}
+        <button
+          onClick={async () => {
+            await supabase.rpc('confirm_gender', { p_gender: 'female' });
+            await refetchProfile();
+            setShowGenderEdit(false);
+            showToast('Berhasil update jenis kelamin', 'success');
+          }}
+          style={{ /* same style as before */ }}
+        >
+          ♀ Perempuan
+        </button>
+
+        <button
+          onClick={async () => {
+            await supabase.rpc('confirm_gender', { p_gender: 'male' });
+            await refetchProfile();
+            setShowGenderEdit(false);
+            showToast('Berhasil update jenis kelamin', 'success');
+          }}
+          style={{ /* same style */ }}
+        >
+          ♂ Laki-laki
+        </button>
+      </div>
+    </div>
+  </BottomSheet>
+)}
+```
+
+---
+
+## TESTING CHECKLIST
+
+Setelah build selesai:
+
+### Gender Selection Flow
+- [ ] User existing (gender_selected_at = NULL) buka Home → **GenderSelectionCard muncul di posisi Quick Check-in**
+- [ ] Section lain (Greeting, Weather, Checklist, Moments, 20FIT Plus) tetap render normal
+- [ ] Klik option "Perempuan" → ada visual feedback (border merah + bg tint)
+- [ ] Klik option "Laki-laki" → ada visual feedback
+- [ ] Confirm button **disabled** sampai user pilih option
+- [ ] Click "KONFIRMASI" → call RPC `confirm_gender`, success → card hilang, widget muncul
+- [ ] Error handling: kalau RPC fail, tampilkan error message di dalam card
+
+### Female Flow (gender = 'female')
+- [ ] 4 widget tampil: **SIKLUS** + WELLNESS + TIDUR + AIR
+- [ ] Layout grid tetap rapi (2 kolom desktop, 1-2 kolom mobile)
+- [ ] Klik SIKLUS widget → bottom sheet input terbuka normal (existing behavior)
+
+### Male Flow (gender = 'male')
+- [ ] 4 widget tampil: **MUSCLE FATIGUE** + WELLNESS + TIDUR + AIR
+- [ ] MUSCLE FATIGUE widget menampilkan empty state kalau belum ada data hari ini
+- [ ] Klik widget → bottom sheet terbuka dengan 4 slider + 6 preset
+- [ ] Pilih preset "Habis leg day" → 4 slider auto-update ke values preset
+- [ ] Drag slider manual → angka di sebelah kanan update real-time, color sesuai level
+- [ ] Click "SIMPAN" → RPC `upsert_muscle_fatigue` dipanggil, sheet close, widget refresh dengan data baru
+- [ ] Overall fatigue dihitung benar (rata-rata 4 area)
+- [ ] Status dot warna sesuai level (green/orange/red)
+- [ ] Refresh page → data persist (one-per-day logic works)
+
+### Profile Page (Gender Edit)
+- [ ] Row "JENIS KELAMIN" sekarang clickable (cursor pointer, chevron indicator)
+- [ ] Click row → BottomSheet edit terbuka
+- [ ] Pilih gender baru → RPC dipanggil, profile refresh, toast success
+- [ ] Kembali ke Home → widget Quick Check-in **sudah berubah** sesuai gender baru
+
+### Edge Cases
+- [ ] User confirm gender → tidak tampil card lagi di Home (state persist)
+- [ ] Browser refresh setelah confirm → tetap tampil widget, bukan card lagi
+- [ ] User existing dengan gender = 'female' di DB tapi gender_selected_at = NULL → TETAP harus konfirmasi (force flow)
+- [ ] User pilih 'female' tapi sebelumnya 'male' → MUSCLE FATIGUE data tetap di DB (tidak hilang), tinggal tidak visible
+- [ ] No console errors saat conditional rendering
+- [ ] Layout grid Quick Check-in tetap balance (4 widget dalam 2x2 grid)
+
+---
+
+## NOTES UNTUK REPLIT AGENT
+
+1. **WAJIB cek existing code Quick Check-in dulu** — kemungkinan struktur file berbeda dari yang saya assume. Existing widgets (SIKLUS, WELLNESS, TIDUR, AIR) mungkin di-render inline di `Home.jsx`, atau punya komponen masing-masing. **Adaptasi conditional logic ke struktur existing**.
+
+2. **Style consistency CRITICAL** — MUSCLE FATIGUE widget HARUS visually konsisten dengan widget Quick Check-in lain:
+   - Dark gradient card (samakan tone dengan SIKLUS/TIDUR — purple-dark)
+   - Section label dengan emoji + Barlow Condensed font, letter-spacing 2px
+   - Anton font untuk angka besar
+   - Status dot di bottom-right
+   - Same border-radius (16px), padding (18px)
+
+3. **Existing components REUSE:**
+   - `BottomSheet` untuk modal input (MuscleFatigueBottomSheet + Profile edit gender modal)
+   - `Skeleton` untuk loading state
+   - `Toast` untuk success/error notifications
+
+4. **JANGAN refactor** widget existing (SIKLUS, WELLNESS, TIDUR, AIR) — biarkan logic-nya. Hanya tambah conditional render di parent.
+
+5. **Auth context** — Saat ini app pakai mock user "ZIDNI". Pastikan Supabase queries pakai `auth.uid()` yang konsisten dengan mock user, atau setup minimal auth supaya RLS works.
+
+6. **Error handling** — Setiap RPC call WAJIB pakai try-catch + show user-friendly error message. Jangan crash app.
+
+7. **Mobile responsiveness** — Grid Quick Check-in harus tetap rapi di mobile (380px width). Test scroll behavior.
+
+8. **Build order:**
+   - Step 1: Buat `fatigueHelpers.js` utility
+   - Step 2: Buat `GenderSelectionCard` component
+   - Step 3: Buat `MuscleFatigueBottomSheet` component
+   - Step 4: Buat `MuscleFatigueWidget` component
+   - Step 5: Modify Quick Check-in parent (Home atau QuickCheckin component) — add conditional logic
+   - Step 6: Modify Profile page — make Jenis Kelamin editable
+   - Step 7: End-to-end test
+
+9. **Report back:**
+   - Files created
+   - Files modified
+   - Existing widget structure yang ditemukan (Home vs separate components)
+   - Testing checklist items passed
+   - Any blocker (especially RLS/auth-related)
