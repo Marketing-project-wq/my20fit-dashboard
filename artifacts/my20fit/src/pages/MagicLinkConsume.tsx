@@ -32,8 +32,8 @@ export default function MagicLinkConsume() {
           setTimeout(() => setLocation("/"), 1200);
         } else if (data.action_link) {
           // Fallback: server-side token extraction failed. Rewrite redirect_to in the
-          // Supabase action_link to point at our own /auth/callback — never photo.20fit.id
-          // or whatever Supabase's Site URL is set to.
+          // Supabase action_link to use our own origin so we always land on /auth/callback
+          // regardless of how Supabase's Site URL is configured.
           window.location.href = data.action_link
             .replace(/redirect_to=[^&]*/i, `redirect_to=${encodeURIComponent(window.location.origin + "/auth/callback")}`);
         } else {
