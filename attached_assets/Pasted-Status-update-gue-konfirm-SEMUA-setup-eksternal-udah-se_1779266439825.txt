@@ -1,0 +1,46 @@
+Status update: gue konfirm SEMUA setup eksternal udah selesai dari sisi gue:
+✅ Google OAuth Client ID + Secret dibuat & di-paste ke Supabase
+✅ Authorized JavaScript origins (3 URI) & redirect URI (1 URI) di Google Cloud
+✅ Supabase Site URL = https://profile.20fit.id  
+✅ Supabase Redirect URLs allowlist termasuk profile.20fit.id/** dan dev URL
+✅ Supabase "Confirm email" OFF
+✅ 7 secret baru di Replit (yang lu udah verify true semua tadi)
+
+Stop nge-flag "menunggu lu" untuk hal-hal di atas. Sekarang lakuin 2 hal:
+
+TASK 1 — Test Mailtrap real
+Run curl ini dari shell Replit (replace email tujuan dengan aluthfi916@gmail.com):
+
+curl -X POST https://send.api.mailtrap.io/api/send \
+  -H "Authorization: Bearer $API_Tokens_Mailtrap" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "from": {"email":"profile@20fit.id","name":"Profile 20FIT"},
+    "to": [{"email":"aluthfi916@gmail.com"}],
+    "subject":"Mailtrap test from Replit",
+    "text":"Halo Lut, ini test email dari profile.20fit.id via Mailtrap API.",
+    "html":"<p>Halo Lut, ini test email dari profile.20fit.id via Mailtrap API.</p>"
+  }'
+
+Report response code + body. Kalau 200 → domain verified, kirim sukses. 
+Kalau 401/403 → kasih tau gue full response message.
+
+TASK 2 — Fix bug redirect ke photo.20fit.id
+Setelah login berhasil di app, user ke-redirect ke https://photo.20fit.id 
+padahal seharusnya tetap di profile.20fit.id atau dev URL.
+
+Grep seluruh codebase:
+  grep -rn "photo.20fit" --include="*.ts" --include="*.tsx" --include="*.js" .
+
+List SEMUA match dengan file + line + context-nya. Khususnya cari di:
+- artifacts/my20fit/src/contexts/AuthContext.tsx
+- artifacts/my20fit/src/pages/AuthCallback.tsx
+- artifacts/my20fit/src/pages/Login.tsx
+- artifacts/my20fit/src/components/Sidebar.tsx
+
+Cari setLocation(), window.location.href, atau redirect lain yang nge-arah 
+ke photo.20fit.id. JANGAN hapus reference yang fungsinya cuma data fetching 
+atau display image — yang gue mau hapus cuma navigation/redirect ke domain 
+photo.20fit.id.
+
+Kasih gue report sebelum lu fix apapun.
