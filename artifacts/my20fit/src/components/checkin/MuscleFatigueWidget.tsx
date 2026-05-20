@@ -92,8 +92,8 @@ export default function MuscleFatigueWidget() {
         {!hasData ? (
           <div
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 400, fontStyle: "italic",
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 400,
               fontSize: 12, color: "rgba(255,255,255,0.5)",
             }}
           >
@@ -111,8 +111,8 @@ export default function MuscleFatigueWidget() {
               {overall}
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 400, fontStyle: "italic",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 400,
                   fontSize: 12, color: "rgba(255,255,255,0.5)", marginLeft: 2,
                 }}
               >
@@ -121,8 +121,8 @@ export default function MuscleFatigueWidget() {
             </div>
             <div
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: 400, fontStyle: "italic",
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
                 fontSize: 11, color: "rgba(255,255,255,0.55)",
                 marginBottom: 8, marginTop: 2,
               }}
@@ -161,7 +161,7 @@ export default function MuscleFatigueWidget() {
                   key={area.id}
                   style={{
                     flex: 1, textAlign: "center",
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 8,
                     color: "rgba(255,255,255,0.4)", letterSpacing: "0.5px",
                   }}

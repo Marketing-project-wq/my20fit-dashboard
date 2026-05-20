@@ -48,7 +48,7 @@ function ToastItem({ item, onDismiss }: { item: ToastItem; onDismiss: () => void
         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
       }}>{cfg.icon}</div>
       <span style={{
-        fontFamily: "'Barlow Condensed', sans-serif",
+        fontFamily: "Inter, sans-serif",
         fontWeight: 900, fontSize: 13, color: "#fff",
       }}>{item.message}</span>
       <button

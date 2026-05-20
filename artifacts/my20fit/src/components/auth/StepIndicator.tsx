@@ -51,7 +51,7 @@ export default function StepIndicator({ current, steps }: StepIndicatorProps) {
               </div>
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontWeight: isActive ? 900 : 400,
                   fontSize: 11,
                   letterSpacing: isActive ? "0.5px" : "0.3px",

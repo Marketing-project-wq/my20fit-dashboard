@@ -48,7 +48,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
         >
           <div
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900, fontSize: 10,
               letterSpacing: "2px", color: "rgba(255,255,255,0.5)",
               marginBottom: 4,
@@ -67,8 +67,8 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
           </div>
           <div
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 400, fontStyle: "italic",
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 400,
               fontSize: 12, color: "rgba(255,255,255,0.6)", marginTop: 4,
             }}
           >
@@ -80,7 +80,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
         <div style={{ marginBottom: 20 }}>
           <div
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900, fontSize: 11,
               letterSpacing: "2px", color: "var(--muted)",
               marginBottom: 12,
@@ -105,8 +105,8 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
                   border: "1px solid var(--border-subtle, rgba(0,0,0,0.08))",
                   borderRadius: 10, padding: "10px 6px",
                   fontSize: 11, cursor: "pointer",
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 400, fontStyle: "italic",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 400,
                   textAlign: "center", transition: "all 0.15s",
                   color: "var(--text)",
                 }}
@@ -122,7 +122,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
         <div style={{ marginBottom: 20 }}>
           <div
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900, fontSize: 11,
               letterSpacing: "2px", color: "var(--muted)",
               marginBottom: 16,
@@ -145,7 +145,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
                     <span style={{ fontSize: 16 }}>{area.emoji}</span>
                     <span
                       style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
+                        fontFamily: "Inter, sans-serif",
                         fontWeight: 900, fontSize: 13,
                         letterSpacing: "1px", color: "var(--text)",
                       }}
@@ -165,7 +165,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
                     </span>
                     <span
                       style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
+                        fontFamily: "Inter, sans-serif",
                         fontWeight: 900, fontSize: 10,
                         letterSpacing: "1px", color: getFatigueColor(value),
                       }}
@@ -190,7 +190,7 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
         <div style={{ marginBottom: 20 }}>
           <label
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900, fontSize: 11,
               letterSpacing: "2px", color: "var(--muted)",
               display: "block", marginBottom: 8,
@@ -208,8 +208,8 @@ export default function MuscleFatigueBottomSheet({ initialData, onClose, onSaved
               padding: "10px 12px",
               border: "1.5px solid var(--border-subtle, #E5E1D8)",
               borderRadius: 8,
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 400, fontStyle: "italic",
+              fontFamily: "Inter, sans-serif",
+              fontWeight: 400,
               fontSize: 13, resize: "vertical",
               background: "var(--card)", color: "var(--text)",
               boxSizing: "border-box",

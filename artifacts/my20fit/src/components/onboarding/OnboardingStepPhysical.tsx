@@ -21,7 +21,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontWeight: 900,
   fontSize: 11,
   letterSpacing: "1.5px",
@@ -49,9 +49,8 @@ export default function OnboardingStepPhysical({
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <p
         style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontWeight: 400,
-          fontStyle: "italic",
           fontSize: 14,
           color: "#6E665C",
           margin: 0,
@@ -83,7 +82,7 @@ export default function OnboardingStepPhysical({
               right: 14,
               top: "50%",
               transform: "translateY(-50%)",
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: 13,
               color: "#9C948A",
             }}
@@ -115,7 +114,7 @@ export default function OnboardingStepPhysical({
               right: 14,
               top: "50%",
               transform: "translateY(-50%)",
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: 13,
               color: "#9C948A",
             }}
@@ -139,7 +138,7 @@ export default function OnboardingStepPhysical({
         >
           <span
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900,
               fontSize: 11,
               letterSpacing: "1.5px",

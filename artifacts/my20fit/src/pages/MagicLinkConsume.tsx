@@ -51,7 +51,7 @@ export default function MagicLinkConsume() {
             size={40}
             style={{ color: "#C41101", animation: "spin 1s linear infinite", margin: "0 auto 16px" }}
           />
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontStyle: "italic", fontSize: 15, color: "#6E665C" }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 15, color: "#6E665C" }}>
             Signing you in…
           </p>
         </div>
@@ -63,7 +63,7 @@ export default function MagicLinkConsume() {
           <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, color: "#0A0908", margin: "0 0 8px" }}>
             Signed in!
           </h1>
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontStyle: "italic", fontSize: 14, color: "#6E665C" }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#6E665C" }}>
             Redirecting to dashboard…
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function MagicLinkConsume() {
           <h1 style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, color: "#0A0908", margin: "0 0 10px" }}>
             Link invalid
           </h1>
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontStyle: "italic", fontSize: 14, color: "#6E665C", margin: "0 0 24px" }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#6E665C", margin: "0 0 24px" }}>
             This link has expired or already been used. Request a new one.
           </p>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -93,7 +93,7 @@ export default function MagicLinkConsume() {
               onClick={() => setLocation("/login")}
               style={{
                 background: "none", border: "none", cursor: "pointer",
-                fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#6E665C",
+                fontFamily: "Inter, sans-serif", fontSize: 13, color: "#6E665C",
               }}
             >
               ← Back to sign in

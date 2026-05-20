@@ -14,7 +14,7 @@ export default function ResetPassword() {
 
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "#fff", border: "1px solid #E5E1D8",
-    borderRadius: 10, padding: "12px 14px", fontFamily: "'Barlow Condensed', sans-serif",
+    borderRadius: 10, padding: "12px 14px", fontFamily: "Inter, sans-serif",
     fontSize: 15, color: "#0A0908", outline: "none", transition: "border-color 0.2s, box-shadow 0.2s",
   };
 
@@ -41,14 +41,14 @@ export default function ResetPassword() {
           alt="20fit.id"
           style={{ height: 48, width: "auto", display: "block", marginBottom: 4 }}
         />
-        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#6E665C", marginBottom: 28 }}>
+        <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#6E665C", marginBottom: 28 }}>
           Buat password baru untuk akunmu.
         </p>
 
         {success ? (
           <div style={{ background: "#DCFCE7", border: "1px solid #86EFAC", borderRadius: 10, padding: "16px 20px", display: "flex", gap: 10, alignItems: "center" }}>
             <CheckCircle size={18} style={{ color: "#16A34A", flexShrink: 0 }} />
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#166534" }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "#166534" }}>
               Password berhasil diubah. Mengalihkan ke halaman masuk…
             </p>
           </div>
@@ -57,7 +57,7 @@ export default function ResetPassword() {
             {error && (
               <div style={{ background: "#FEF2F2", border: "1px solid #FECACA", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 10, alignItems: "center" }}>
                 <AlertCircle size={16} style={{ color: "#C41101", flexShrink: 0 }} />
-                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#7F1D1D" }}>{error}</p>
+                <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#7F1D1D" }}>{error}</p>
               </div>
             )}
             <div style={{ position: "relative" }}>
@@ -73,7 +73,7 @@ export default function ResetPassword() {
             </div>
             <button type="submit" disabled={loading} style={{
               background: "#C41101", color: "#fff", border: "none", borderRadius: 10, padding: "14px",
-              fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", cursor: "pointer",
+              fontFamily: "Inter, sans-serif", fontSize: 15, letterSpacing: "2.5px", cursor: "pointer",
               transition: "transform 0.2s, box-shadow 0.2s", marginTop: 4,
               opacity: loading ? 0.7 : 1,
             }}>

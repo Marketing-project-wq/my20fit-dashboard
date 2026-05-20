@@ -16,7 +16,7 @@ const inputStyle: React.CSSProperties = {
   border: "1px solid #E5E1D8",
   borderRadius: 12,
   padding: "12px 14px",
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontSize: 15,
   color: "#0A0908",
   outline: "none",
@@ -25,7 +25,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontWeight: 900,
   fontSize: 11,
   letterSpacing: "1.5px",
@@ -114,7 +114,7 @@ export default function Register() {
     <AuthShell>
       <p
         style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontWeight: 900,
           fontSize: 10,
           letterSpacing: "2px",
@@ -155,7 +155,7 @@ export default function Register() {
           <AlertCircle size={16} style={{ color: "#C41101", flexShrink: 0, marginTop: 1 }} />
           <p
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: 13,
               color: "#7F1D1D",
               margin: 0,
@@ -208,7 +208,7 @@ export default function Register() {
           {emailError && (
             <p
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 12,
                 color: "#C41101",
                 margin: "4px 0 0",
@@ -223,7 +223,7 @@ export default function Register() {
                   border: "none",
                   color: "#C41101",
                   cursor: "pointer",
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontSize: 12,
                   fontWeight: 900,
                   textDecoration: "underline",
@@ -316,7 +316,7 @@ export default function Register() {
         <div style={{ flex: 1, height: 1, background: "#E5E1D8" }} />
         <span
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontSize: 12,
             color: "#9C948A",
           }}
@@ -341,7 +341,7 @@ export default function Register() {
             background: "none",
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontSize: 13,
             color: "#6E665C",
           }}

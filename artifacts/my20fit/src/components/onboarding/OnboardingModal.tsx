@@ -34,7 +34,7 @@ const secondaryBtn: React.CSSProperties = {
   color: "#6E665C",
   border: "1.5px solid #E5E1D8",
   borderRadius: 12,
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontWeight: 400,
   fontSize: 14,
   cursor: "pointer",
@@ -165,7 +165,7 @@ export default function OnboardingModal({ open, onClose }: OnboardingModalProps)
           <div style={{ marginBottom: 24 }}>
             <p
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontWeight: 900,
                 fontSize: 10,
                 letterSpacing: "2px",
@@ -265,9 +265,8 @@ export default function OnboardingModal({ open, onClose }: OnboardingModalProps)
                       color: "#991B1B",
                       padding: "10px 12px",
                       borderRadius: 8,
-                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: 14,
-                      fontStyle: "italic",
                     }}
                   >
                     {saveError}

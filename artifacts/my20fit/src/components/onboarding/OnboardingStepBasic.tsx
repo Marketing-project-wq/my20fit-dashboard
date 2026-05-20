@@ -21,7 +21,7 @@ const inputStyle: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontWeight: 900,
   fontSize: 11,
   letterSpacing: "1.5px",

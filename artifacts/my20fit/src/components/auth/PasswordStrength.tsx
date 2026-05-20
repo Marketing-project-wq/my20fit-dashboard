@@ -41,7 +41,7 @@ export default function PasswordStrength({ password }: PasswordStrengthProps) {
       {label && (
         <span
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontSize: 11,
             fontWeight: 900,
             letterSpacing: "1px",

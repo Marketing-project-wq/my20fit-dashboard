@@ -165,7 +165,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   if (!active || !payload?.length) return null;
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "8px 12px", border: "1px solid #333" }}>
-      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>{label}</p>
+      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 4 }}>{label}</p>
       {payload.map((p, i) => (
         <p key={i} style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 13, fontWeight: 400, color: p.color || "#fff" }}>
           {p.value}{p.name ? ` ${p.name}` : ""}
@@ -181,7 +181,7 @@ const SleepTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   const q = sleepQuality(hours);
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
-      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontFamily: "'Inter'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
       <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "#fff", marginBottom: 4 }}>{hours}j</p>
       <span style={{ background: q.color + "25", color: q.color, fontFamily: "'Barlow Condensed'", fontSize: 11, letterSpacing: 1, padding: "2px 8px", borderRadius: 99 }}>{q.label}</span>
     </div>
@@ -194,9 +194,9 @@ const WaterTooltip = ({ active, payload, label }: { active?: boolean; payload?: 
   const pct = payload.find(p => p.dataKey === "pct")?.value ?? 0;
   return (
     <div style={{ background: "#0A0908", borderRadius: 8, padding: "10px 14px", border: "1px solid #333" }}>
-      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
+      <p style={{ fontFamily: "'Inter'", fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>{label}</p>
       <p style={{ fontFamily: "'JetBrains Mono'", fontSize: 18, fontWeight: 400, color: "#06B6D4", marginBottom: 4 }}>{liters}L</p>
-      <p style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{pct}% dari target</p>
+      <p style={{ fontFamily: "'Inter'", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>{pct}% dari target</p>
     </div>
   );
 };
@@ -223,7 +223,7 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
       {filtered.length < 2 ? (
         <div style={{ height: 100, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
           <TrendingUp size={24} style={{ color: "var(--border-subtle)" }} />
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)", textAlign: "center" }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "var(--muted)", textAlign: "center" }}>
             Tambah data untuk melihat tren
           </p>
         </div>
@@ -243,12 +243,12 @@ function ChartCard({ title, data, dataKey, unit, color = "#C41101", refLines, se
               )}
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-subtle)" vertical={false} />
-            <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
+            <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "Inter, sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fontFamily: "Inter, sans-serif", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={["auto", "auto"]} />
             <Tooltip content={<CustomTooltip />} />
             {refLines?.map(r => (
               <ReferenceLine key={r.y} y={r.y} stroke="rgba(100,100,100,0.4)" strokeDasharray="4 4"
-                label={{ value: r.label, position: "insideTopRight", style: { fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" } }}
+                label={{ value: r.label, position: "insideTopRight", style: { fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" } }}
               />
             ))}
             <Area type="monotone" dataKey={dataKey as string} stroke={color} strokeWidth={2}
@@ -290,7 +290,7 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
         <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 26, fontWeight: 400, lineHeight: 1, color: "var(--text)" }}>
           {value ?? "—"}
         </span>
-        {unit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>{unit}</span>}
+        {unit && <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "var(--muted)", marginBottom: 2 }}>{unit}</span>}
       </div>
       {change != null && (
         <div style={{ display: "flex", alignItems: "center", gap: 3, marginBottom: 4 }}>
@@ -298,12 +298,12 @@ function MetricCard({ label, value, unit, status, change, changeUnit, trend, pos
             ? <TrendingUp size={12} style={{ color: "#C41101" }} />
             : <TrendingDown size={12} style={{ color: "#16A34A" }} />}
           <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 11, color: change > 0 ? "#C41101" : "#16A34A" }}>
-            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit && <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400 }}>{changeUnit}</span>}
+            {change > 0 ? "+" : ""}{change.toFixed(1)}{changeUnit && <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 400 }}>{changeUnit}</span>}
           </span>
         </div>
       )}
       {status && (
-        <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, fontWeight: 600, color: status.color,
+        <span style={{ fontFamily: "Inter, sans-serif", fontSize: 10, fontWeight: 600, color: status.color,
           backgroundColor: status.color + "18", borderRadius: 4, padding: "2px 6px" }}>
           {status.label}
         </span>
@@ -497,7 +497,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
 
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "var(--card2)", border: "1px solid var(--border-subtle)",
-    borderRadius: 8, padding: "9px 12px", fontFamily: "'Barlow Condensed', sans-serif",
+    borderRadius: 8, padding: "9px 12px", fontFamily: "Inter, sans-serif",
     fontSize: 14, color: "var(--text)", outline: "none",
   };
   const labelStyle: React.CSSProperties = {
@@ -524,7 +524,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, flexWrap: "wrap", gap: 10 }}>
             <div>
               <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 30, letterSpacing: "1px", color: "var(--text)", lineHeight: 1 }}>PROGRESS</h1>
-              <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--muted)", marginTop: 2 }}>Pantau perkembangan kesehatanmu</p>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "var(--muted)", marginTop: 2 }}>Pantau perkembangan kesehatanmu</p>
             </div>
             <div style={{ display: "flex", gap: 6 }}>
               {(["1M", "3M", "6M", "1Y", "ALL"] as DateRange[]).map(r => (
@@ -571,12 +571,12 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                         <span style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 44, color: "#fff", lineHeight: 1 }}>{mcuResult.grade}</span>
                       </div>
                       <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 10, letterSpacing: "2px", color: "var(--muted)", marginTop: 6 }}>HEALTH GRADE</p>
-                      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
+                      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 2 }}>
                         {mcuResult.date ? format(parseISO(mcuResult.date), "d MMM yyyy") : "Terbaru"}
                       </p>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--text-soft)", lineHeight: 1.6, fontStyle: "italic" }}>
+                      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "var(--text-soft)", lineHeight: 1.6, }}>
                         {mcuResult.summary ?? "Hasil pemeriksaan telah dianalisis."}
                       </p>
                     </div>
@@ -587,7 +587,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                       <Activity size={24} style={{ color: "var(--muted)" }} />
                     </div>
                     <div>
-                      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "var(--text)" }}>Upload MCU untuk melihat health grade kamu</p>
+                      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 14, color: "var(--text)" }}>Upload MCU untuk melihat health grade kamu</p>
                     </div>
                   </div>
                 )}
@@ -715,7 +715,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <div style={{ textAlign: "center", padding: "32px 20px" }}>
                       <Moon size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
                       <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, color: "var(--muted)" }}>BELUM ADA DATA TIDUR</div>
-                      <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                      <div style={{ fontFamily: "'Inter'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
                         Catat jam tidur kamu di Quick Check-in setiap hari
                       </div>
                     </div>
@@ -723,13 +723,13 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <ResponsiveContainer width="100%" height={160}>
                       <ComposedChart data={sleepData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
-                        <YAxis domain={[0, 12]} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis domain={[0, 12]} tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
                         <Tooltip content={<SleepTooltip />} />
                         <ReferenceLine y={7} stroke="#22C55E" strokeDasharray="4 4"
-                          label={{ value: "Ideal", fill: "#22C55E", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                          label={{ value: "Ideal", fill: "#22C55E", fontSize: 9, fontFamily: "'Inter'" }} />
                         <ReferenceLine y={9} stroke="#3B82F6" strokeDasharray="4 4"
-                          label={{ value: "Max", fill: "#3B82F6", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                          label={{ value: "Max", fill: "#3B82F6", fontSize: 9, fontFamily: "'Inter'" }} />
                         <Bar dataKey="hours" radius={[4, 4, 0, 0]}>
                           {sleepData.map((entry, i) => (
                             <Cell key={i} fill={
@@ -764,7 +764,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <div style={{ textAlign: "center", padding: "32px 20px" }}>
                       <Droplets size={32} style={{ color: "var(--muted)", opacity: 0.4, margin: "0 auto 8px", display: "block" }} />
                       <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 15, color: "var(--muted)" }}>BELUM ADA DATA AIR</div>
-                      <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
+                      <div style={{ fontFamily: "'Inter'", fontSize: 12, color: "var(--muted)", marginTop: 4 }}>
                         Catat asupan air di Quick Check-in setiap hari
                       </div>
                     </div>
@@ -778,12 +778,12 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
-                        <YAxis tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={[0, "auto"]} />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} domain={[0, "auto"]} />
                         <Tooltip content={<WaterTooltip />} />
                         {waterData.length > 0 && (
                           <ReferenceLine y={waterData[waterData.length - 1].target} stroke="#06B6D4" strokeDasharray="4 4"
-                            label={{ value: "Target", fill: "#06B6D4", fontSize: 9, fontFamily: "'Barlow Condensed'" }} />
+                            label={{ value: "Target", fill: "#06B6D4", fontSize: 9, fontFamily: "'Inter'" }} />
                         )}
                         <Area type="monotone" dataKey="liters" stroke="#06B6D4" strokeWidth={2}
                           fill="url(#grad-water)" dot={{ r: 3, fill: "#06B6D4", strokeWidth: 0 }}
@@ -805,10 +805,10 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                       <p style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "var(--muted)" }}>ENERGI & MOOD</p>
                       <div style={{ display: "flex", gap: 12 }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "#22C55E" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Inter'", fontSize: 11, color: "#22C55E" }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />Energi
                         </span>
-                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "#F97316" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 4, fontFamily: "'Inter'", fontSize: 11, color: "#F97316" }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#F97316", display: "inline-block" }} />Mood ×2
                         </span>
                       </div>
@@ -816,8 +816,8 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                     <ResponsiveContainer width="100%" height={130}>
                       <LineChart data={wellnessChartData} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-subtle)" />
-                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
-                        <YAxis domain={[0, 10]} tick={{ fontFamily: "'Barlow Condensed'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="date" tickFormatter={fmtDate} tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
+                        <YAxis domain={[0, 10]} tick={{ fontFamily: "'Inter'", fontSize: 9, fill: "var(--muted)" }} tickLine={false} axisLine={false} />
                         <Tooltip content={<CustomTooltip />} />
                         <Line type="monotone" dataKey="energy" stroke="#22C55E" strokeWidth={2} dot={{ r: 3, fill: "#22C55E", strokeWidth: 0 }} activeDot={{ r: 5 }} connectNulls name="/10" />
                         <Line type="monotone" dataKey="mood" stroke="#F97316" strokeWidth={2} dot={{ r: 3, fill: "#F97316", strokeWidth: 0 }} activeDot={{ r: 5 }} connectNulls name="/10" />
@@ -836,7 +836,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                 {workoutGroups.length === 0 ? (
                   <div className="app-card" style={{ textAlign: "center", padding: "28px 20px" }}>
                     <Dumbbell size={28} style={{ color: "var(--border-subtle)", margin: "0 auto 8px" }} />
-                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "var(--muted)" }}>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "var(--muted)" }}>
                       Belum ada riwayat latihan. Mulai catat aktivitasmu!
                     </p>
                   </div>
@@ -856,12 +856,12 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                               </div>
                               <div style={{ flex: 1 }}>
                                 <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 14, letterSpacing: "1px", color: "var(--text)" }}>{w.type.toUpperCase()}</p>
-                                <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "var(--muted)" }}>
+                                <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "var(--muted)" }}>
                                   {fmtDate(w.date)}{w.note ? ` · ${w.note}` : ""}
                                 </p>
                               </div>
                               <span style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 14, fontWeight: 400, color: "var(--text)" }}>
-                                {w.duration}<span style={{ fontSize: 10, color: "var(--muted)", fontFamily: "'Barlow Condensed', sans-serif" }}> min</span>
+                                {w.duration}<span style={{ fontSize: 10, color: "var(--muted)", fontFamily: "Inter, sans-serif" }}> min</span>
                               </span>
                             </div>
                           );
@@ -887,7 +887,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                           {isPositive
                             ? <CheckCircle size={16} style={{ color: "#16A34A", flexShrink: 0, marginTop: 2 }} />
                             : <AlertCircle size={16} style={{ color: "#D97706", flexShrink: 0, marginTop: 2 }} />}
-                          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{rec}</p>
+                          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{rec}</p>
                         </div>
                       );
                     })}
@@ -936,7 +936,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 20, letterSpacing: "2px", color: "var(--text)" }}>TAMBAH DATA KESEHATAN</h2>
+              <h2 style={{ fontFamily: "Inter, sans-serif", fontSize: 20, letterSpacing: "2px", color: "var(--text)" }}>TAMBAH DATA KESEHATAN</h2>
               <button onClick={() => setShowModal(false)} style={{ color: "var(--muted)", fontSize: 22, background: "none", cursor: "pointer", lineHeight: 1 }}>×</button>
             </div>
 
@@ -946,7 +946,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   key={tab}
                   onClick={() => setModalTab(tab)}
                   style={{
-                    flex: 1, padding: "10px", fontFamily: "'Barlow Condensed', sans-serif",
+                    flex: 1, padding: "10px", fontFamily: "Inter, sans-serif",
                     fontSize: 13, letterSpacing: "2px", cursor: "pointer", transition: "all 0.2s",
                     backgroundColor: modalTab === tab ? "#C41101" : "transparent",
                     color: modalTab === tab ? "#fff" : "var(--muted)",
@@ -968,12 +968,12 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <div>
                     <span style={labelStyle}>TINGGI BADAN (cm) {!height && <span style={{ color: "#C41101" }}>*</span>}</span>
                     <input type="number" value={fHeightInput} onChange={e => setFHeightInput(e.target.value)} placeholder="170" style={inputStyle} />
-                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Digunakan untuk hitung BMI otomatis</p>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "var(--muted)", marginTop: 3 }}>Digunakan untuk hitung BMI otomatis</p>
                   </div>
                 )}
                 {height && !showHeightEdit && (
                   <button onClick={() => setShowHeightEdit(true)}
-                    style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#C41101", background: "none", cursor: "pointer", textAlign: "left", textDecoration: "underline" }}>
+                    style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41101", background: "none", cursor: "pointer", textAlign: "left", textDecoration: "underline" }}>
                     Edit tinggi badan ({height} cm)
                   </button>
                 )}
@@ -981,7 +981,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>BERAT BADAN (kg)</span>
                   <input type="number" value={fWeight} onChange={e => setFWeight(e.target.value)} placeholder="70.0" step="0.1" style={inputStyle} />
                   {fBmi && fWeight && (
-                    <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#2563EB", marginTop: 3 }}>
+                    <p style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#2563EB", marginTop: 3 }}>
                       BMI: {fBmi} ({bmiStatus(parseFloat(fBmi)).label})
                     </p>
                   )}
@@ -1006,7 +1006,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>TEKANAN DARAH (mmHg)</span>
                   <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                     <input type="number" value={fBpSys} onChange={e => setFBpSys(e.target.value)} placeholder="120" style={{ ...inputStyle, flex: 1 }} />
-                    <span style={{ color: "var(--muted)", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 18 }}>/</span>
+                    <span style={{ color: "var(--muted)", fontFamily: "Inter, sans-serif", fontSize: 18 }}>/</span>
                     <input type="number" value={fBpDia} onChange={e => setFBpDia(e.target.value)} placeholder="80" style={{ ...inputStyle, flex: 1 }} />
                   </div>
                 </div>
@@ -1015,7 +1015,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <textarea value={fNote} onChange={e => setFNote(e.target.value)}
                     placeholder="Kondisi hari ini, perubahan diet, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-                <button onClick={saveHealthEntry} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
+                <button onClick={saveHealthEntry} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "Inter, sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN DATA
                 </button>
               </div>
@@ -1043,7 +1043,7 @@ export default function Progress({ theme, toggleTheme }: { theme: string; toggle
                   <span style={labelStyle}>CATATAN</span>
                   <textarea value={wNote} onChange={e => setWNote(e.target.value)} placeholder="Intensitas, lokasi, dll" rows={3} style={{ ...inputStyle, resize: "vertical" }} />
                 </div>
-                <button onClick={saveWorkout} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
+                <button onClick={saveWorkout} style={{ width: "100%", padding: "14px", borderRadius: 8, cursor: "pointer", backgroundColor: "#C41101", color: "#fff", fontFamily: "Inter, sans-serif", fontSize: 15, letterSpacing: "2.5px", marginTop: 4 }}>
                   SIMPAN LATIHAN
                 </button>
               </div>

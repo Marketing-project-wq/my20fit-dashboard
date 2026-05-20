@@ -71,7 +71,7 @@ export default function AuthShell({ children, footer, maxWidth = 480 }: AuthShel
           {footer ?? (
             <p
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 12,
                 color: "#6E665C",
                 lineHeight: 1.6,

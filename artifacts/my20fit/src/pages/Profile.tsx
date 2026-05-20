@@ -317,7 +317,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
   const inputStyle: React.CSSProperties = {
     width: "100%", background: "var(--bg)", border: "1.5px solid var(--border-subtle,#E5E1D8)",
     borderRadius: 10, padding: "11px 14px",
-    fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontSize: 15,
+    fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 15,
     color: "var(--text)", outline: "none", boxSizing: "border-box",
   };
 
@@ -399,7 +399,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     background: "linear-gradient(135deg, rgba(212,168,0,.2), rgba(212,168,0,.1))",
                     border: "0.5px solid rgba(212,168,0,.35)",
                     borderRadius: 99, padding: "5px 12px",
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 8, letterSpacing: "1.5px", color: "#D4A800",
                   }}>⭐ PLUS MEMBER</div>
                 ) : (
@@ -407,7 +407,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     background: "rgba(255,255,255,.06)",
                     border: "0.5px solid rgba(255,255,255,.1)",
                     borderRadius: 99, padding: "5px 12px",
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 8, letterSpacing: "1.5px", color: "rgba(255,255,255,.35)",
                   }}>FREE MEMBER</div>
                 )}
@@ -422,8 +422,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
 
               {/* Email + join date */}
               <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: 400, fontStyle: "italic",
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
                 fontSize: 12, color: "rgba(255,255,255,.4)", marginBottom: 16,
               }}>
                 {userEmail} · Member sejak {joinDate}
@@ -450,7 +450,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                       fontSize: 18, fontWeight: 700, color: "#fff", lineHeight: 1,
                     }}>{s.value}</div>
                     <div style={{
-                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontFamily: "Inter, sans-serif",
                       fontWeight: 900, fontSize: 7,
                       letterSpacing: "2px", color: "rgba(255,255,255,.25)", marginTop: 3,
                     }}>{s.label}</div>
@@ -505,7 +505,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   Complete your profile
                 </div>
                 <div style={{
-                  fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic",
+                  fontFamily: "Inter, sans-serif", fontWeight: 400,
                   fontSize: 12, color: "#6E665C", marginTop: 2,
                 }}>
                   Get personalized workout & nutrition targets
@@ -553,12 +553,12 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 }}>{row.icon}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 10,
                     letterSpacing: "1.5px", color: "var(--muted)",
                   }}>{row.label}</div>
                   <div style={{
-                    fontFamily: row.mono ? "'JetBrains Mono', monospace" : "'Barlow Condensed', sans-serif",
+                    fontFamily: row.mono ? "'JetBrains Mono', monospace" : "Inter, sans-serif",
                     fontWeight: 400, fontSize: row.mono ? 13 : 14,
                     color: row.value === "Belum diisi" || row.value === "—" ? "var(--muted)" : "var(--text)",
                     marginTop: 1,
@@ -566,8 +566,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     {row.value}
                     {"unit" in row && row.unit && row.value !== "—" && (
                       <span style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                        fontWeight: 400, fontStyle: "italic",
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 400,
                         fontSize: 11, color: "var(--muted)", marginLeft: 3,
                       }}>{row.unit}</span>
                     )}
@@ -583,13 +583,13 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
           <div style={{ background: "var(--card)", borderRadius: 16, padding: 16, boxShadow: "var(--shadow)", marginBottom: 16 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontWeight: 900, fontSize: 9,
                 letterSpacing: "2px", color: "var(--muted)",
               }}>SNAPSHOT TERKINI</div>
               <div style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: 400, fontStyle: "italic",
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 400,
                 fontSize: 10, color: "var(--muted)",
               }}>
                 {latestEntry ? `Update ${formatRelativeDate(latestEntry.date)}` : "Belum ada data"}
@@ -616,21 +616,21 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     {m.value ? String(typeof m.value === "number" ? (Number.isInteger(m.value) ? m.value : m.value.toFixed(1)) : m.value) : "—"}
                     {m.unit && m.value && (
                       <span style={{
-                        fontFamily: "'Barlow Condensed', sans-serif",
-                        fontWeight: 400, fontStyle: "italic",
+                        fontFamily: "Inter, sans-serif",
+                        fontWeight: 400,
                         fontSize: 9, color: "var(--muted)", marginLeft: 2,
                       }}>{m.unit}</span>
                     )}
                   </div>
                   <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 7,
                     letterSpacing: "1.5px", color: "var(--muted)", marginTop: 3,
                   }}>{m.label}</div>
                   {m.status && (
                     <div style={{
-                      fontFamily: "'Barlow Condensed', sans-serif",
-                      fontWeight: 400, fontStyle: "italic",
+                      fontFamily: "Inter, sans-serif",
+                      fontWeight: 400,
                       fontSize: 8, marginTop: 2,
                       color: m.status === "Normal" || m.status === "Baik" || m.status === "Excellent" || m.status === "Athlete"
                         ? "#22C55E" : "#EAB308",
@@ -652,8 +652,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     HEALTH GRADE {mcu.grade}
                   </div>
                   <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 400, fontStyle: "italic",
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 400,
                     fontSize: 10, color: "var(--muted)", marginTop: 1,
                   }}>Dianalisis dari MCU · {mcu.reviewed_at || "baru-baru ini"}</div>
                 </div>
@@ -686,7 +686,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 16, color: "var(--text)", marginBottom: 2 }}>
                     Grade {mcu.grade} · Health Baseline
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>
                     Dianalisis {mcu.reviewed_at || "baru-baru ini"}
                   </div>
                 </div>
@@ -708,7 +708,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 18, color: "var(--text)", marginBottom: 2 }}>
                     Belum ada MCU
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>
                     Upload untuk program personal
                   </div>
                 </div>
@@ -739,7 +739,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     {s.value || "0"}
                   </div>
                   <div style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 7,
                     letterSpacing: "1px", color: "var(--muted)", marginTop: 2,
                   }}>{s.label}</div>
@@ -759,13 +759,13 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   {currentStreak}
                 </div>
                 <div style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontWeight: 900, fontSize: 9,
                   letterSpacing: "1.5px", color: "rgba(196,17,1,.6)",
                 }}>HARI STREAK</div>
                 <div style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
-                  fontWeight: 400, fontStyle: "italic",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 400,
                   fontSize: 10, color: "var(--muted)", marginTop: 2,
                 }}>Terbaik: {bestStreak} hari berturut-turut</div>
               </div>
@@ -782,7 +782,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                     ⭐ 20FIT PLUS AKTIF
                   </div>
                   <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 24, color: "#fff" }}>MEMBER AKTIF</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 12, color: "rgba(255,255,255,.35)", marginTop: 4 }}>
                     Berlaku hingga 31 Des 2026
                   </div>
                 </div>
@@ -808,13 +808,13 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 ⭐ 20FIT PLUS
               </div>
               <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 22, color: "#fff", marginBottom: 4 }}>UPGRADE SEKARANG</div>
-              <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 16 }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,.55)", marginBottom: 16 }}>
                 Hemat 10% di semua layanan 20FIT
               </div>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <div style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: 20, fontWeight: 400, color: "#D4A800" }}>
                   Rp 49.000
-                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,.4)" }}>/bulan</span>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 13, color: "rgba(255,255,255,.4)" }}>/bulan</span>
                 </div>
                 <button style={{
                   background: "linear-gradient(135deg, #D4A800, #FFD700)", color: "#0A0908",
@@ -845,8 +845,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   color: "var(--muted)", flexShrink: 0,
                 }}>{s.icon}</div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontSize: 15, color: "var(--text)" }}>{s.label}</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{s.sublabel}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 15, color: "var(--text)" }}>{s.label}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>{s.sublabel}</div>
                 </div>
                 {s.type === "toggle" ? (
                   <Toggle
@@ -964,17 +964,17 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                 <label style={fieldLabel}>TINGGI BADAN</label>
                 <div style={{ position: "relative" }}>
                   <input type="number" value={editHeight} onChange={e => setEditHeight(e.target.value)} placeholder="170" style={{ ...inputStyle, paddingRight: 44 }} />
-                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: "var(--muted)" }}>cm</span>
+                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 13, color: "var(--muted)" }}>cm</span>
                 </div>
               </div>
               <div>
                 <label style={fieldLabel}>BERAT BADAN</label>
                 <div style={{ position: "relative" }}>
                   <input type="number" value={editWeight} onChange={e => setEditWeight(e.target.value)} placeholder="70" style={{ ...inputStyle, paddingRight: 44 }} />
-                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: "var(--muted)" }}>kg</span>
+                  <span style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 13, color: "var(--muted)" }}>kg</span>
                 </div>
                 {computedBmi && (
-                  <div style={{ marginTop: 8, fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 13, color: bmiLabel(computedBmi).color }}>
+                  <div style={{ marginTop: 8, fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 13, color: bmiLabel(computedBmi).color }}>
                     BMI: {computedBmi.toFixed(1)} ({bmiLabel(computedBmi).label})
                   </div>
                 )}
@@ -984,8 +984,8 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
                   onClick={handleRemoveAvatar}
                   style={{
                     background: "none", border: "none",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 400, fontStyle: "italic",
+                    fontFamily: "Inter, sans-serif",
+                    fontWeight: 400,
                     fontSize: 12, color: "#EF4444",
                     cursor: "pointer", textDecoration: "underline",
                     padding: 0,
@@ -1074,7 +1074,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
               >
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 15, color: item.color }}>{item.label}</div>
-                  <div style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{item.sublabel}</div>
+                  <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>{item.sublabel}</div>
                 </div>
                 <ChevronRight size={14} color="var(--muted)" />
               </div>

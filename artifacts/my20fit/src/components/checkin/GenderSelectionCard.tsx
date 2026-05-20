@@ -54,8 +54,8 @@ export default function GenderSelectionCard({ onConfirmed }: Props) {
 
         <div
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 400, fontStyle: "italic",
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 400,
             fontSize: 14, color: "rgba(255,255,255,0.65)",
             lineHeight: 1.5, maxWidth: 420,
             margin: "0 auto 24px",
@@ -99,7 +99,7 @@ export default function GenderSelectionCard({ onConfirmed }: Props) {
                 </div>
                 <div
                   style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900, fontSize: 10,
                     color: "rgba(255,255,255,0.5)", letterSpacing: "1.5px",
                   }}
@@ -113,8 +113,8 @@ export default function GenderSelectionCard({ onConfirmed }: Props) {
 
         <div
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 400, fontStyle: "italic",
+            fontFamily: "Inter, sans-serif",
+            fontWeight: 400,
             fontSize: 12, color: "rgba(255,255,255,0.4)",
             marginBottom: 20,
           }}

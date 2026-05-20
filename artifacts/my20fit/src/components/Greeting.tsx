@@ -104,7 +104,7 @@ export default function Greeting() {
 
       <div style={{
         fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900,
-        fontSize: 11, fontStyle: "italic",
+        fontSize: 11,
         color: "rgba(255,255,255,.35)",
         marginTop: 8, lineHeight: 1.4,
         position: "relative",
@@ -124,7 +124,7 @@ export default function Greeting() {
             padding: "5px 12px",
             fontSize: 9, letterSpacing: 1.5,
             color: chip.red ? "rgba(255,100,100,.8)" : "rgba(255,255,255,.4)",
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 900,
           }}>{chip.label}</div>
         ))}

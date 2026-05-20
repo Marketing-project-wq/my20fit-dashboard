@@ -65,9 +65,8 @@ export default function VerifyEmailPending() {
         </h1>
         <p
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 400,
-            fontStyle: "italic",
             fontSize: 15,
             color: "#6E665C",
             margin: "0 0 6px",
@@ -89,9 +88,8 @@ export default function VerifyEmailPending() {
         </p>
         <p
           style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 400,
-            fontStyle: "italic",
             fontSize: 13,
             color: "#9C948A",
             margin: "0 0 24px",
@@ -115,7 +113,7 @@ export default function VerifyEmailPending() {
           >
             <p
               style={{
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 13,
                 color: "#166534",
                 margin: 0,
@@ -135,7 +133,7 @@ export default function VerifyEmailPending() {
             background: countdown > 0 ? "#F5F1E8" : "#FFFFFF",
             border: `1.5px solid ${countdown > 0 ? "#E5E1D8" : "#0A0908"}`,
             borderRadius: 12,
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 900,
             fontSize: 14,
             letterSpacing: "1px",
@@ -162,7 +160,7 @@ export default function VerifyEmailPending() {
             background: "none",
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontSize: 13,
             color: "#6E665C",
             marginTop: 16,

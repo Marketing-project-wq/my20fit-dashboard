@@ -14,7 +14,7 @@ export default function PlusCard() {
           style={{
             backgroundColor: '#1F1F0A',
             borderRadius: '4px',
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontWeight: 900,
             fontSize: '10px',
             letterSpacing: '1.5px',
@@ -45,7 +45,7 @@ export default function PlusCard() {
               style={{
                 backgroundColor: '#1A1A0A',
                 borderRadius: '6px',
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontWeight: 900,
                 fontSize: '13px',
                 letterSpacing: '1px',
@@ -68,7 +68,7 @@ export default function PlusCard() {
               <Check size={13} strokeWidth={3} style={{ color: '#D4A800', flexShrink: 0 }} />
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontWeight: 900,
                   fontSize: '14px',
                   color: 'rgba(255,255,255,0.8)',
@@ -91,7 +91,7 @@ export default function PlusCard() {
             <p
               style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '18px', fontWeight: 400 }}
             >
-              Rp 49.000<span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', fontFamily: "'Barlow Condensed', sans-serif" }}>/mo</span>
+              Rp 49.000<span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', fontFamily: "Inter, sans-serif" }}>/mo</span>
             </p>
           </div>
           <button

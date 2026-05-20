@@ -13,7 +13,7 @@ function baseTemplate(content: string): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>20fit.id</title>
 </head>
-<body style="margin:0;padding:0;background:${bg};font-family:'Helvetica Neue',Arial,sans-serif;">
+<body style="margin:0;padding:0;background:${bg};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;font-size:14px;line-height:1.6;color:${textPrimary};-webkit-font-smoothing:antialiased;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:${bg};min-height:100vh;">
     <tr>
       <td align="center" style="padding:40px 16px;">

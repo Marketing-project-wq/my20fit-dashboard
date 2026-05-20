@@ -8,7 +8,7 @@ interface OnboardingStepGoalsProps {
 }
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontWeight: 900,
   fontSize: 11,
   letterSpacing: "1.5px",
@@ -88,9 +88,8 @@ function RadioGroup({
               {opt.sub && (
                 <div
                   style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 400,
-                    fontStyle: "italic",
                     fontSize: 12,
                     color: "#6E665C",
                     marginTop: 1,

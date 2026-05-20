@@ -339,7 +339,7 @@ export default function WeatherCard() {
           {loading ? (
             <Shimmer w={90} h={13} style={{ marginBottom: "4px" }} />
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "14px", fontWeight: 400, fontStyle: "italic", ...muted, marginBottom: "2px" }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "14px", fontWeight: 400, ...muted, marginBottom: "2px" }}>
               {error ? "—" : `${weatherIcon(weather?.conditionCode ?? 1000, weather?.isDay ?? true)} ${weather?.condition}`}
             </p>
           )}
@@ -348,7 +348,7 @@ export default function WeatherCard() {
           {loading ? (
             <Shimmer w={70} h={11} />
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "12px", color: "rgba(255,255,255,.25)" }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "rgba(255,255,255,.25)" }}>
               {error ? "" : `Feels like ${weather?.feels}°`}
             </p>
           )}
@@ -407,7 +407,7 @@ export default function WeatherCard() {
             ) : (
               <p style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "16px", fontWeight: 400, ...text, lineHeight: 1 }}>{s.val}</p>
             )}
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "11px", ...muted, marginTop: "2px" }}>{s.unit}</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "11px", ...muted, marginTop: "2px" }}>{s.unit}</p>
           </div>
         ))}
       </div>
@@ -421,7 +421,7 @@ export default function WeatherCard() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "2px", color: recTagColor, marginBottom: "2px" }}>{rec.tag}</p>
             <p style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: "15px", color: recTagColor, marginBottom: "3px", letterSpacing: "0.5px" }}>{rec.title}</p>
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", fontWeight: 400, fontStyle: "italic", color: "rgba(255,255,255,.45)", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", fontWeight: 400, color: "rgba(255,255,255,.45)", marginBottom: "8px", lineHeight: 1.4 }}>{rec.desc}</p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "5px" }}>
               {rec.pills.map(pill => (
                 <span key={pill} style={{ backgroundColor: recPillBg, color: recTagColor, fontFamily: "'Barlow Condensed', sans-serif", fontSize: "9px", letterSpacing: "1px", borderRadius: "99px", padding: "3px 8px" }}>{pill}</span>
@@ -440,7 +440,7 @@ export default function WeatherCard() {
               <Shimmer key={i} w={64} h={90} style={{ flexShrink: 0, borderRadius: "10px" }} />
             ))
           ) : error ? (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: "12px", color: "#C41101" }}>Gagal memuat data cuaca</p>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: "12px", color: "#C41101" }}>Gagal memuat data cuaca</p>
           ) : (
             (weather?.hourly ?? []).map((h, i) => {
               const isNow = h.time === currentHourLabel || (i === 0 && !(weather?.hourly ?? []).find(x => x.time === currentHourLabel));
@@ -480,7 +480,7 @@ export default function WeatherCard() {
 
       {/* ── Section 5: Timestamp ── */}
       {!loading && !error && (
-        <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "11px", ...muted, textAlign: "right", padding: "0 20px 14px" }}>
+        <p style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "11px", ...muted, textAlign: "right", padding: "0 20px 14px" }}>
           Updated {minAgo < 1 ? "just now" : `${minAgo} min ago`} · Geolocation
         </p>
       )}

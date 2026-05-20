@@ -139,6 +139,7 @@ export default function TodaysChecklist() {
       const timer = setTimeout(() => setShowConfetti(false), 3000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [allDone, showToast]);
 
   const toggleTask = (id: string) => {
@@ -169,7 +170,7 @@ export default function TodaysChecklist() {
               style={{
                 backgroundColor: "rgba(34,197,94,0.12)",
                 color: "#22C55E",
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontWeight: 900,
                 fontSize: "9px",
                 letterSpacing: "1px",
@@ -255,7 +256,7 @@ export default function TodaysChecklist() {
               {task.icon && <span className="mr-1">{task.icon}</span>}
               <span
                 style={{
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontWeight: 900,
                   fontSize: "15px",
                   color: task.done ? "var(--muted)" : "var(--text)",
@@ -267,7 +268,7 @@ export default function TodaysChecklist() {
               {task.desc && (
                 <p
                   className="truncate"
-                  style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 400, fontStyle: "italic", fontSize: "12px", color: "var(--muted)" }}
+                  style={{ fontFamily: "Inter, sans-serif", fontWeight: 400, fontSize: "12px", color: "var(--muted)" }}
                 >
                   {task.desc}
                 </p>
@@ -279,7 +280,7 @@ export default function TodaysChecklist() {
                 <span
                   key={tag}
                   style={{
-                    fontFamily: "'Barlow Condensed', sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontWeight: 900,
                     fontSize: "10px",
                     letterSpacing: "1px",

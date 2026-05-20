@@ -189,7 +189,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                 <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 30, letterSpacing: 0.5, color: "var(--text)" }}>
                   NUTRISI HARIAN
                 </div>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 14, color: "var(--muted)" }}>
+                <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 14, color: "var(--muted)" }}>
                   {new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long" })}
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                   <div style={{ fontFamily: "'Barlow Condensed'", fontSize: 12, letterSpacing: 1.5, color: "#92400E", marginBottom: 2 }}>
                     REKOMENDASI UMUM
                   </div>
-                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "#78350F", lineHeight: 1.4 }}>
+                  <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "#78350F", lineHeight: 1.4 }}>
                     Upload hasil MCU untuk rekomendasi yang lebih personal berdasarkan kondisi kesehatanmu.
                   </div>
                 </div>
@@ -263,7 +263,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
               {/* Last updated */}
               {cachedTimestamp && (
-                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 11, color: "var(--muted)", textAlign: "right" }}>
+                <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 11, color: "var(--muted)", textAlign: "right" }}>
                   Diperbarui: {new Date(cachedTimestamp).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })} · Cache berlaku 3 jam
                 </div>
               )}
@@ -273,7 +273,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                 <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 11, letterSpacing: 1.5, color: "rgba(255,255,255,.45)", marginBottom: 6 }}>
                   GOAL NUTRISI HARI INI
                 </div>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontSize: 15, fontStyle: "italic", color: "#fff", marginBottom: 20, lineHeight: 1.4 }}>
+                <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 15, color: "#fff", marginBottom: 20, lineHeight: 1.4 }}>
                   {recommendation.overall_goal}
                 </div>
 
@@ -296,7 +296,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                 </div>
 
                 {recommendation.insight && (
-                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.1)", fontFamily: "'Barlow Condensed'", fontSize: 12, color: "rgba(255,255,255,.55)", lineHeight: 1.5, fontStyle: "italic" }}>
+                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.1)", fontFamily: "'Inter'", fontSize: 12, color: "rgba(255,255,255,.55)", lineHeight: 1.5, }}>
                     💡 {recommendation.insight}
                   </div>
                 )}
@@ -323,7 +323,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                     }} />
                   </div>
 
-                  <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>
+                  <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>
                     {recommendation.hydration.reminder}
                   </div>
                 </div>
@@ -377,8 +377,8 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           {meal.suggestions.map((s, i) => (
                             <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
                               <div>
-                                <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</span>
-                                <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>{s.portion}</span>
+                                <span style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</span>
+                                <span style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "var(--muted)", marginLeft: 6 }}>{s.portion}</span>
                                 {s.tags?.map(tag => (
                                   <span key={tag} style={{ display: "inline-block", background: "rgba(196,17,1,.08)", color: "#C41101", fontFamily: "'Barlow Condensed'", fontSize: 9, letterSpacing: 1, padding: "2px 6px", borderRadius: 4, marginLeft: 6 }}>
                                     {tag}
@@ -403,7 +403,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                               <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 900, fontSize: 10, letterSpacing: 1.5, color: "#EF4444", marginBottom: 6 }}>HINDARI</div>
                               <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                                 {meal.avoid.map((a, i) => (
-                                  <span key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,.08)", color: "#EF4444", fontFamily: "'Barlow Condensed'", fontSize: 12, padding: "4px 10px", borderRadius: 99 }}>
+                                  <span key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(239,68,68,.08)", color: "#EF4444", fontFamily: "'Inter'", fontSize: 12, padding: "4px 10px", borderRadius: 99 }}>
                                     <X size={10} />{a}
                                   </span>
                                 ))}
@@ -413,7 +413,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           {meal.reason && (
                             <div style={{ marginTop: 10, background: "var(--bg)", borderRadius: 8, padding: "10px 12px", display: "flex", gap: 8 }}>
                               <Info size={14} color="var(--muted)" style={{ flexShrink: 0, marginTop: 2 }} />
-                              <span style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>{meal.reason}</span>
+                              <span style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "var(--muted)", lineHeight: 1.4 }}>{meal.reason}</span>
                             </div>
                           )}
                         </div>
@@ -437,8 +437,8 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                           <X size={14} color="#EF4444" />
                         </div>
                         <div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{item.food}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{item.reason}</div>
+                          <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{item.food}</div>
+                          <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "var(--muted)", marginTop: 2 }}>{item.reason}</div>
                         </div>
                       </div>
                     ))}
@@ -458,16 +458,16 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
                         <div>
                           <div style={{ fontFamily: "'Anton'", fontWeight: 400, fontSize: 14, color: "var(--text)" }}>{s.name}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 12, color: "var(--muted)" }}>{s.reason}</div>
+                          <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 12, color: "var(--muted)" }}>{s.reason}</div>
                         </div>
                         <div style={{ textAlign: "right", flexShrink: 0 }}>
                           <div style={{ fontFamily: "'JetBrains Mono'", fontWeight: 400, fontSize: 12, color: "#C41101" }}>{s.dose}</div>
-                          <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 11, color: "var(--muted)" }}>{s.timing}</div>
+                          <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 11, color: "var(--muted)" }}>{s.timing}</div>
                         </div>
                       </div>
                     ))}
                   </div>
-                  <div style={{ marginTop: 12, fontFamily: "'Barlow Condensed'", fontSize: 11, color: "var(--muted)", fontStyle: "italic" }}>
+                  <div style={{ marginTop: 12, fontFamily: "'Inter'", fontSize: 11, color: "var(--muted)", }}>
                     * Konsultasikan dengan dokter sebelum mengonsumsi suplemen
                   </div>
                 </div>
@@ -475,7 +475,7 @@ export default function Nutrition({ theme, toggleTheme }: { theme: string; toggl
 
               {/* Section 6: Disclaimer */}
               <div style={{ padding: "12px 16px", background: "var(--bg)", borderRadius: 10, marginBottom: 8 }}>
-                <div style={{ fontFamily: "'Barlow Condensed'", fontWeight: 400, fontStyle: "italic", fontSize: 11, color: "var(--muted)", lineHeight: 1.5, textAlign: "center" }}>
+                <div style={{ fontFamily: "'Inter'", fontWeight: 400, fontSize: 11, color: "var(--muted)", lineHeight: 1.5, textAlign: "center" }}>
                   🤖 Rekomendasi ini dibuat oleh AI berdasarkan data kesehatanmu.
                   Bukan pengganti saran dokter atau ahli gizi.
                   Selalu konsultasikan perubahan diet signifikan dengan tenaga medis.

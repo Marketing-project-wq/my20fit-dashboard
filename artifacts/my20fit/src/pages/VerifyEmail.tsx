@@ -57,9 +57,8 @@ export default function VerifyEmail() {
           />
           <p
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 400,
-              fontStyle: "italic",
               fontSize: 15,
               color: "#6E665C",
             }}
@@ -84,9 +83,8 @@ export default function VerifyEmail() {
           </h1>
           <p
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 400,
-              fontStyle: "italic",
               fontSize: 15,
               color: "#6E665C",
               margin: "0 0 28px",
@@ -131,9 +129,8 @@ export default function VerifyEmail() {
           </h1>
           <p
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 400,
-              fontStyle: "italic",
               fontSize: 15,
               color: "#6E665C",
               margin: "0 0 24px",
@@ -156,7 +153,7 @@ export default function VerifyEmail() {
                   border: "1px solid #E5E1D8",
                   borderRadius: 12,
                   padding: "12px 14px",
-                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontSize: 15,
                   color: "#0A0908",
                   outline: "none",
@@ -196,7 +193,7 @@ export default function VerifyEmail() {
               }}
             >
               <Mail size={16} style={{ color: "#16A34A", flexShrink: 0 }} />
-              <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#166534", margin: 0 }}>
+              <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#166534", margin: 0 }}>
                 New verification link sent — check your inbox.
               </p>
             </div>
@@ -208,7 +205,7 @@ export default function VerifyEmail() {
               background: "none",
               border: "none",
               cursor: "pointer",
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: 13,
               color: "#6E665C",
               marginTop: 12,

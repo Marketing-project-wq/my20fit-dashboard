@@ -16,7 +16,7 @@ const inputBase: React.CSSProperties = {
   border: "1px solid #E5E1D8",
   borderRadius: 10,
   padding: "12px 14px",
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontSize: 15,
   color: "#0A0908",
   outline: "none",
@@ -25,7 +25,7 @@ const inputBase: React.CSSProperties = {
 };
 
 const labelStyle: React.CSSProperties = {
-  fontFamily: "'Barlow Condensed', sans-serif",
+  fontFamily: "Inter, sans-serif",
   fontSize: 10,
   letterSpacing: "2px",
   color: "#6E665C",
@@ -47,7 +47,7 @@ function ErrorAlert({ msg }: { msg: string }) {
       padding: "12px 16px", display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 14,
     }}>
       <AlertCircle size={16} style={{ color: "#C41101", flexShrink: 0, marginTop: 2 }} />
-      <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#7F1D1D", margin: 0 }}>
+      <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#7F1D1D", margin: 0 }}>
         {msg}
       </p>
     </div>
@@ -141,14 +141,14 @@ export default function Login() {
 
   const redBtn: React.CSSProperties = {
     width: "100%", padding: "13px", borderRadius: 10, cursor: "pointer",
-    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, letterSpacing: "2.5px",
+    fontFamily: "Inter, sans-serif", fontSize: 14, letterSpacing: "2.5px",
     border: "none", background: "#C41101", color: "#fff",
     transition: "transform 0.2s ease, box-shadow 0.2s ease",
     opacity: loading ? 0.7 : 1,
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "'Barlow Condensed', sans-serif" }}>
+    <div style={{ minHeight: "100vh", display: "flex", fontFamily: "Inter, sans-serif" }}>
 
       {/* ── LEFT PANEL ── */}
       <motion.div
@@ -223,7 +223,7 @@ export default function Login() {
             {formState === "forgot" && (
               <motion.div key="forgot" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
                 <button onClick={() => { setFormState("normal"); setForgotSuccess(false); setError(null); }}
-                  style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#6E665C", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, marginBottom: 20 }}>
+                  style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: "#6E665C", fontFamily: "Inter, sans-serif", fontSize: 13, marginBottom: 20 }}>
                   ← Back to Sign In
                 </button>
                 <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 22, letterSpacing: "0.5px", color: "#0A0908", marginBottom: 6 }}>FORGOT PASSWORD</h2>
@@ -282,7 +282,7 @@ export default function Login() {
 
                 <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
                   <div style={{ flex: 1, height: 1, background: "#E5E1D8" }} />
-                  <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#9C948A" }}>or</span>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#9C948A" }}>or</span>
                   <div style={{ flex: 1, height: 1, background: "#E5E1D8" }} />
                 </div>
 
@@ -295,7 +295,7 @@ export default function Login() {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
                       <label style={{ ...labelStyle, marginBottom: 0 }}>PASSWORD</label>
                       <button type="button" onClick={() => { setFormState("forgot"); setForgotEmail(loginEmail); setError(null); }}
-                        style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 12, color: "#C41101" }}>
+                        style={{ background: "none", border: "none", cursor: "pointer", fontFamily: "Inter, sans-serif", fontSize: 12, color: "#C41101" }}>
                         Forgot password?
                       </button>
                     </div>
@@ -338,7 +338,7 @@ export default function Login() {
                 <p style={{ textAlign: "center", fontSize: 13, color: "#6E665C", marginTop: 16 }}>
                   Don't have an account?{" "}
                   <button type="button" onClick={() => setLocation("/register")}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, fontWeight: 600 }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "#C41101", fontFamily: "Inter, sans-serif", fontSize: 13, fontWeight: 600 }}>
                     Join free
                   </button>
                 </p>

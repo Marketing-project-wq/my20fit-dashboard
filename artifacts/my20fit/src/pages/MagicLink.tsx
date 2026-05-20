@@ -86,9 +86,8 @@ export default function MagicLink() {
       </h1>
       <p
         style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontWeight: 400,
-          fontStyle: "italic",
           fontSize: 14,
           color: "#6E665C",
           margin: "0 0 24px",
@@ -111,7 +110,7 @@ export default function MagicLink() {
           }}
         >
           <AlertCircle size={16} style={{ color: "#C41101", flexShrink: 0, marginTop: 1 }} />
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#7F1D1D", margin: 0 }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#7F1D1D", margin: 0 }}>
             {error}
           </p>
         </div>
@@ -127,7 +126,7 @@ export default function MagicLink() {
             marginBottom: 16,
           }}
         >
-          <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#92400E", margin: "0 0 8px" }}>
+          <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#92400E", margin: "0 0 8px" }}>
             Your email isn't verified yet. Verify it first to use magic link login.
           </p>
           {!resendDone ? (
@@ -137,7 +136,7 @@ export default function MagicLink() {
                 background: "none",
                 border: "none",
                 cursor: "pointer",
-                fontFamily: "'Barlow Condensed', sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontWeight: 900,
                 fontSize: 13,
                 color: "#92400E",
@@ -148,7 +147,7 @@ export default function MagicLink() {
               Resend verification email →
             </button>
           ) : (
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 13, color: "#166534", margin: 0 }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#166534", margin: 0 }}>
               Verification email sent ✓
             </p>
           )}
@@ -159,7 +158,7 @@ export default function MagicLink() {
         <div>
           <label
             style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontWeight: 900,
               fontSize: 11,
               letterSpacing: "1.5px",
@@ -185,7 +184,7 @@ export default function MagicLink() {
               border: "1px solid #E5E1D8",
               borderRadius: 12,
               padding: "12px 14px",
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: 15,
               color: "#0A0908",
               outline: "none",
@@ -232,7 +231,7 @@ export default function MagicLink() {
             background: "none",
             border: "none",
             cursor: "pointer",
-            fontFamily: "'Barlow Condensed', sans-serif",
+            fontFamily: "Inter, sans-serif",
             fontSize: 13,
             color: "#6E665C",
           }}

@@ -93,14 +93,14 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
                 <div style={{
                   width: 72, height: 72, borderRadius: "50%", background: "#C41101",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontFamily: "'Barlow Condensed', sans-serif", fontSize: 30, color: "#fff",
+                  fontFamily: "Inter, sans-serif", fontSize: 30, color: "#fff",
                   marginBottom: 14,
                 }}>
                   {firstName.slice(0, 2).toUpperCase()}
                 </div>
               )}
 
-              <h2 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", margin: 0 }}>
+              <h2 style={{ fontFamily: "Inter, sans-serif", fontSize: 28, letterSpacing: "2px", color: "#0A0908", margin: 0 }}>
                 Halo, {firstName}! 👋
               </h2>
 
@@ -134,7 +134,7 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
                     <Circle size={18} style={{ color: "#D1C9BF", flexShrink: 0 }} />
                   )}
                   <span style={{
-                    fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14,
+                    fontFamily: "Inter, sans-serif", fontSize: 14,
                     color: item.done ? "#0A0908" : "#6E665C",
                     flex: 1,
                   }}>
@@ -153,7 +153,7 @@ export default function WelcomeOverlay({ onDismiss }: WelcomeOverlayProps) {
               style={{
                 width: "100%", padding: "14px", background: "#C41101", color: "#fff",
                 border: "none", borderRadius: 10, cursor: "pointer",
-                fontFamily: "'Barlow Condensed', sans-serif", fontSize: 15, letterSpacing: "2.5px",
+                fontFamily: "Inter, sans-serif", fontSize: 15, letterSpacing: "2.5px",
                 transition: "transform 0.2s, box-shadow 0.2s",
               }}
               onMouseEnter={e => {

@@ -31,10 +31,10 @@ export default function ComingSoon({
             >
               <Construction size={32} style={{ color: 'var(--muted)' }} />
             </div>
-            <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '32px', letterSpacing: '3px', color: 'var(--text)' }}>
+            <h1 style={{ fontFamily: "Inter, sans-serif", fontSize: '32px', letterSpacing: '3px', color: 'var(--text)' }}>
               {title}
             </h1>
-            <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: '14px', color: 'var(--muted)', textAlign: 'center' }}>
+            <p style={{ fontFamily: "Inter, sans-serif", fontSize: '14px', color: 'var(--muted)', textAlign: 'center' }}>
               Halaman ini sedang dalam pengembangan.<br />Segera hadir!
             </p>
           </div>
