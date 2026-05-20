@@ -1,0 +1,86 @@
+Update status:
+- SQL trigger fix udah jalan sukses di Supabase
+- Email aluthfi916@gmail.com KONFIRMASI GAK ADA di auth.users (gue cek 
+  manual di Supabase Dashboard, cuma ada 1 user ferkerja1@gmail.com)
+- Bukan duplicate email issue
+- Tapi register dari profile.20fit.id MASIH return "Registration failed"
+
+Artinya bug terjadi di backend SEBELUM user sempat ke-create di auth.users.
+
+Lakuin debugging berikut SECARA SISTEMATIS:
+
+STEP 1 — Test endpoint /api/auth/register langsung dari Replit shell
+
+Run command ini di Replit shell:
+
+curl -v -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "fullName":"Test Debug Fresh",
+    "email":"test-fresh-20260520@example.com",
+    "phone":"+6285999888777",
+    "password":"DebugPass123"
+  }' 2>&1
+
+Capture FULL output:
+- Status code
+- Response headers
+- Response body
+- Any error message
+
+STEP 2 — Tail API server log selama curl di STEP 1 jalan
+
+Capture LOG REAL-TIME dari workflow API server. Khususnya:
+- Log entry untuk request POST /api/auth/register
+- Any error stack trace
+- Any warning
+- Any "failed" message
+
+STEP 3 — Buka kode di artifacts/api-server/src/routes/auth.ts
+
+Print KESELURUHAN endpoint POST /auth/register (atau /auth/register, mana yang 
+dipake). Khususnya bagian:
+- Call ke supabaseAdmin.auth.admin.createUser
+- Error handling-nya
+- Apa yang di-return ke client kalau error
+
+STEP 4 — Verifikasi service role key & admin API
+
+Run dari Replit shell:
+
+# Test bahwa service role key beneran punya admin permission
+curl -X GET "$SUPABASE_URL/auth/v1/admin/users" \
+  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+
+Expected: HTTP 200 dengan list users
+Kalau dapat 401/403 → service role key salah atau format-nya beda 
+(sb_secret_xxx mungkin perlu treatment beda)
+
+STEP 5 — Test createUser langsung via curl ke Supabase
+
+curl -X POST "$SUPABASE_URL/auth/v1/admin/users" \
+  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email":"test-direct-api-20260520@example.com",
+    "password":"TestPass123",
+    "email_confirm":false,
+    "user_metadata":{"full_name":"Direct API Test","phone":"+6285111222333"}
+  }'
+
+Expected: HTTP 200 dengan user object
+Kalau error → kasih tau error message detail
+
+STEP 6 — Report
+
+Kasih gue 5 hal ini secara explicit:
+1. STEP 1 output (full curl response)
+2. STEP 2 output (full server log selama request)
+3. STEP 3 output (kode register endpoint, especially createUser call)
+4. STEP 4 output (apakah service role key works)
+5. STEP 5 output (apakah createUser direct API works)
+
+Setelah lu kasih 5 hal di atas, baru kasih analisis root cause + recommendation 
+fix. JANGAN apply fix dulu sebelum gue confirm rooting cause-nya bener.
