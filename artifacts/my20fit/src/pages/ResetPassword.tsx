@@ -36,9 +36,11 @@ export default function ResetPassword() {
   return (
     <div style={{ minHeight: "100vh", background: "#F4F2EE", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
-        <h1 style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 28, letterSpacing: "3px", color: "#0A0908", marginBottom: 4 }}>
-          my<span style={{ color: "#C41101" }}>20</span>FIT
-        </h1>
+        <img
+          src="/logo-20fit.jpg"
+          alt="20fit.id"
+          style={{ height: 48, width: "auto", display: "block", marginBottom: 4 }}
+        />
         <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontSize: 14, color: "#6E665C", marginBottom: 28 }}>
           Buat password baru untuk akunmu.
         </p>

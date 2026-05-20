@@ -7,12 +7,11 @@ export default function Header({ theme, toggleTheme }: { theme: string; toggleTh
       style={{ backgroundColor: 'var(--bg)' }}
       data-testid="header"
     >
-      <h1
-        className="text-2xl"
-        style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: '1px', color: 'var(--text)' }}
-      >
-        my<span style={{ color: '#C41101' }}>20</span>FIT
-      </h1>
+      <img
+        src="/logo-20fit.jpg"
+        alt="20fit.id"
+        style={{ height: 36, width: "auto", display: "block", background: "#FFFFFF", borderRadius: 6, padding: "2px 6px" }}
+      />
 
       <button
         onClick={toggleTheme}

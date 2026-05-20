@@ -11,7 +11,7 @@ function baseTemplate(content: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>my20FIT</title>
+  <title>20fit.id</title>
 </head>
 <body style="margin:0;padding:0;background:${bg};font-family:'Helvetica Neue',Arial,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:${bg};min-height:100vh;">
@@ -22,9 +22,9 @@ function baseTemplate(content: string): string {
           <!-- Logo -->
           <tr>
             <td style="padding-bottom:24px;text-align:center;">
-              <span style="font-size:26px;font-weight:900;color:${textPrimary};letter-spacing:-0.5px;">
-                my<span style="color:${brandRed};">20</span>FIT
-              </span>
+              <img src="https://profile.20fit.id/logo-20fit.jpg" alt="20fit.id"
+                   width="120" height="auto"
+                   style="display:inline-block;max-width:120px;height:auto;border:0;outline:none;text-decoration:none;" />
             </td>
           </tr>
 
@@ -58,14 +58,14 @@ export function verificationEmailHtml(params: {
   verifyUrl: string;
 }): { html: string; text: string; subject: string } {
   const { fullName, verifyUrl } = params;
-  const subject = "Verify your email at my20FIT";
+  const subject = "Verify your email at 20fit.id";
 
   const content = `
     <h1 style="font-size:24px;font-weight:700;color:${textPrimary};margin:0 0 8px;">
       Verify your email address
     </h1>
     <p style="font-size:14px;color:${textMuted};line-height:1.6;margin:0 0 28px;">
-      Hi <strong style="color:${textPrimary};">${fullName}</strong>, welcome to my20FIT!<br>
+      Hi <strong style="color:${textPrimary};">${fullName}</strong>, welcome to 20fit.id!<br>
       Click the button below to confirm your email address and activate your account.
       This link expires in <strong>24 hours</strong>.
     </p>
@@ -87,15 +87,15 @@ export function verificationEmailHtml(params: {
 
     <hr style="border:none;border-top:1px solid ${borderSubtle};margin:28px 0;">
     <p style="font-size:12px;color:${textMuted};margin:0;">
-      If you didn't create an account at my20FIT, you can safely ignore this email.
+      If you didn't create an account at 20fit.id, you can safely ignore this email.
     </p>
   `;
 
-  const text = `Verify your email at my20FIT
+  const text = `Verify your email at 20fit.id
 
 Hi ${fullName},
 
-Welcome to my20FIT! Click the link below to verify your email address (valid for 24 hours):
+Welcome to 20fit.id! Click the link below to verify your email address (valid for 24 hours):
 
 ${verifyUrl}
 
@@ -113,7 +113,7 @@ export function magicLinkEmailHtml(params: {
   userAgent?: string;
 }): { html: string; text: string; subject: string } {
   const { email, loginUrl, ipAddress, userAgent } = params;
-  const subject = "Your my20FIT login link — valid for 15 minutes";
+  const subject = "Your 20fit.id login link — valid for 15 minutes";
 
   const fraudInfo = (ipAddress || userAgent)
     ? `<p style="font-size:12px;color:${textMuted};line-height:1.5;margin:0 0 4px;">
@@ -161,7 +161,7 @@ export function magicLinkEmailHtml(params: {
     </p>
   `;
 
-  const text = `Your my20FIT login link
+  const text = `Your 20fit.id login link
 
 Here's your one-click login link for ${email} (valid 15 minutes, single use):
 

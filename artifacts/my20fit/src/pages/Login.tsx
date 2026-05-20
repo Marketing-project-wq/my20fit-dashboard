@@ -164,9 +164,11 @@ export default function Login() {
         <div style={{ height: 3, background: "linear-gradient(90deg, #C41101, #FF4444, #C41101)", backgroundSize: "200% 100%", animation: "stripeShimmer 3s linear infinite" }} />
         <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", padding: "48px 56px" }}>
           <motion.div initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} style={{ marginBottom: 40 }}>
-            <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 34, color: "#fff", letterSpacing: "1.5px", margin: 0 }}>
-              my<span style={{ color: "#C41101" }}>20</span>FIT
-            </h1>
+            <img
+              src="/logo-20fit.jpg"
+              alt="20fit.id"
+              style={{ height: 56, width: "auto", display: "block", background: "#FFFFFF", borderRadius: 10, padding: "6px 12px" }}
+            />
             <span style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: "1.5px", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.12)", borderRadius: 20, padding: "2px 10px", display: "inline-block", marginTop: 6 }}>
               MEMBER APP
             </span>
@@ -208,9 +210,11 @@ export default function Login() {
       >
         <div style={{ width: "100%", maxWidth: 400 }}>
           <div className="lg:hidden" style={{ marginBottom: 28, textAlign: "center" }}>
-            <h1 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 30, color: "#0A0908", letterSpacing: "1px" }}>
-              my<span style={{ color: "#C41101" }}>20</span>FIT
-            </h1>
+            <img
+              src="/logo-20fit.jpg"
+              alt="20fit.id"
+              style={{ height: 48, width: "auto", display: "inline-block" }}
+            />
           </div>
 
           <AnimatePresence mode="wait">
@@ -249,7 +253,7 @@ export default function Login() {
               <motion.div key="normal" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }} transition={{ duration: 0.2 }}>
                 <p style={{ fontFamily: "'Barlow Condensed', sans-serif", fontWeight: 900, fontSize: 10, letterSpacing: "1.5px", color: "#6E665C", marginBottom: 4 }}>WELCOME BACK</p>
                 <h2 style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, fontSize: 26, letterSpacing: "0.5px", color: "#0A0908", marginBottom: 20 }}>
-                  Sign in to my20FIT.
+                  Sign in to 20fit.id.
                 </h2>
 
                 {/* Tab switcher */}

@@ -40,17 +40,16 @@ export default function AuthShell({ children, footer, maxWidth = 480 }: AuthShel
             }}
             aria-label="Go to homepage"
           >
-            <span
+            <img
+              src="/logo-20fit.jpg"
+              alt="20fit.id"
               style={{
-                fontFamily: "'Anton', sans-serif",
-                fontWeight: 400,
-                fontSize: 30,
-                color: "#0A0908",
-                letterSpacing: "1px",
+                height: 56,
+                width: "auto",
+                display: "block",
+                margin: "0 auto",
               }}
-            >
-              my<span style={{ color: "#C41101" }}>20</span>FIT
-            </span>
+            />
           </button>
         </div>
 

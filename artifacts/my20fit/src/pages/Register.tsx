@@ -133,7 +133,7 @@ export default function Register() {
           letterSpacing: "0.5px",
         }}
       >
-        Join my20FIT.
+        Join 20fit.id.
       </h1>
 
       <TabSwitcher active="register" />

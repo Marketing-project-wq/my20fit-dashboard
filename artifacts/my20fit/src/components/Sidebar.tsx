@@ -45,12 +45,19 @@ export default function Sidebar({ theme, toggleTheme }: { theme: string; toggleT
     >
       <div className="px-6 pt-8 pb-6">
         <Link href="/">
-          <h1
-            className="text-3xl cursor-pointer text-white"
-            style={{ fontFamily: "'Anton', sans-serif", fontWeight: 400, letterSpacing: '1px' }}
-          >
-            my<span style={{ color: "#C41101" }}>20</span>FIT
-          </h1>
+          <img
+            src="/logo-20fit.jpg"
+            alt="20fit.id"
+            className="cursor-pointer"
+            style={{
+              height: 40,
+              width: "auto",
+              display: "block",
+              background: "#FFFFFF",
+              borderRadius: 8,
+              padding: "4px 8px",
+            }}
+          />
         </Link>
       </div>
 

@@ -894,7 +894,7 @@ export default function Profile({ theme, toggleTheme }: { theme: string; toggleT
 
           {/* ── SECTION 9: APP INFO ── */}
           <div style={{ textAlign: "center", padding: "12px 0 8px" }}>
-            <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 14, color: "var(--muted)" }}>my20FIT</div>
+            <div style={{ fontFamily: "'Anton', sans-serif", fontSize: 14, color: "var(--muted)" }}>20fit.id</div>
             <div style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 400, fontSize: 10, color: "#C8BFB0", marginTop: 2 }}>
               v1.0.0 · © 2026 20FIT
             </div>
